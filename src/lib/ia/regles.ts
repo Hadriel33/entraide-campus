@@ -1,3 +1,5 @@
+import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES } from "@/lib/annonces/validation";
+
 // Règles déterministes autour de l'IA : nettoyage de ses réponses et filet de sécurité quand elle échoue.
 
 export type StatutModeration = "en_attente" | "ok" | "a_verifier" | "refus_probable";
@@ -74,4 +76,26 @@ ${origine.description}`)) {
   if (!proposition) return null;
   if (proposition.titre === origine.titre && proposition.description === origine.description) return null;
   return proposition;
+}
+
+// Colette rédactrice : le brouillon de l'IA passe par ces règles avant d'arriver dans le formulaire.
+// Valeurs hors liste remplacées, textes coupés, coordonnées retirées. L'étudiant relit tout avant de publier.
+export type Brouillon = { type: string; categorie: string; titre: string; description: string; contrepartie: string; quartier: string; tram: string };
+
+export function nettoyerBrouillon(b: Record<string, unknown> | null): Brouillon | null {
+  if (!b) return null;
+  const texte = (v: unknown, max: number) => retirerCoordonnees(String(v ?? "").trim().replace(/\s+/g, " ")).slice(0, max).trim();
+  const titre = texte(b.titre, 80);
+  const description = texte(b.description, 1000);
+  if (titre.length < 5 || description.length < 20) return null;
+  const dans = <T extends object>(liste: T, v: unknown, defaut: string) => (typeof v === "string" && v in liste ? v : defaut);
+  return {
+    type: dans(TYPES, b.type, "propose"),
+    categorie: dans(CATEGORIES, b.categorie, "coup_de_main"),
+    titre,
+    description,
+    contrepartie: dans(CONTREPARTIES, b.contrepartie, "a_discuter"),
+    quartier: dans(QUARTIERS, b.quartier, ""),
+    tram: typeof b.tram === "string" && (TRAMS as readonly string[]).includes(b.tram) ? b.tram : "",
+  };
 }

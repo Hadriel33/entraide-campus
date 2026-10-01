@@ -17,8 +17,9 @@ function fichiers(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = path.join(dir, e.name);
     if (e.isDirectory()) return e.name === "__tests__" ? [] : fichiers(p);
-    // opengraph-image : ImageResponse ne lit pas les variables CSS, seule exception documentée.
-    return /\.(tsx|ts)$/.test(e.name) && !e.name.startsWith("opengraph-image") ? [p] : [];
+    // Exceptions documentées : fichiers lus HORS du CSS du thème, qui ne peuvent pas utiliser ses variables.
+    // opengraph-image et apple-icon (ImageResponse), manifest (lu par le téléphone à l'installation).
+    return /\.(tsx|ts)$/.test(e.name) && !/^(opengraph-image|apple-icon|manifest)\./.test(e.name) ? [p] : [];
   });
 }
 

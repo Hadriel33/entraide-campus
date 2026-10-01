@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { validerAnnonce } from "@/lib/annonces/validation";
 import { programmerModeration } from "@/lib/ia/moderation";
+import { redigerAnnonce } from "@/lib/ia/modele";
+import type { Brouillon } from "@/lib/ia/regles";
 
 export type EtatAnnonce = {
   erreurs?: Partial<Record<string, string>>;
@@ -101,4 +103,17 @@ export async function appliquerCorrection(id: string) {
   programmerModeration(id, { titre: s.titre, description: s.description, lieu: data?.lieu ?? null });
   revalidatePath("/annonces");
   redirect(`/annonces/${id}?ok=corrigee`);
+}
+
+// IA n°3 (bonus) : Colette rédige un brouillon à partir d'une phrase. Rien n'est publié : le brouillon
+// remplit le formulaire, l'étudiant relit, corrige, puis publie lui-même (et la modération passe ensuite).
+export type EtatRedaction = { brouillon?: Brouillon; erreur?: string; idee?: string };
+
+export async function redigerAvecColette(_: EtatRedaction, formData: FormData): Promise<EtatRedaction> {
+  await clientConnecte();
+  const idee = String(formData.get("idee") ?? "").trim().slice(0, 400);
+  if (idee.length < 10) return { erreur: "Dis-en un peu plus : au moins une phrase.", idee };
+  const brouillon = await redigerAnnonce(idee);
+  if (!brouillon) return { erreur: "Colette n'a pas réussi cette fois. Tu peux remplir le formulaire à la main juste en dessous.", idee };
+  return { brouillon, idee };
 }

@@ -8,6 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
+import { TableauImpact } from "./impact";
 import { changerRole, creerClasse, modererAnnonce, supprimerAnnonceAdmin, supprimerClasse, traiterSignalement, validerClasse, validerModeration } from "./actions";
 
 export const metadata: Metadata = { title: "Admin" };
@@ -44,7 +45,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
   // Un non-admin reçoit une 404 : on ne révèle même pas que la page existe.
   if (profil.role !== "admin") notFound();
   const brutOnglet = (await searchParams).onglet;
-  const onglet = brutOnglet === "etudiants" || brutOnglet === "classes" ? brutOnglet : "moderation";
+  const onglet = brutOnglet === "etudiants" || brutOnglet === "classes" || brutOnglet === "moderation" ? brutOnglet : "impact";
 
   const [{ data: stats }, { data: signalements }, { data: annonces }, { data: etudiants }, { data: aModerer }] = await Promise.all([
     supabase.rpc("stats_admin"),
@@ -97,7 +98,8 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
 
       <nav className="inline-flex self-start rounded-ui bg-papier-fonce p-1" aria-label="Sections admin">
         {[
-          { valeur: "moderation", label: "Modération", href: "/admin" },
+          { valeur: "impact", label: "Impact", href: "/admin" },
+          { valeur: "moderation", label: "Modération", href: "/admin?onglet=moderation" },
           { valeur: "etudiants", label: "Étudiants et rôles", href: "/admin?onglet=etudiants" },
           { valeur: "classes", label: "Classes", href: "/admin?onglet=classes" },
         ].map((o) => (
@@ -112,7 +114,9 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
         ))}
       </nav>
 
-      {onglet === "moderation" ? (
+      {onglet === "impact" ? (
+        <TableauImpact supabase={supabase} />
+      ) : onglet === "moderation" ? (
         <>
           <section className="flex flex-col gap-3">
             <div>

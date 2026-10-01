@@ -1,0 +1,4 @@
+-- Tableau d'impact (01/10/2026). Transaction annulée. Attendu : « 3 tests tableau d'impact OK ».
+-- 1 un étudiant ne lit pas le tableau (42501) · 2 un admin lit des chiffres cohérents (croisement, entonnoir, 30 jours)
+-- 3 un visiteur non connecté ne peut pas l'appeler
+-- Script exécuté via le MCP Supabase.

@@ -16,7 +16,7 @@ export async function modererAnnonce(id: string, statut: "masquee" | "publiee") 
   await supabase.from("annonces").update({ statut }).eq("id", id);
   revalidatePath("/admin");
   revalidatePath("/annonces");
-  redirect("/admin");
+  redirect("/admin?onglet=moderation");
 }
 
 export async function supprimerAnnonceAdmin(id: string) {
@@ -24,14 +24,14 @@ export async function supprimerAnnonceAdmin(id: string) {
   await supabase.from("annonces").delete().eq("id", id);
   revalidatePath("/admin");
   revalidatePath("/annonces");
-  redirect("/admin");
+  redirect("/admin?onglet=moderation");
 }
 
 export async function traiterSignalement(id: string) {
   const { supabase } = await exigerAdmin();
   await supabase.from("signalements").update({ statut: "traite" }).eq("id", id);
   revalidatePath("/admin");
-  redirect("/admin");
+  redirect("/admin?onglet=moderation");
 }
 
 export async function changerRole(cible: string, role: "admin" | "etudiant") {

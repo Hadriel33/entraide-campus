@@ -21,13 +21,15 @@ Sam est photographe (ESP), Léa organise le gala de son asso (ESD).
 ## Les 2 IA (avec Colette, la mascotte)
 - **IA n°1, le profil depuis le CV** : le PDF est lu par l'IA puis oublié (jamais stocké), l'étudiant garde ou retire chaque compétence.
 - **IA n°2, la relecture des annonces** (inventée) : ok, à vérifier ou refus probable. Quand c'est réparable (numéro collé dans le texte, ton agressif), **Colette propose une version corrigée** que l'auteur applique ou non. Un admin garde le dernier mot.
+- **Mesurée** sur 40 annonces annotées à la main (`npm run eval:ia`) : 94 % de bonnes décisions, 10 arnaques sur 10 bloquées, aucune annonce normale freinée. Rapport : [docs/ia/evaluation-moderation.md](docs/ia/evaluation-moderation.md).
+- **Bonus, Colette rédactrice** : une phrase, et elle remplit l'annonce ; l'étudiant relit avant de publier.
 - Aucune clé d'API : Vercel AI Gateway (jeton OIDC), modèle Gemini 2.5 Flash. Défense complète : [docs/IA-DEFENSE.md](docs/IA-DEFENSE.md).
 
 ## La sécurité
 Les 3 règles d'or (coordonnées après accord, mes annonces seulement, conversation à deux) sont garanties **en base** : RLS, triggers, droits par colonne. **84 vérifications SQL** rejouables dans `supabase/tests/`, toutes bloquées. Failles trouvées, corrigées et testées : [docs/securite/FAILLES.md](docs/securite/FAILLES.md).
 
 ## Et pour donner envie de revenir
-Mon bureau (ce qui t'attend, punaisé), le mur en direct à projeter, la vraie carte de Bordeaux par quartier, le classement des étudiants, des classes et ESD contre ESP, les badges, le défi de la semaine, la garde-robe de Colette à débloquer, le fil du campus (avec l'accord des deux), le mode tableau noir, les notifications en direct.
+Mon bureau (ce qui t'attend, punaisé), le tableau d'impact de l'admin (entonnoir, croisement ESD × ESP, offre et demande), l'appli installable sur le téléphone, le mur en direct à projeter, la vraie carte de Bordeaux par quartier, le classement des étudiants, des classes et ESD contre ESP, les badges, le défi de la semaine, la garde-robe de Colette à débloquer, le fil du campus (avec l'accord des deux), le mode tableau noir, les notifications en direct.
 
 ## Stack
 Next.js 16 · Supabase (Postgres, Auth, Storage, Realtime, pg_cron) · Vercel (+ AI Gateway) · Tailwind CSS 4 · Vitest · GitHub Actions. Aucune librairie d'interface ni de carte : tout est dans `src/`.
@@ -39,7 +41,7 @@ Next.js 16 · Supabase (Postgres, Auth, Storage, Realtime, pg_cron) · Vercel (+
 - Recette à deux comptes : [docs/RECETTE.md](docs/RECETTE.md) · Démo de 3 minutes : [docs/DEMO.md](docs/DEMO.md)
 
 ## En chiffres
-21 migrations SQL · 84 vérifications de sécurité en base · 108 tests Vitest · CI à chaque push (lint, tests, build, typage, recherche de clés).
+22 migrations SQL · 87 vérifications de sécurité en base · une simulation de campus (25 contrôles) · 112 tests Vitest · CI à chaque push (lint, tests, build, typage, recherche de clés).
 
 ## Lancer en local
 ```bash

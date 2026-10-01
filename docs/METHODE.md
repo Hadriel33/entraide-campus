@@ -88,6 +88,8 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Vraie carte sans librairie de carte : on calcule nous-mêmes les tuiles OpenStreetMap | Pas de dépendance à ajouter (règle du projet), pas de clé d'API, 30 lignes testées. Attribution OpenStreetMap affichée comme l'exige la licence. |
 | 01/10 | IA n°2 v2 : proposer une correction plutôt que refuser | Relu avec les critères du cours (besoin, humain qui valide, plan B) : la correction aide l'auteur, et une règle fixe la remplace si l'IA se trompe ou tombe. |
 | 01/10 | Gel des fonctionnalités, priorité à ce qui est noté | Le brief note la méthode (30 %), l'IA (25 %) et un parcours qui tourne en direct : on prépare la recette, la démo et la défense plutôt qu'une 15e fonctionnalité. |
+| 01/10 | Mesurer l'IA sur un jeu annoté à la main avant de la défendre | Tout le monde utilisera l'IA : la différence, c'est de prouver qu'elle marche. 40 annonces écrites et annotées AVANT de lancer la mesure, pour ne pas ajuster les réponses au résultat. |
+| 01/10 | Comptes de démo créés par Hadriel via un script SQL, pas par l'IA | Créer des comptes n'est pas le rôle de l'IA ; le script est vérifié à blanc, effaçable en une requête, et ses comptes n'ont pas de mot de passe. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
@@ -107,3 +109,4 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | La copie locale de padel-snipe n'était pas à jour (22 commits de retard) | Lecture directe de la version GitHub (`origin/main`), sans toucher à la branche locale. |
 | 01/10 | L'effet de survol des cartes ne marchait pas : l'animation d'apparition gardait `transform: none` | Animation passée sur la propriété CSS `translate`, le survol garde `transform`. Repéré en vérifiant le rendu en local. |
 | 01/10 | Les tuiles CARTO affichaient « API key required » | Passage aux tuiles OpenStreetMap officielles, gratuites avec attribution ; couleurs adoucies par un filtre CSS. |
+| 01/10 | La mesure de l'IA donnait 35 % au premier essai | 26 pannes (limite de 5 appels simultanés de l'offre gratuite) comptées comme des erreurs. Pannes comptées à part, appels espacés et délai maximal : 94 %. La limite elle-même est notée comme un risque pour le lancement. |

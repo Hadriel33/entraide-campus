@@ -3,7 +3,9 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { PROMPT_COMPETENCES } from "./prompts/competences";
 import { PROMPT_MODERATION } from "./prompts/moderation";
-import { nettoyerCompetences, type ReponseModeration } from "./regles";
+import { PROMPT_REDACTION } from "./prompts/redaction";
+import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS } from "@/lib/annonces/validation";
+import { nettoyerBrouillon, nettoyerCompetences, type Brouillon, type ReponseModeration } from "./regles";
 
 // Modèle servi par Vercel AI Gateway. Authentification automatique par le jeton OIDC du projet :
 // aucune clé d'API dans le code ni dans les variables. Gratuit sur l'offre de base (choix de Hadriel).
@@ -55,6 +57,38 @@ export async function modererAnnonce(annonce: { titre: string; description: stri
     return output;
   } catch (erreur) {
     console.error("IA modération indisponible", erreur);
+    return null;
+  }
+}
+
+// IA n°3 (bonus) : Colette rédige l'annonce à partir d'une phrase. Renvoie null si l'IA est indisponible.
+export async function redigerAnnonce(idee: string): Promise<Brouillon | null> {
+  const cles = <T extends object>(o: T) => Object.keys(o) as [string, ...string[]];
+  try {
+    const { output } = await generateText({
+      model: MODELE,
+      system: PROMPT_REDACTION,
+      output: Output.object({
+        schema: z.object({
+          type: z.enum(["propose", "cherche"]),
+          categorie: z.enum(cles(CATEGORIES)),
+          titre: z.string(),
+          description: z.string(),
+          contrepartie: z.enum(cles(CONTREPARTIES)),
+          quartier: z.enum(cles(QUARTIERS)).nullable(),
+          tram: z.enum([...TRAMS] as [string, ...string[]]).nullable(),
+        }),
+      }),
+      prompt: `Catégories possibles : ${Object.entries(CATEGORIES).map(([k, v]) => `${k} (${v})`).join(", ")}.
+<idee>
+${idee}
+</idee>`,
+      abortSignal: AbortSignal.timeout(15_000),
+      maxRetries: 1,
+    });
+    return nettoyerBrouillon(output);
+  } catch (erreur) {
+    console.error("IA rédaction indisponible", erreur);
     return null;
   }
 }

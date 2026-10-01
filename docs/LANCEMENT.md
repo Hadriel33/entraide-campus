@@ -30,3 +30,10 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 - [ ] Gel du code le **10 décembre** : ensuite, seulement des corrections de bugs trouvés en recette (le cours : ne plus toucher au code la veille)
 - [ ] Démo de 3 minutes répétée 3 fois, chronométrée, depuis un autre ordinateur (`docs/DEMO.md`)
 - [ ] Failles trouvées le 26 novembre ajoutées et corrigées dans `docs/securite/FAILLES.md`
+
+## Campus de démo
+- [ ] Lancer `supabase/demo/campus-demo.sql` dans Supabase › SQL Editor (16 étudiants, 21 annonces, 9 entraides, sans mot de passe)
+- [ ] Avant l'ouverture au vrai campus : lancer `supabase/demo/nettoyage-demo.sql`
+
+## Risque repéré par la mesure de l'IA
+- [ ] L'offre gratuite de la passerelle IA accepte 5 appels simultanés. Pour l'ouverture au campus : passer sur une offre payante, ou accepter que certaines annonces attendent l'admin aux heures de pointe.

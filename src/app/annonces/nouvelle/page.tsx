@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FormulaireAnnonce } from "@/components/annonces/formulaire-annonce";
+import { AssistantRedaction } from "@/components/annonces/assistant-redaction";
 import { TitrePage } from "@/components/ui/titre-page";
 import { creerAnnonce } from "../actions";
 import { TYPES } from "@/lib/annonces/validation";
@@ -16,7 +16,7 @@ export default async function PageNouvelleAnnonce({ searchParams }: PageProps<"/
       <TitrePage accroche="Ce que tu sais faire, ou ce dont tu as besoin. Ton annonce est visible par les étudiants connectés.">
         Publier une annonce
       </TitrePage>
-      <FormulaireAnnonce action={creerAnnonce} libelle="Publier l'annonce" annulerVers="/annonces" initial={initial} />
+      <AssistantRedaction action={creerAnnonce} initial={initial} />
     </div>
   );
 }
