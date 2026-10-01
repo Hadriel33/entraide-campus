@@ -14,14 +14,18 @@ export function programmerModeration(id: string, annonce: Texte) {
     const serveur = clientServeur();
     if (!serveur) return; // pas de clé secrète : l'annonce reste « en attente », l'admin la verra
     const ia = await modererAnnonce(annonce);
-    const decision = deciderModeration(ia, `${annonce.titre}\n${annonce.description}\n${annonce.lieu ?? ""}`);
+    const decision = deciderModeration(
+      ia,
+      `${annonce.titre}\n${annonce.description}\n${annonce.lieu ?? ""}`,
+    );
     const suggestion = proposerCorrection(ia, annonce, decision.statut);
     if (decision.statut === "en_attente" && !suggestion) return;
 
     const { error } = await serveur
       .from("annonces")
       .update({
-        moderation: decision.statut === "en_attente" ? "a_verifier" : decision.statut,
+        moderation:
+          decision.statut === "en_attente" ? "a_verifier" : decision.statut,
         moderation_raisons: decision.raisons,
         moderation_suggestion: suggestion,
         modere_le: new Date().toISOString(),

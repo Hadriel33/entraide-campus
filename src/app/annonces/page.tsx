@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { niveauMatch, suggerer } from "@/lib/matching/suggestions";
+import { matcherAnnonces } from "@/lib/ia/modele";
+import { Colette } from "@/components/colette/colette";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { normaliserRecherche } from "@/lib/annonces/recherche";
 import {
@@ -35,6 +37,7 @@ type Filtres = {
   tri?: string;
   page?: string;
   vue?: string;
+  colette?: string;
 };
 
 const PAR_PAGE = 30;
@@ -53,6 +56,7 @@ function lienFiltre(actuels: Filtres, change: Filtres) {
     "tri",
     "page",
     "vue",
+    "colette",
   ] as const)
     if (f[cle]) p.set(cle, f[cle]!);
   const q = p.toString();
@@ -96,6 +100,7 @@ export default async function PageAnnonces({
     tri:
       brut.tri === "bientot" || brut.tri === "pour_moi" ? brut.tri : undefined,
     vue: brut.vue === "liste" ? "liste" : undefined,
+    colette: brut.colette === "1" && brut.tri === "pour_moi" ? "1" : undefined,
     page: brut.page && /^[2-5]$/.test(brut.page) ? brut.page : undefined,
   };
   const pourMoi = filtres.tri === "pour_moi";
@@ -175,6 +180,7 @@ export default async function PageAnnonces({
   let pourToi: ReturnType<typeof suggerer<Annonce>> = [];
   let etatAccueil = null;
   let matchs = new Map<string, { niveau: string; raisons: string[] }>();
+  let coletteOk: boolean | null = null; // null : pas demandé ; false : IA indisponible
   let profilMatch: { competences: string[]; categories: string[] } | null =
     null;
   if ((sansFiltre || pourMoi) && user && profil) {
@@ -209,6 +215,49 @@ export default async function PageAnnonces({
           { niveau: niveauMatch(c.score), raisons: c.raisons },
         ]),
       );
+      // IA n°3, à la demande : Colette relit les 40 annonces les plus récentes et comprend le sens
+      // (« Premiere Pro » = « monter une vidéo »). Indisponible : on garde le classement par règles ci-dessus.
+      if (filtres.colette) {
+        const lot = autres.slice(0, 40);
+        const ia = await matcherAnnonces(
+          {
+            competences: moi.competences,
+            propose: moi.categoriesProposees.map((c) => CATEGORIES[c]),
+            cherche: moi.categoriesCherchees.map((c) => CATEGORIES[c]),
+          },
+          lot.map((a) => ({
+            id: a.id,
+            type: a.type,
+            categorie: a.categorie,
+            titre: a.titre,
+            description: a.description,
+          })),
+        );
+        coletteOk = ia !== null;
+        if (ia) {
+          const regles = new Map(classees.map((c) => [c.annonce.id, c.score]));
+          const note = (id: string) => ia.get(id)?.pertinence ?? 0;
+          annonces = lot
+            .filter((a) => note(a.id) >= 2)
+            .sort(
+              (a, b) =>
+                note(b.id) - note(a.id) ||
+                (regles.get(b.id) ?? 0) - (regles.get(a.id) ?? 0),
+            );
+          matchs = new Map(
+            annonces.map((a) => [
+              a.id,
+              {
+                niveau:
+                  note(a.id) === 3
+                    ? "Colette : parfait pour toi"
+                    : "Colette : ça peut coller",
+                raisons: [ia.get(a.id)?.raison ?? ""].filter(Boolean),
+              },
+            ]),
+          );
+        }
+      }
       profilMatch = {
         competences: moi.competences,
         categories: [
@@ -610,6 +659,40 @@ export default async function PageAnnonces({
               : "ajouter mon CV"}
           </Link>
         </p>
+      )}
+
+      {/* IA n°3 : Colette comprend le sens, au-delà des mots exacts. Appel seulement à la demande. */}
+      {pourMoi && profilMatch && (
+        <div className="flex flex-wrap items-center gap-3 rounded-carte border border-encre bg-surface p-3 shadow-[3px_3px_0_0_var(--color-lilas)]">
+          <Colette
+            anim={coletteOk ? "saute" : "reflechit"}
+            taille={56}
+            saison={false}
+            className="shrink-0"
+          />
+          <p className="min-w-56 flex-1 text-sm leading-snug">
+            {coletteOk === true
+              ? "Colette a relu les 40 dernières annonces et garde celles qui te vont vraiment, même écrites avec d'autres mots."
+              : coletteOk === false
+                ? "Colette est indisponible pour l'instant : voici le classement simple, par mots et catégories."
+                : "Le classement simple compare les mots exacts. Colette, elle, comprend le sens : « Premiere Pro » colle à « monter une vidéo »."}
+          </p>
+          {coletteOk ? (
+            <Link
+              href={lienFiltre(filtres, { colette: undefined })}
+              className="text-sm font-semibold text-encre-douce hover:text-encre"
+            >
+              Revenir au classement simple
+            </Link>
+          ) : (
+            <BoutonLien
+              href={lienFiltre(filtres, { colette: "1" })}
+              variante="contour"
+            >
+              {coletteOk === false ? "Réessayer" : "Demander à Colette"}
+            </BoutonLien>
+          )}
+        </div>
       )}
 
       {recherche && (

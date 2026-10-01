@@ -4,26 +4,56 @@ import { z } from "zod";
 import { PROMPT_COMPETENCES } from "./prompts/competences";
 import { PROMPT_MODERATION } from "./prompts/moderation";
 import { PROMPT_REDACTION } from "./prompts/redaction";
-import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS } from "@/lib/annonces/validation";
-import { nettoyerBrouillon, nettoyerCompetences, type Brouillon, type ReponseModeration } from "./regles";
+import {
+  PROMPT_MATCHING,
+  promptMatching,
+  type AnnonceMatching,
+  type ProfilMatching,
+} from "./prompts/matching";
+import {
+  CATEGORIES,
+  CONTREPARTIES,
+  QUARTIERS,
+  TRAMS,
+} from "@/lib/annonces/validation";
+import {
+  nettoyerBrouillon,
+  nettoyerCompetences,
+  nettoyerMatchs,
+  type Brouillon,
+  type Match,
+  type ReponseModeration,
+} from "./regles";
 
 // Modèle servi par Vercel AI Gateway. Authentification automatique par le jeton OIDC du projet :
 // aucune clé d'API dans le code ni dans les variables. Gratuit sur l'offre de base (choix de Hadriel).
 const MODELE = "google/gemini-2.5-flash";
 
 // IA n°1 : compétences depuis un CV (PDF). Renvoie null si l'IA est indisponible ou trop lente.
-export async function extraireCompetences(pdf: Uint8Array): Promise<string[] | null> {
+export async function extraireCompetences(
+  pdf: Uint8Array,
+): Promise<string[] | null> {
   try {
     const { output } = await generateText({
       model: MODELE,
       system: PROMPT_COMPETENCES,
-      output: Output.object({ schema: z.object({ competences: z.array(z.string()).max(30) }) }),
+      output: Output.object({
+        schema: z.object({ competences: z.array(z.string()).max(30) }),
+      }),
       messages: [
         {
           role: "user",
           content: [
-            { type: "file", mediaType: "application/pdf", data: pdf, filename: "cv.pdf" },
-            { type: "text", text: "Voici mon CV. Quelles compétences puis-je proposer aux autres étudiants ?" },
+            {
+              type: "file",
+              mediaType: "application/pdf",
+              data: pdf,
+              filename: "cv.pdf",
+            },
+            {
+              type: "text",
+              text: "Voici mon CV. Quelles compétences puis-je proposer aux autres étudiants ?",
+            },
           ],
         },
       ],
@@ -38,7 +68,11 @@ export async function extraireCompetences(pdf: Uint8Array): Promise<string[] | n
 }
 
 // IA n°2 : modération d'une annonce. Renvoie null si l'IA est indisponible (l'annonce reste « en attente »).
-export async function modererAnnonce(annonce: { titre: string; description: string; lieu: string | null }): Promise<ReponseModeration | null> {
+export async function modererAnnonce(annonce: {
+  titre: string;
+  description: string;
+  lieu: string | null;
+}): Promise<ReponseModeration | null> {
   try {
     const { output } = await generateText({
       model: MODELE,
@@ -47,7 +81,9 @@ export async function modererAnnonce(annonce: { titre: string; description: stri
         schema: z.object({
           statut: z.enum(["ok", "a_verifier", "refus_probable"]),
           raisons: z.array(z.string()).max(5),
-          suggestion: z.object({ titre: z.string(), description: z.string() }).nullable(),
+          suggestion: z
+            .object({ titre: z.string(), description: z.string() })
+            .nullable(),
         }),
       }),
       prompt: `<annonce>\nTitre : ${annonce.titre}\nDescription : ${annonce.description}\nLieu : ${annonce.lieu ?? "non précisé"}\n</annonce>`,
@@ -61,9 +97,10 @@ export async function modererAnnonce(annonce: { titre: string; description: stri
   }
 }
 
-// IA n°3 (bonus) : Colette rédige l'annonce à partir d'une phrase. Renvoie null si l'IA est indisponible.
+// Bonus : Colette rédige l'annonce à partir d'une phrase. Renvoie null si l'IA est indisponible.
 export async function redigerAnnonce(idee: string): Promise<Brouillon | null> {
-  const cles = <T extends object>(o: T) => Object.keys(o) as [string, ...string[]];
+  const cles = <T extends object>(o: T) =>
+    Object.keys(o) as [string, ...string[]];
   try {
     const { output } = await generateText({
       model: MODELE,
@@ -79,7 +116,9 @@ export async function redigerAnnonce(idee: string): Promise<Brouillon | null> {
           tram: z.enum([...TRAMS] as [string, ...string[]]).nullable(),
         }),
       }),
-      prompt: `Catégories possibles : ${Object.entries(CATEGORIES).map(([k, v]) => `${k} (${v})`).join(", ")}.
+      prompt: `Catégories possibles : ${Object.entries(CATEGORIES)
+        .map(([k, v]) => `${k} (${v})`)
+        .join(", ")}.
 <idee>
 ${idee}
 </idee>`,
@@ -89,6 +128,45 @@ ${idee}
     return nettoyerBrouillon(output);
   } catch (erreur) {
     console.error("IA rédaction indisponible", erreur);
+    return null;
+  }
+}
+
+// IA n°3 : Colette classe le mur « pour moi » en comprenant le sens. Seuls les compétences et les catégories
+// de l'étudiant partent vers le modèle (ni nom, ni CV), avec le texte public des annonces.
+// Renvoie null si l'IA est indisponible : l'appli garde alors le classement par règles.
+export async function matcherAnnonces(
+  profil: ProfilMatching,
+  annonces: AnnonceMatching[],
+): Promise<Map<string, Match> | null> {
+  if (annonces.length === 0) return new Map();
+  try {
+    const { output } = await generateText({
+      model: MODELE,
+      system: PROMPT_MATCHING,
+      output: Output.object({
+        schema: z.object({
+          resultats: z
+            .array(
+              z.object({
+                id: z.string(),
+                pertinence: z.number(),
+                raison: z.string(),
+              }),
+            )
+            .max(80),
+        }),
+      }),
+      prompt: promptMatching(profil, annonces),
+      abortSignal: AbortSignal.timeout(20_000),
+      maxRetries: 1,
+    });
+    return nettoyerMatchs(
+      output.resultats,
+      annonces.map((a) => a.id),
+    );
+  } catch (erreur) {
+    console.error("IA matching indisponible", erreur);
     return null;
   }
 }

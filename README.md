@@ -18,10 +18,11 @@ Sam est photographe (ESP), Léa organise le gala de son asso (ESD).
 - **Palier 2, ça discute** : discussion en direct entre les deux personnes, après acceptation.
 - **Palier 3, ça matche** : suggestions « Pour toi » expliquées (compétences et catégories).
 
-## Les 2 IA (avec Colette, la mascotte)
+## Les 3 IA (avec Colette, la mascotte)
 - **IA n°1, le profil depuis le CV** : le PDF est lu par l'IA puis oublié (jamais stocké), l'étudiant garde ou retire chaque compétence.
 - **IA n°2, la relecture des annonces** (inventée) : ok, à vérifier ou refus probable. Quand c'est réparable (numéro collé dans le texte, ton agressif), **Colette propose une version corrigée** que l'auteur applique ou non. Un admin garde le dernier mot.
 - **Mesurée** sur 40 annonces annotées à la main (`npm run eval:ia`) : 94 % de bonnes décisions, 10 arnaques sur 10 bloquées, aucune annonce normale freinée. Rapport : [docs/ia/evaluation-moderation.md](docs/ia/evaluation-moderation.md).
+- **IA n°3, le « Pour moi » intelligent** (inventée) : Colette classe le mur d'après tes compétences en comprenant le sens (« Power BI » colle à « tableau de bord »). Mesurée : 97 % contre 73 % pour les règles. Rapport : [docs/ia/evaluation-matching.md](docs/ia/evaluation-matching.md).
 - **Bonus, Colette rédactrice** : une phrase, et elle remplit l'annonce ; l'étudiant relit avant de publier.
 - Aucune clé d'API : Vercel AI Gateway (jeton OIDC), modèle Gemini 2.5 Flash. Défense complète : [docs/IA-DEFENSE.md](docs/IA-DEFENSE.md).
 

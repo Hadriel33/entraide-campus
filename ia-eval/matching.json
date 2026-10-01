@@ -1,0 +1,56 @@
+[
+  {
+    "profil": "Monteuse vidéo (ESP)",
+    "competences": ["Premiere Pro", "After Effects", "Tournage", "Étalonnage"],
+    "propose": ["video"],
+    "cherche": ["dev"],
+    "annonces": [
+      { "id": "a1", "type": "cherche", "categorie": "video", "titre": "Quelqu'un pour monter notre aftermovie", "description": "On a deux heures de rushes du gala, il nous faut un clip d'une minute pour Instagram.", "pertinent": true },
+      { "id": "a2", "type": "cherche", "categorie": "design", "titre": "Animer le logo de notre asso", "description": "On voudrait une petite animation de notre logo, cinq secondes, pour nos stories.", "pertinent": true },
+      { "id": "a3", "type": "cherche", "categorie": "coup_de_main", "titre": "Montage d'une armoire IKEA", "description": "Samedi matin, il me faut deux bras et un tournevis pour monter une armoire.", "pertinent": false },
+      { "id": "a4", "type": "propose", "categorie": "dev", "titre": "Je t'aide à mettre ton portfolio en ligne", "description": "Webflow ou Next.js, on met ton site en ligne ensemble avec un vrai nom de domaine.", "pertinent": true },
+      { "id": "a5", "type": "cherche", "categorie": "photo", "titre": "Photographe pour notre soirée", "description": "Soirée de cent personnes, il nous faut quelqu'un pour faire des photos pendant deux heures.", "pertinent": false },
+      { "id": "a6", "type": "cherche", "categorie": "video", "titre": "Filmer un tournoi de foot", "description": "On organise un tournoi inter-écoles et on voudrait filmer les matchs pour un résumé.", "pertinent": true },
+      { "id": "a7", "type": "propose", "categorie": "video", "titre": "Je monte tes vidéos YouTube", "description": "Je monte tes rushes avec sous-titres et habillage, rendu sous une semaine.", "pertinent": false },
+      { "id": "a8", "type": "cherche", "categorie": "redaction", "titre": "Sous-titres pour une vidéo de présentation", "description": "Il faut écrire et caler les sous-titres d'une vidéo de deux minutes pour le forum des assos.", "pertinent": true },
+      { "id": "a9", "type": "cherche", "categorie": "ux_ui", "titre": "Avis sur ma maquette Figma", "description": "Quinze minutes pour regarder mon prototype et me dire ce qui bloque.", "pertinent": false },
+      { "id": "a10", "type": "cherche", "categorie": "coloc", "titre": "Je cherche une coloc pour janvier", "description": "Budget 450 euros, proche du tram, je suis calme et je cuisine bien.", "pertinent": false }
+    ]
+  },
+  {
+    "profil": "Dev data (ESD)",
+    "competences": ["Python", "Power BI", "SQL", "Next.js"],
+    "propose": ["data_ia", "dev"],
+    "cherche": ["video"],
+    "annonces": [
+      { "id": "b1", "type": "cherche", "categorie": "data_ia", "titre": "Aide Python pour mon mémoire", "description": "Je dois nettoyer un jeu de données et faire quelques graphiques propres.", "pertinent": true },
+      { "id": "b2", "type": "cherche", "categorie": "coup_de_main", "titre": "Suivre les adhérents de notre asso", "description": "On note tout dans un Excel illisible, on voudrait un tableau de bord clair pour suivre les inscriptions.", "pertinent": true },
+      { "id": "b3", "type": "cherche", "categorie": "coup_de_main", "titre": "Nourrir mon python en août", "description": "Mon serpent, un python royal, doit être nourri une fois par semaine pendant mes vacances.", "pertinent": false },
+      { "id": "b4", "type": "propose", "categorie": "video", "titre": "Montage de tes vidéos", "description": "Je monte tes vidéos pour les réseaux, format vertical, musique libre de droits.", "pertinent": true },
+      { "id": "b5", "type": "cherche", "categorie": "dev", "titre": "Mon site WordPress plante", "description": "Depuis une mise à jour, la page d'accueil affiche une erreur. Une heure de ton temps me sauverait.", "pertinent": true },
+      { "id": "b6", "type": "cherche", "categorie": "design", "titre": "Logo pour mon asso", "description": "Je lance une asso étudiante et je cherche quelqu'un qui aime les identités visuelles.", "pertinent": false },
+      { "id": "b7", "type": "cherche", "categorie": "coup_de_main", "titre": "Organiser les commandes de ma boutique", "description": "Ma petite boutique en ligne grandit, je dois ranger mes commandes et mes clients dans une vraie base de données.", "pertinent": true },
+      { "id": "b8", "type": "propose", "categorie": "data_ia", "titre": "Je t'explique Excel", "description": "Tableaux croisés et formules : une heure pour être à l'aise sur Excel.", "pertinent": false },
+      { "id": "b9", "type": "cherche", "categorie": "photo", "titre": "Shooting pour ma marque", "description": "Je lance une marque de bijoux et il me faut des photos produits.", "pertinent": false },
+      { "id": "b10", "type": "cherche", "categorie": "covoiturage", "titre": "Covoit le jeudi soir", "description": "Je finis à 19 h le jeudi, je cherche quelqu'un qui rentre vers Pessac.", "pertinent": false }
+    ]
+  },
+  {
+    "profil": "Designer UX (ESP)",
+    "competences": ["Figma", "Illustrator", "Typographie", "Tests utilisateurs"],
+    "propose": ["ux_ui", "design"],
+    "cherche": ["coloc"],
+    "annonces": [
+      { "id": "c1", "type": "cherche", "categorie": "ux_ui", "titre": "Avis UX sur mon appli", "description": "Quinze minutes pour tester mon prototype et me dire ce qui bloque.", "pertinent": true },
+      { "id": "c2", "type": "cherche", "categorie": "dev", "titre": "Des écrans propres avant de coder", "description": "Je dois coder une appli mais il me faut d'abord des maquettes des écrans principaux.", "pertinent": true },
+      { "id": "c3", "type": "cherche", "categorie": "design", "titre": "Affiche pour notre gala", "description": "Une affiche A3 et ses déclinaisons pour les réseaux.", "pertinent": true },
+      { "id": "c4", "type": "propose", "categorie": "coloc", "titre": "Chambre libre dans notre coloc", "description": "Une chambre se libère dans un T4 à dix minutes du campus.", "pertinent": true },
+      { "id": "c5", "type": "cherche", "categorie": "redaction", "titre": "Choisir une police pour mon CV", "description": "Mon CV fait amateur, j'aimerais des conseils sur les polices et la mise en page.", "pertinent": true },
+      { "id": "c6", "type": "propose", "categorie": "ux_ui", "titre": "Atelier Figma pour débutants", "description": "Une heure pour apprendre les composants et le prototypage.", "pertinent": false },
+      { "id": "c7", "type": "cherche", "categorie": "data_ia", "titre": "Aide Python", "description": "Je bloque sur un script pour mon cours de data.", "pertinent": false },
+      { "id": "c8", "type": "cherche", "categorie": "video", "titre": "Monteur pour un clip", "description": "Un clip d'une minute pour un projet musical, tournage sur une journée.", "pertinent": false },
+      { "id": "c9", "type": "cherche", "categorie": "materiel", "titre": "Je cherche un vélo", "description": "Pour aller au campus, je peux l'emprunter un mois.", "pertinent": false },
+      { "id": "c10", "type": "cherche", "categorie": "binome", "titre": "Tester notre prototype avec de vrais étudiants", "description": "Il nous faut quelqu'un pour organiser des sessions de test auprès d'utilisateurs.", "pertinent": true }
+    ]
+  }
+]
