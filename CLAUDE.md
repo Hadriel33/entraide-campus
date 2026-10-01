@@ -37,6 +37,7 @@
 - Après chaque étape : explique ce que tu as changé et pourquoi, puis commit et push. Le déploiement Vercel suit tout seul.
 - Après 2 essais ratés, on revient à la dernière version qui marchait et on reformule.
 - Les prompts des fonctionnalités IA sont rangés dans `src/lib/ai/prompts/` pour être relus et améliorés.
+- **Documenter en continu (servira à la présentation)** : après chaque étape, ajouter une ligne dans `docs/JOURNAL.md`. Chaque décision structurante va dans le tableau « Décisions » de `docs/METHODE.md`, chaque problème et son contournement dans « Ce qui n'a pas marché ». On ne réécrit pas l'historique, on ajoute.
 
 ## Skills du projet (`.claude/skills/`)
 - `nouvelle-etape` : la méthode du cours, à suivre pour chaque nouvelle fonctionnalité.
