@@ -152,6 +152,9 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
                 <Badge variante="ok">Acceptée</Badge> Tu peux contacter {prenom} :
               </p>
               <BlocCoordonnees c={coordonnees} prenom={prenom} />
+              <BoutonLien href={`/demandes/${demande.id}`} className="self-start">
+                Discuter avec {prenom}
+              </BoutonLien>
               {!monAvis && <FormulaireAvis demandeId={demande.id} retour={`/annonces/${annonce.id}`} prenom={prenom} />}
             </div>
           )}

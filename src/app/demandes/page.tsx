@@ -4,7 +4,7 @@ import { exigerSession } from "@/lib/session";
 import { dateCourte } from "@/lib/annonces/requetes";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
-import { Bouton } from "@/components/ui/bouton";
+import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { BlocCoordonnees, type Coordonnees } from "@/components/demandes/coordonnees";
 import { FormulaireAvis } from "@/components/demandes/formulaire-avis";
@@ -130,6 +130,9 @@ export default async function PageDemandes({ searchParams }: PageProps<"/demande
               {d.statut === "acceptee" && (
                 <>
                   <BlocCoordonnees c={coordonneesDe.get(autre.id) ?? null} prenom={autre.prenom} />
+                  <BoutonLien href={`/demandes/${d.id}`} className="self-start">
+                    Discuter avec {autre.prenom}
+                  </BoutonLien>
                   {!avisDonnes.has(d.id) && <FormulaireAvis demandeId={d.id} retour="/demandes" prenom={autre.prenom} />}
                 </>
               )}
