@@ -63,6 +63,10 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Rôle admin non modifiable par l'utilisateur | Droits par colonne (`role` exclu des colonnes modifiables), fonction `definir_role()` réservée aux admins, premier admin nommé en SQL. Tests : élévation par UPDATE et par la fonction, les deux bloquées. |
 | 01/10 | Destinataire d'une demande et cible d'un avis imposés par la base | Les triggers écrasent ce que le client envoie. Testé : un destinataire détourné est remis à l'auteur de l'annonce, un avis visant un tiers est redirigé vers la bonne personne. |
 | 01/10 | Animations courtes en CSS pur, aucune librairie | `apparition` en cascade, `souleve`, `presse`, `pop`, et un toast de confirmation. Tout est coupé si l'utilisateur active `prefers-reduced-motion`. |
+| 01/10 | IA sans clé ni coût : Vercel AI Gateway (jeton OIDC du projet, 5 $ de crédits gratuits par mois) | Test réel : Claude est bloqué sur l'offre gratuite (403). Hadriel choisit **Gemini 2.5 Flash** (gratuit, lit les PDF) plutôt que de payer pour Claude Haiku. Le choix est documenté dans `docs/etapes/06-07-fonctionnalites-ia.md`. |
+| 01/10 | IA n°1 : le CV n'est jamais stocké, l'étudiant valide chaque compétence | PDF lu en mémoire, réponse en JSON avec schéma zod, nettoyage testé, écran de relecture (cocher, décocher, ajouter). Si l'IA est en panne, saisie à la main. |
+| 01/10 | IA n°2 : la modération ne peut être écrite que par le serveur ou un admin | Un trigger remet « en attente » toute annonce créée ou modifiée par un utilisateur, et refuse qu'il touche aux colonnes de modération (4 tests SQL). « Refus probable » masque l'annonce en attendant l'admin, qui a toujours le dernier mot. Sans clé secrète, tout reste en attente d'un humain : on échoue du côté sûr. |
+| 01/10 | Tests réels sur cas piégés avant de brancher l'IA | CV avec injection cachée, annonce avec téléphone, arnaque à l'IBAN, texte haineux avec tentative de manipulation : tout est bien classé (`docs/ia/tests-reels-2026-10-01.md`). |
 | 01/10 | Gamification repoussée après le palier 1 (décision initiale, remplacée le jour même) | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
@@ -78,4 +82,5 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Advisors Supabase : fonctions de trigger appelables via l'API | Fermées (migration 0007). Les autres alertes concernent des fonctions appelées volontairement, qui vérifient elles-mêmes les droits : documenté. |
 | 01/10 | Vitest ne résolvait pas l'alias `@/` | Alias ajouté dans `vitest.config.ts`. |
 | 01/10 | Caractère étoile refusé par le test front-portable (c'est un pictogramme) | Étoiles en SVG. Le garde-fou a fonctionné. |
+| 01/10 | Claude inaccessible sur l'offre gratuite de la passerelle Vercel | Test de 6 modèles gratuits, puis choix de Gemini 2.5 Flash par Hadriel. Le code reste indépendant du modèle (une constante à changer). |
 | 01/10 | La copie locale de padel-snipe n'était pas à jour (22 commits de retard) | Lecture directe de la version GitHub (`origin/main`), sans toucher à la branche locale. |

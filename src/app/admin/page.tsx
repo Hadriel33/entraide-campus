@@ -8,7 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
-import { changerRole, modererAnnonce, supprimerAnnonceAdmin, traiterSignalement } from "./actions";
+import { changerRole, modererAnnonce, supprimerAnnonceAdmin, traiterSignalement, validerModeration } from "./actions";
 
 export const metadata: Metadata = { title: "Admin" };
 
@@ -20,7 +20,23 @@ const MOTIFS: Record<string, string> = {
   autre: "Autre",
 };
 
-type StatsAdmin = { etudiants: number; annonces: number; mises_en_relation: number; signalements_ouverts: number };
+type StatsAdmin = { etudiants: number; annonces: number; mises_en_relation: number; signalements_ouverts: number; a_moderer: number };
+
+const MODERATION: Record<string, { label: string; variante: "besoin" | "neutre" | "offre" }> = {
+  refus_probable: { label: "Refus probable", variante: "besoin" },
+  a_verifier: { label: "À vérifier", variante: "offre" },
+  en_attente: { label: "Pas encore relue", variante: "neutre" },
+};
+type AModerer = {
+  id: string;
+  titre: string;
+  description: string;
+  statut: string;
+  moderation: string;
+  moderation_raisons: string[];
+  cree_le: string;
+  auteur: { pseudo: string } | null;
+};
 
 export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
   const { supabase, user, profil } = await exigerSession();
@@ -28,7 +44,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
   if (profil.role !== "admin") notFound();
   const onglet = (await searchParams).onglet === "etudiants" ? "etudiants" : "moderation";
 
-  const [{ data: stats }, { data: signalements }, { data: annonces }, { data: etudiants }] = await Promise.all([
+  const [{ data: stats }, { data: signalements }, { data: annonces }, { data: etudiants }, { data: aModerer }] = await Promise.all([
     supabase.rpc("stats_admin"),
     supabase
       .from("signalements")
@@ -43,7 +59,17 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
     onglet === "etudiants"
       ? supabase.from("profils").select("id, pseudo, prenom, ecole, avatar_chemin, role, cree_le").order("cree_le", { ascending: false }).limit(200)
       : Promise.resolve({ data: [] }),
+    supabase
+      .from("annonces")
+      .select("id, titre, description, statut, moderation, moderation_raisons, cree_le, auteur:profils!annonces_auteur_id_fkey(pseudo)")
+      .neq("moderation", "ok")
+      .order("moderation", { ascending: false })
+      .order("cree_le", { ascending: false })
+      .limit(50),
   ]);
+  const file = ((aModerer ?? []) as unknown as AModerer[]).sort(
+    (a, b) => ["refus_probable", "a_verifier", "en_attente"].indexOf(a.moderation) - ["refus_probable", "a_verifier", "en_attente"].indexOf(b.moderation),
+  );
   const s = stats as StatsAdmin | null;
 
   return (
@@ -51,11 +77,12 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
       <TitrePage accroche="Modération des annonces, signalements et rôles. Chaque action est vérifiée par la base.">Admin</TitrePage>
 
       {s && (
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {[
             { label: "étudiants inscrits", valeur: s.etudiants },
             { label: "annonces publiées", valeur: s.annonces },
             { label: "mises en relation", valeur: s.mises_en_relation },
+            { label: "annonces à modérer", valeur: s.a_moderer, alerte: s.a_moderer > 0 },
             { label: "signalements à traiter", valeur: s.signalements_ouverts, alerte: s.signalements_ouverts > 0 },
           ].map((t, i) => (
             <div key={t.label} className="apparition rounded-carte border border-ligne bg-surface p-4" style={{ "--i": i } as React.CSSProperties}>
@@ -84,6 +111,56 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
 
       {onglet === "moderation" ? (
         <>
+          <section className="flex flex-col gap-3">
+            <div>
+              <h2 className="text-lg font-semibold">File de modération IA</h2>
+              <p className="text-sm text-encre-douce">
+                L&apos;IA relit chaque annonce publiée ou modifiée. Elle ne supprime rien : c&apos;est toi qui décides.
+              </p>
+            </div>
+            {file.length ? (
+              <ul className="flex flex-col gap-2.5">
+                {file.map((a, i) => (
+                  <li key={a.id} className="apparition flex flex-col gap-2 rounded-carte border border-ligne bg-surface p-4" style={{ "--i": i } as React.CSSProperties}>
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <Badge variante={MODERATION[a.moderation]?.variante ?? "neutre"}>{MODERATION[a.moderation]?.label ?? a.moderation}</Badge>
+                      {a.statut === "masquee" && <Badge>Masquée en attendant ta décision</Badge>}
+                      <span className="text-encre-douce">
+                        @{a.auteur?.pseudo} · {dateCourte(a.cree_le)}
+                      </span>
+                    </div>
+                    <Link href={`/annonces/${a.id}`} className="font-semibold hover:underline">
+                      {a.titre}
+                    </Link>
+                    <p className="line-clamp-2 font-serif text-sm">{a.description}</p>
+                    {a.moderation_raisons.length > 0 && (
+                      <ul className="list-inside list-disc text-sm text-encre-douce">
+                        {a.moderation_raisons.map((r) => (
+                          <li key={r}>{r}</li>
+                        ))}
+                      </ul>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      <form action={validerModeration.bind(null, a.id)}>
+                        <Bouton>{a.statut === "masquee" ? "Valider et republier" : "Valider"}</Bouton>
+                      </form>
+                      {a.statut !== "masquee" && (
+                        <form action={modererAnnonce.bind(null, a.id, "masquee")}>
+                          <Bouton variante="contour">Masquer</Bouton>
+                        </form>
+                      )}
+                      <form action={supprimerAnnonceAdmin.bind(null, a.id)}>
+                        <Bouton variante="danger">Supprimer</Bouton>
+                      </form>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-encre-douce">Rien à modérer. Toutes les annonces ont été validées.</p>
+            )}
+          </section>
+
           <section className="flex flex-col gap-3">
             <h2 className="text-lg font-semibold">Signalements à traiter</h2>
             {signalements?.length ? (

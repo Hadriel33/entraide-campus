@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { exigerSession } from "@/lib/session";
 import { normaliserPseudo, validerAvatar, validerCoordonnees, validerPseudo } from "@/lib/profils/validation";
+import { extraireCompetences } from "@/lib/ia/modele";
+import { nettoyerCompetences } from "@/lib/ia/regles";
 
 export type EtatProfil = { erreurs?: Partial<Record<string, string>>; message?: string };
 
@@ -62,4 +64,34 @@ export async function enregistrerCoordonnees(_: EtatProfil, formData: FormData):
   const { error } = await supabase.from("coordonnees").update(validation.valeurs).eq("id", user.id);
   if (error) return { message: "Enregistrement impossible. Réessaie." };
   redirect("/compte?ok=coordonnees");
+}
+
+// ---------- IA n°1 : compétences depuis le CV ----------
+
+export type EtatCV = { propositions?: string[]; message?: string; erreur?: string };
+
+// Le CV est lu en mémoire et transmis au modèle, puis oublié : il n'est jamais stocké.
+export async function analyserCV(_: EtatCV, formData: FormData): Promise<EtatCV> {
+  await exigerSession();
+  const fichier = formData.get("cv");
+  if (!(fichier instanceof File) || fichier.size === 0) return { erreur: "Choisis ton CV au format PDF." };
+  if (fichier.type !== "application/pdf") return { erreur: "Le CV doit être un PDF." };
+  if (fichier.size > 2 * 1024 * 1024) return { erreur: "2 Mo maximum." };
+
+  const propositions = await extraireCompetences(new Uint8Array(await fichier.arrayBuffer()));
+  if (propositions === null) {
+    return { erreur: "L'IA ne répond pas pour l'instant. Tu peux ajouter tes compétences à la main juste en dessous." };
+  }
+  if (propositions.length === 0) {
+    return { propositions, message: "Aucune compétence trouvée dans ce document. Ajoute-les à la main." };
+  }
+  return { propositions, message: "Voici ce que l'IA propose. Décoche ce qui ne te correspond pas, ajoute ce qui manque, puis enregistre." };
+}
+
+// Rien n'est enregistré sans le clic de l'étudiant : c'est lui qui valide la liste finale.
+export async function enregistrerCompetences(competences: string[]) {
+  const { supabase, user } = await exigerSession();
+  await supabase.from("profils").update({ competences: nettoyerCompetences(competences) }).eq("id", user.id);
+  revalidatePath("/compte");
+  redirect("/compte?ok=competences");
 }

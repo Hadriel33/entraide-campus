@@ -88,6 +88,13 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
         )}
       </dl>
 
+      {estAuteur && annonce.statut === "masquee" && (
+        <p role="status" className="rounded-carte bg-besoin p-4 text-sm">
+          <strong className="block">Annonce en attente de vérification</strong>
+          Elle n&apos;est pas visible des autres étudiants pour le moment. Un modérateur va la relire rapidement.
+        </p>
+      )}
+
       {estAuteur ? (
         <div className="flex flex-wrap gap-3 border-t border-ligne pt-6">
           <BoutonLien href={`/annonces/${annonce.id}/modifier`}>Modifier</BoutonLien>

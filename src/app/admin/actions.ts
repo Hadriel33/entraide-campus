@@ -40,3 +40,21 @@ export async function changerRole(cible: string, role: "admin" | "etudiant") {
   revalidatePath("/admin");
   redirect("/admin?onglet=etudiants");
 }
+
+// Décision humaine sur une annonce passée par la modération IA : l'admin a toujours le dernier mot.
+export async function validerModeration(id: string) {
+  const { supabase } = await exigerAdmin();
+  const { data } = await supabase.from("annonces").select("statut").eq("id", id).single();
+  await supabase
+    .from("annonces")
+    .update({
+      moderation: "ok",
+      moderation_raisons: [],
+      modere_le: new Date().toISOString(),
+      ...(data?.statut === "masquee" ? { statut: "publiee" } : {}),
+    })
+    .eq("id", id);
+  revalidatePath("/admin");
+  revalidatePath("/annonces");
+  redirect("/admin?ok=moderation");
+}

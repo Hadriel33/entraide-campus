@@ -18,6 +18,8 @@ const MESSAGES: Record<string, string> = {
   profil: "Profil enregistré.",
   photo: "Photo de profil mise à jour.",
   coordonnees: "Coordonnées enregistrées.",
+  competences: "Compétences enregistrées sur ton profil.",
+  moderation: "Décision de modération enregistrée.",
   signalement: "Merci, l'équipe de modération va regarder.",
   bienvenue: "Bienvenue sur l'entraide du campus.",
 };

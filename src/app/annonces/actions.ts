@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { validerAnnonce } from "@/lib/annonces/validation";
+import { programmerModeration } from "@/lib/ia/moderation";
 
 export type EtatAnnonce = {
   erreurs?: Partial<Record<string, string>>;
@@ -40,6 +41,7 @@ export async function creerAnnonce(_: EtatAnnonce, formData: FormData): Promise<
     return { message: "L'annonce n'a pas pu être publiée. Réessaie.", valeurs: champs };
   }
 
+  programmerModeration(data.id, validation.valeurs);
   revalidatePath("/annonces");
   redirect(`/annonces/${data.id}?ok=publiee`);
 }
@@ -56,6 +58,7 @@ export async function modifierAnnonce(id: string, _: EtatAnnonce, formData: Form
     return { message: "Modification impossible : cette annonce n'existe pas ou n'est pas la tienne.", valeurs: champs };
   }
 
+  programmerModeration(id, validation.valeurs);
   revalidatePath("/annonces");
   redirect(`/annonces/${id}?ok=modifiee`);
 }

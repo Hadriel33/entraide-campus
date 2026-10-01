@@ -7,6 +7,7 @@ import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { CarteProgression } from "@/components/profil/progression";
 import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./formulaires";
+import { AssistantCompetences } from "./assistant-competences";
 
 export const metadata: Metadata = { title: "Mon profil" };
 
@@ -50,6 +51,13 @@ export default async function PageCompte() {
 
       <Section titre="Photo de profil">
         <FormulairePhoto apercu={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" />} />
+      </Section>
+
+      <Section
+        titre="Mes compétences"
+        aide="Ce que tu peux proposer aux autres. Dépose ton CV : l'IA te fait des propositions, tu gardes ce qui est juste."
+      >
+        <AssistantCompetences actuelles={profil.competences ?? []} />
       </Section>
 
       <Section titre="Mon identité" aide="Ce que les autres étudiants voient sur ton profil et tes annonces.">

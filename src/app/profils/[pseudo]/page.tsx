@@ -20,7 +20,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
   const pseudo = decodeURIComponent((await params).pseudo).toLowerCase();
 
   // Profil public : jamais de coordonnées ici (elles sont dans une autre table, protégée).
-  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, role, cree_le").eq("pseudo", pseudo).maybeSingle();
+  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, cree_le").eq("pseudo", pseudo).maybeSingle();
   if (!profil) notFound();
 
   const [{ data: stats }, { data: annonces }, { data: avis }] = await Promise.all([
@@ -48,6 +48,15 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
             <span className="text-xs">membre depuis le {dateCourte(profil.cree_le)}</span>
           </p>
           {profil.bio && <p className="max-w-xl font-serif text-lg">{profil.bio}</p>}
+          {profil.competences?.length > 0 && (
+            <ul className="flex flex-wrap gap-1.5" aria-label="Compétences">
+              {(profil.competences as string[]).map((c) => (
+                <li key={c} className="rounded-full bg-offre px-2.5 py-0.5 text-xs font-medium">
+                  {c}
+                </li>
+              ))}
+            </ul>
+          )}
           {s?.note_moyenne != null && (
             <p className="flex items-center gap-2 text-sm">
               <NoteEtoiles note={s.note_moyenne} /> <strong>{String(s.note_moyenne).replace(".", ",")}</strong>
