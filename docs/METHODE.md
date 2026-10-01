@@ -86,6 +86,8 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Fil du campus en double consentement, désactivé par défaut | Montrer l'entraide sans exposer personne : la base ne renvoie une entraide que si les deux ont dit oui, et seulement la catégorie (ni message, ni titre). |
 | 01/10 | Tableau noir par jetons : on redéfinit les couleurs du thème, et on remet les jetons clairs dans les papiers | Aucun composant à réécrire : c'est la preuve que le front est piloté par les jetons (consigne du prof). |
 | 01/10 | Vraie carte sans librairie de carte : on calcule nous-mêmes les tuiles OpenStreetMap | Pas de dépendance à ajouter (règle du projet), pas de clé d'API, 30 lignes testées. Attribution OpenStreetMap affichée comme l'exige la licence. |
+| 01/10 | IA n°2 v2 : proposer une correction plutôt que refuser | Relu avec les critères du cours (besoin, humain qui valide, plan B) : la correction aide l'auteur, et une règle fixe la remplace si l'IA se trompe ou tombe. |
+| 01/10 | Gel des fonctionnalités, priorité à ce qui est noté | Le brief note la méthode (30 %), l'IA (25 %) et un parcours qui tourne en direct : on prépare la recette, la démo et la défense plutôt qu'une 15e fonctionnalité. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |

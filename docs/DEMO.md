@@ -1,12 +1,38 @@
-# Scénario de démo (5 minutes)
+# La démo finale : 3 minutes, l'histoire de Léa et Sam
 
-Fil rouge : Colette, la mascotte, apparaît à chaque étape (accueil, tuto, CV, modération, acceptation).
+> Le cours : un vrai parcours, en direct sur l'appli en ligne, pas de capture ni de vidéo. Raconter l'histoire d'une personne.
 
-1. **Le mur en direct** projeté (`/mur`, bouton « Mode projection »). On explique : chaque post-it est une annonce, couleur = famille (lilas créa, ciel tech, jaune projets, ocre vie de campus).
-2. **Publier depuis un téléphone** (compte ESP) : une annonce « Je cherche ». Elle tombe sur le mur projeté en direct, sans recharger.
-3. **Demander le contact** depuis un 2e compte (ESD) : la demande apparaît punaisée dans « À traiter ». Les coordonnées restent cachées (règle d'or n° 1, vérifiée en base).
-4. **Accepter** : confettis, la discussion s'ouvre, les coordonnées deviennent visibles. Un message en direct.
-5. **Avis et classement** : on laisse un avis, les points et le badge « croisement ESD × ESP » montent, et la classe grimpe sur le podium des classes.
-6. **Coulisses** : Ctrl+K, la modération IA dans l'admin, les tests SQL qui prouvent la sécurité, le journal de méthode.
+## Avant de commencer (la veille au plus tard, sans toucher au code)
+- [ ] Deux comptes de démo ouverts dans **deux navigateurs** (pas deux onglets du même : sinon, même session) :
+  - **Sam** (ESP, photographe) : son CV PDF prêt sur le bureau, son annonce déjà publiée « Photos pour vos événements d'asso ».
+  - **Léa** (ESD, organise le gala de son asso) : connectée, sur le mur.
+- [ ] Une vingtaine de vraies annonces sur le mur (voir `docs/CONTENU-DEMO.md`), les deux comptes dans le fil du campus.
+- [ ] Le **mur en direct** ouvert en mode projection sur un troisième onglet.
+- [ ] Le téléphone en partage de connexion, au cas où le wifi lâche.
+- [ ] Répété 3 fois, chronométré, depuis un autre ordinateur.
 
-À préparer avant : les classes dans l'admin, 2 comptes (un @mail-esd.com, un @mail-esp.com), une dizaine de vraies annonces crédibles sur le mur, le téléphone connecté.
+## Le déroulé (3 minutes)
+
+| Temps | Qui | Ce qu'on fait | Ce qu'on dit |
+|---|---|---|---|
+| 0:00 | | Page d'accueil | « Léa organise le gala de son asso et cherche un photographe. Sur le campus, il y en a sûrement un, mais où ? » |
+| 0:15 | Léa | Mur des annonces, filtre Photo | « Chaque annonce est un post-it, la couleur dit la famille. Seuls les étudiants ESD et ESP peuvent entrer. » |
+| 0:35 | Léa | Ouvre le post-it de Sam, « Demander le contact » | « Le numéro de Sam est caché. Pas juste à l'écran : la base refuse de l'envoyer. C'est notre règle d'or n°1. » |
+| 0:55 | Sam | Bureau : la demande de Léa est punaisée dans « À traiter », il accepte | Confettis, Colette saute. « Sam accepte : les coordonnées apparaissent des deux côtés et une discussion s'ouvre. » |
+| 1:15 | Les deux | Un message envoyé dans la discussion, reçu en direct de l'autre côté | « Cette conversation n'est lisible que par eux deux, règle d'or n°3. » |
+| 1:35 | Sam | Mon profil, dépose son CV | « IA n°1 : Colette lit le CV et propose ses compétences. Sam garde ce qui est juste. Le CV n'est jamais stocké. » |
+| 2:00 | Léa | Publie « RECHERCHE PHOTOGRAPHE, appelle le 06... » | « IA n°2, celle qu'on a inventée. » Ouvrir l'annonce : Colette propose une version corrigée, sans le numéro. « Elle ne refuse pas sèchement : elle aide. Léa clique Appliquer. » |
+| 2:30 | | Le mur en direct (projection) | Le post-it de Léa tombe sur le mur. « Et le campus le voit en direct. » |
+| 2:45 | | Classement des classes | « Chaque entraide fait monter sa classe. Sam vient de rapporter un bonus croisement ESD × ESP. » |
+| 3:00 | | | Fin. |
+
+## Après la démo : expliquer nos choix (questions préparées)
+- **Notre palier** : les 3 (ça tourne, ça discute, ça matche). Le palier 1 testé à deux comptes, les règles d'or prouvées en base par 84 vérifications SQL.
+- **Nos deux IA** : voir `docs/IA-DEFENSE.md` (besoin, humain qui valide, plan si ça rate, aucune clé).
+- **Une faille réparée** : l'erreur d'une demande de contact laissait deviner si une annonce existait (un « oracle »). Correction : connexion exigée avant toute vérification, message neutre, test SQL qui rejoue l'attaque (voir `docs/securite/FAILLES.md`).
+- **Avec une séance de plus** : l'IA qui aide à rédiger l'annonce dès le départ, et les notifications par email.
+
+## Plan B si quelque chose casse en direct
+- **L'IA est lente** : continuer le parcours, revenir à l'annonce à la fin (la modération tourne en arrière-plan).
+- **Le réseau tombe** : partage de connexion du téléphone. L'appli est en ligne sur Vercel, rien ne tourne sur l'ordinateur.
+- **Une page plante** : « Réessayer » (Colette débordée) ; sinon, recharger.

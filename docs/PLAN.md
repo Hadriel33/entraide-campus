@@ -18,3 +18,7 @@ Chaque étape a un moyen de vérification. On ne passe à la suivante que quand 
 | 8 🟡 | S5 · 26 nov (à blanc le 01/10) | Chasse aux failles : corriger côté base + un test par faille | Je refais l'attaque après correction, elle échoue. |
 | 9 🟡 | Bonus | Palier 2 (messagerie en direct) et palier 3 (suggestions « Pour toi ») | 6 tests SQL (règle d'or n°3), 6 tests de matching. À la main : discuter entre 2 comptes. |
 | 10 🟡 | Ajout 01/10 | Profil (pseudo, photo, bio), rôle admin et modération, gamification (points, niveaux, badges, avis, classement) | 14 tests SQL de sécurité. À la main : nommer un admin, masquer une annonce, laisser un avis. |
+| 11 🟡 | Ajouts 01/10 | Post-it campus : DA « mur du campus », Colette, bureau, classes, carte, fil du campus, tableau noir | 108 tests Vitest, 84 vérifications SQL. À la main : `docs/RECETTE.md`. |
+| 12 🟡 | Ajout 01/10 | IA n°2 v2 : correction proposée à l'auteur | 6 tests de règles, 4 tests SQL, 4 annonces piégées testées en réel (`docs/ia/`). |
+| 13 | S6 · 17 déc | Démo finale de 3 minutes | `docs/DEMO.md` répétée 3 fois ; `docs/IA-DEFENSE.md` et `docs/securite/FAILLES.md` pour les questions. |
+

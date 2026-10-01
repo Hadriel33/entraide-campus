@@ -16,12 +16,17 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 - [x] Notifications en direct, accueil guidé, recherche, quartier et tram, expiration et relance, favoris, défi de la semaine, titres, classement de la semaine, compteur d'impact
 
 ## À faire par Hadriel (je ne manipule ni mots de passe ni clés secrètes)
-- [ ] Créer son compte, puis me donner son pseudo : je le nomme **admin**
+- [x] Créer son compte (@hadri) : nommé **admin** le 01/10
 - [ ] Ajouter `SUPABASE_SECRET_KEY` sur Vercel : active l'écriture de la modération IA
 - [ ] **Brevo en SMTP** (Supabase › Authentication › Emails › SMTP Settings, avec la clé SMTP Brevo) : sans ça, Supabase n'envoie d'emails qu'aux membres de l'équipe, donc le « mot de passe oublié » ne marche pas pour les autres étudiants. Une fois branché : réactiver « Confirm email ».
-- [ ] Test complet avec 2 comptes : annonce, demande, acceptation, discussion, avis, points
+- [ ] Test complet avec 2 comptes : suivre `docs/RECETTE.md` (toutes les cases)
 
 ## Décisions à prendre
 - [x] **Appli réservée aux emails de l'école** (@mail-esd.com, @mail-esp.com), école déduite automatiquement. **Ne devient sûr qu'avec la confirmation d'email**, donc avec le SMTP branché.
 - [ ] Nom de domaine propre (ex. `entraide-campus.fr`), à brancher sur Vercel en 5 minutes.
-- [ ] Premières annonces crédibles pour l'ouverture : 2 ou 3 par catégorie, publiées par de vrais étudiants volontaires.
+- [ ] Premières annonces crédibles pour l'ouverture : la liste de 20 est prête dans `docs/CONTENU-DEMO.md`, à publier par de vrais étudiants volontaires.
+
+## Avant le 17 décembre
+- [ ] Gel du code le **10 décembre** : ensuite, seulement des corrections de bugs trouvés en recette (le cours : ne plus toucher au code la veille)
+- [ ] Démo de 3 minutes répétée 3 fois, chronométrée, depuis un autre ordinateur (`docs/DEMO.md`)
+- [ ] Failles trouvées le 26 novembre ajoutées et corrigées dans `docs/securite/FAILLES.md`
