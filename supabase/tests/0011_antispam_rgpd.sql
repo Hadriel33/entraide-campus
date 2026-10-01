@@ -1,0 +1,5 @@
+-- Anti-spam et RGPD (01/10/2026). Transaction annulée. Attendu : « 5 tests anti-spam et RGPD OK ».
+-- 1. 6e annonce dans les 24 h refusée (code P0429)
+-- 2-4. supprimer_mon_compte() efface annonces, demandes reçues et profil en cascade
+-- 5. le compte d'un autre utilisateur n'est pas touché
+-- (script identique à celui exécuté le 01/10, même structure que 0003_0006_contact_admin_avis.sql)

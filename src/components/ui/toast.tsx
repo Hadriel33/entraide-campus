@@ -22,6 +22,10 @@ const MESSAGES: Record<string, string> = {
   moderation: "Décision de modération enregistrée.",
   signalement: "Merci, l'équipe de modération va regarder.",
   bienvenue: "Bienvenue sur l'entraide du campus.",
+  limite: "Limite du jour atteinte (anti-spam). Réessaie demain.",
+  compte_supprime: "Ton compte et toutes tes données ont été supprimés.",
+  mot_de_passe: "Mot de passe modifié.",
+  lien_envoye: "Si un compte existe avec cet email, un lien vient de partir.",
 };
 
 export function Toast() {

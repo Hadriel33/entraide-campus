@@ -50,7 +50,7 @@ export function Conversation({ demandeId, moi, initiaux, prenomAutre }: { demand
       .single<Message>();
     setEnvoi(false);
     if (error || !data) {
-      setErreur("Message non envoyé. Réessaie.");
+      setErreur(error?.code === "P0429" ? error.message : "Message non envoyé. Réessaie.");
       return;
     }
     setMessages((liste) => (liste.some((x) => x.id === data.id) ? liste : [...liste, data]));

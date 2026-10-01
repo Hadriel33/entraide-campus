@@ -8,6 +8,8 @@ import { TitrePage } from "@/components/ui/titre-page";
 import { CarteProgression } from "@/components/profil/progression";
 import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
+import { ZoneSensible } from "./zone-sensible";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "Mon profil" };
 
@@ -69,6 +71,16 @@ export default async function PageCompte() {
         aide="Cachées par défaut. Seules les personnes dont tu acceptes la demande (ou qui acceptent la tienne) peuvent les voir."
       >
         <FormulaireCoordonnees telephone={coordonnees?.telephone ?? ""} email={coordonnees?.email ?? ""} reseau={coordonnees?.reseau ?? ""} />
+      </Section>
+
+      <Section titre="Mot de passe">
+        <Link href="/compte/mot-de-passe" className="self-start text-sm font-semibold underline-offset-2 hover:underline">
+          Changer mon mot de passe
+        </Link>
+      </Section>
+
+      <Section titre="Supprimer mon compte" aide="Ton droit à l'effacement (RGPD). Voir aussi la page Confidentialité.">
+        <ZoneSensible />
       </Section>
     </div>
   );

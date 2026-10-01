@@ -13,6 +13,9 @@ export function FormulaireConnexion() {
     <form action={action} className="flex flex-col gap-4" noValidate>
       <Champ label="Email" name="email" type="email" autoComplete="email" erreur={etat.erreurs?.email} defaultValue={etat.valeurs?.email} />
       <Champ label="Mot de passe" name="motDePasse" type="password" autoComplete="current-password" erreur={etat.erreurs?.motDePasse} />
+      <Link href="/mot-de-passe-oublie" className="-mt-2 self-end text-sm text-encre-douce underline-offset-2 hover:text-encre hover:underline">
+        Mot de passe oublié ?
+      </Link>
       {etat.message && <p role="alert" className="text-sm text-alerte">{etat.message}</p>}
       <Bouton disabled={enCours} className="py-3">
         {enCours ? "Connexion..." : "Se connecter"}

@@ -15,6 +15,7 @@ function texte(formData: FormData, cle: string, max: number) {
 export async function demanderContact(annonceId: string, formData: FormData) {
   const { supabase } = await exigerSession();
   const { error } = await supabase.from("demandes_contact").insert({ annonce_id: annonceId, message: texte(formData, "message", 300) });
+  if (error?.code === "P0429") redirect(`/annonces/${annonceId}?ok=limite`); // limite anti-spam
   if (error && error.code !== "23505") console.error("Demande de contact", error); // 23505 = déjà demandé : on ignore
   revalidatePath(`/annonces/${annonceId}`);
   redirect(`/annonces/${annonceId}?ok=demande`);

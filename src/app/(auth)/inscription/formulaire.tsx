@@ -40,6 +40,13 @@ export function FormulaireInscription() {
       <Bouton disabled={enCours} className="py-3">
         {enCours ? "Création du compte..." : "Créer mon compte"}
       </Bouton>
+      <p className="text-xs text-encre-douce">
+        En créant un compte, tu acceptes nos règles de{" "}
+        <Link href="/confidentialite" className="underline">
+          confidentialité
+        </Link>
+        . Tes coordonnées restent cachées jusqu&apos;à ton accord.
+      </p>
       <p className="text-sm">
         Déjà un compte ? <Link href="/connexion" className="underline">Se connecter</Link>
       </p>

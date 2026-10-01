@@ -95,3 +95,20 @@ export async function enregistrerCompetences(competences: string[]) {
   revalidatePath("/compte");
   redirect("/compte?ok=competences");
 }
+
+// ---------- RGPD : droit à l'effacement ----------
+
+export async function supprimerMonCompte() {
+  const { supabase, user } = await exigerSession();
+  // 1. La photo (Storage n'est pas couvert par la cascade SQL).
+  const { data: fichiers } = await supabase.storage.from("avatars").list(user.id);
+  if (fichiers?.length) await supabase.storage.from("avatars").remove(fichiers.map((f) => `${user.id}/${f.name}`));
+  // 2. Le compte et tout le reste, en cascade (fonction SQL limitée à son propre compte).
+  const { error } = await supabase.rpc("supprimer_mon_compte");
+  if (error) {
+    console.error("Suppression de compte", error);
+    redirect("/compte?erreur=suppression");
+  }
+  await supabase.auth.signOut();
+  redirect("/?ok=compte_supprime");
+}

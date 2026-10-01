@@ -93,3 +93,26 @@ export async function deconnecter() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+// ---------- Mot de passe oublié ----------
+
+// Réponse identique que le compte existe ou non : on ne révèle pas quels emails sont inscrits.
+export async function demanderReinitialisation(formData: FormData) {
+  const email = texte(formData, "email").trim();
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const origine = (await headers()).get("origin") ?? "https://entraide-campus.vercel.app";
+    const supabase = await createClient();
+    await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${origine}/auth/confirmer?suite=mot-de-passe` });
+  }
+  redirect("/connexion?ok=lien_envoye");
+}
+
+export async function changerMotDePasse(_: EtatFormulaire, formData: FormData): Promise<EtatFormulaire> {
+  const motDePasse = texte(formData, "motDePasse");
+  if (motDePasse.length < 8) return { erreurs: { motDePasse: "8 caractères minimum." } };
+  if (motDePasse !== texte(formData, "confirmation")) return { erreurs: { confirmation: "Les deux mots de passe ne sont pas identiques." } };
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password: motDePasse });
+  if (error) return { message: messageErreur(error.code, error.message) };
+  redirect("/compte?ok=mot_de_passe");
+}

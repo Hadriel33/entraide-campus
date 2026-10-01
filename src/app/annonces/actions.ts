@@ -37,6 +37,7 @@ export async function creerAnnonce(_: EtatAnnonce, formData: FormData): Promise<
   // auteur_id n'est pas envoyé : la base le remplit avec auth.uid(), et la RLS refuse tout autre auteur.
   const { data, error } = await supabase.from("annonces").insert(validation.valeurs).select("id").single();
   if (error || !data) {
+    if (error?.code === "P0429") return { message: error.message, valeurs: champs }; // limite anti-spam
     console.error("Création d'annonce", error);
     return { message: "L'annonce n'a pas pu être publiée. Réessaie.", valeurs: champs };
   }

@@ -18,5 +18,7 @@ export async function GET(request: NextRequest) {
     ok = !(await supabase.auth.verifyOtp({ type, token_hash: tokenHash })).error;
   }
 
-  return NextResponse.redirect(new URL(ok ? "/annonces" : "/connexion?lien=invalide", origin));
+  // Destination choisie dans une liste fermée (jamais une URL reçue en paramètre : pas d'open redirect).
+  const suite = searchParams.get("suite") === "mot-de-passe" ? "/compte/mot-de-passe" : "/annonces";
+  return NextResponse.redirect(new URL(ok ? suite : "/connexion?lien=invalide", origin));
 }

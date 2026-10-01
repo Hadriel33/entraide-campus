@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
 import { Archivo, DM_Sans, Source_Serif_4 } from "next/font/google";
 import { getSession } from "@/lib/session";
 import { BarreLaterale, EnTetePublic } from "@/components/app/navigation";
@@ -16,12 +17,17 @@ const sourceSerif = Source_Serif_4({ subsets: ["latin"], variable: "--font-sourc
 export const metadata: Metadata = {
   title: { default: "L'entraide du campus", template: "%s · L'entraide du campus" },
   description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants ESD et ESP Bordeaux.",
+  metadataBase: new URL("https://entraide-campus.vercel.app"),
+  openGraph: { siteName: "L'entraide du campus", locale: "fr_FR", type: "website" },
 };
 
 function PiedDePage() {
   return (
     <footer className="border-t border-ligne px-4 py-4 text-center text-xs text-encre-douce">
-      Projet étudiant non officiel, réalisé dans le cadre du module Vibe Coding (M2 Data).
+      Projet étudiant non officiel, réalisé dans le cadre du module Vibe Coding (M2 Data).{" "}
+      <Link href="/confidentialite" className="underline-offset-2 hover:underline">
+        Confidentialité
+      </Link>
     </footer>
   );
 }

@@ -17,7 +17,8 @@ function fichiers(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
     const p = path.join(dir, e.name);
     if (e.isDirectory()) return e.name === "__tests__" ? [] : fichiers(p);
-    return /\.(tsx|ts)$/.test(e.name) ? [p] : [];
+    // opengraph-image : ImageResponse ne lit pas les variables CSS, seule exception documentée.
+    return /\.(tsx|ts)$/.test(e.name) && !e.name.startsWith("opengraph-image") ? [p] : [];
   });
 }
 
