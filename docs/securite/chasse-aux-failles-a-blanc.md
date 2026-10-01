@@ -26,6 +26,7 @@ Objectif : jouer l'attaquant sur notre propre appli **avant** la séance 5, avec
 - **CI GitHub** (`.github/workflows/ci.yml`) : lint, 60 tests, build, typage et **recherche de clés secrètes dans le code** à chaque push.
 - Test `front-portable` : pas d'emoji, de couleur en dur ni de pictogramme.
 
-## 5. Reste à faire (réglage dashboard, côté Hadriel)
-- **Mot de passe minimum** : l'appli exige 8 caractères, mais l'API Auth de Supabase en accepte 6 si on l'appelle directement. Réglage : Authentication › Sign In / Providers › Email › *Minimum password length* = 8.
+## 5. Réglages du dashboard (faits le 01/10 par Claude dans le navigateur, Hadriel s'étant connecté lui-même)
+- **Mot de passe minimum = 8** dans Supabase Auth. Vérifié : un appel direct à l'API avec 7 caractères renvoie maintenant `weak_password`.
+- Confirmation d'email désactivée (le SMTP gratuit n'envoie qu'à l'équipe), URL de redirection `https://entraide-campus.vercel.app/**` ajoutée.
 - Réactiver la confirmation d'email une fois l'envoi d'emails branché sur Brevo.
