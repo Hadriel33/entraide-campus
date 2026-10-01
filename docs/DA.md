@@ -1,4 +1,21 @@
-# Direction artistique : 3 pistes (à choisir)
+# Direction artistique
+
+## V2 (01/10, après retour de Hadriel) : « moderne, dashboard SaaS, inspiré de l'ESD et de l'ESP »
+Planche de maquettes : https://claude.ai/artifact/BZQNr7ohGZZejXGKL5384i (kit UI, tableau de bord et mobile pour chaque piste).
+Point de départ : les **vrais codes** relevés dans le CSS des sites ecole-du-digital.com et espub.org, qui partagent le même système : encre `#1B2027`, fonds `#F5F7FA` et `#EBEEF9`, gris `#98A3B3`, bleu ESP `#28367F`, bleu vif `#3D5CF5`, orange `#F6A151`, rouge `#E84545`, marine `#0A2240`, police DM Sans.
+La même interface est déclinée en 3 pistes : **seuls les jetons changent**, ce qui démontre le front portable (skill `adapter-front`).
+
+| Piste | Idée | Couleurs | Polices | Arrondi |
+|---|---|---|---|---|
+| **A · Campus** | Fidèle au système du groupe ESD/ESP, sobre, de type Linear/Notion | fond `#F5F7FA`, encre `#1B2027`, principale `#28367F`, accent `#3D5CF5` | DM Sans | 10 px |
+| **B · Duo** | Une couleur par école : bleu ESD, orange ESP. Sidebar sombre | fond `#F3F4F6`, encre `#12161C`, ESD `#3D5CF5`, ESP `#F6A151` | Schibsted Grotesk + DM Sans | 8 px |
+| **C · Éditorial** | Marine du groupe, titres serif (écho du Minion Pro de l'ESP), rouge en touche | fond `#F6F5F1`, marine `#0A2240`, rouge `#E84545` | Newsreader + DM Sans | 4 px |
+
+Écartés : la proposition violette et Fira du skill `ui-ux-pro-max` (le violet est le signal n°4 de la checklist anti-IA), le mode sombre imposé (signal n°5), et les logos officiels (projet non officiel).
+
+---
+
+## V1 (01/10, matin) : premières pistes, avant la consigne « dashboard SaaS »
 
 Contraintes : ne pas ressembler à padel-snipe (navy et vert fluo, sport), ne pas imiter les chartes ESD et ESP (projet étudiant non officiel : pas de logo, pas de bleu-sarcelle, pas de noir pur dominant), et passer la checklist du skill `anti-ia-design`.
 Le front est piloté par des **jetons** (`src/app/globals.css`) : changer de piste = appliquer le skill `adapter-front` avec la référence choisie.
