@@ -29,7 +29,8 @@
 - Aux règles RLS existantes sans me montrer le avant/après.
 - Aux fichiers de `docs/` sans me le dire.
 - Aux dépendances : pas de nouvelle librairie sans me demander pourquoi.
-- Pas de `using (true)` dans une policy RLS.
+- Pas de `using (true)` dans une policy RLS (sauf donnée non sensible, justifiée en commentaire).
+- Pas de couleur en dur dans les composants : uniquement les jetons du thème (test `front-portable`).
 
 ## Méthode (imposée par le cours)
 - Pose-moi tes questions **avant** de coder. Propose un plan en étapes avec, pour chacune, un moyen de vérifier.
@@ -44,6 +45,7 @@
 - `supabase-rls-securite` : RLS, les 3 règles d'or, l'admin, la chasse aux failles.
 - `fonctionnalite-ia` : brancher le profil CV et la modération IA proprement.
 - `tests-comptes` : Vitest, comptes de test, cas piégés pour l'IA.
+- `adapter-front` : migrer le front vers n'importe quelle référence visuelle (jetons de `globals.css`).
 - `anti-ia-design` et `ui-ux-pro-max` : design et textes qui ne font pas « généré par IA ».
 - `gamification-badges` : badges, avis, historique, sans triche (bonus).
 

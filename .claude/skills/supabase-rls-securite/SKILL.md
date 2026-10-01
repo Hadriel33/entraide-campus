@@ -37,3 +37,9 @@ Pour chaque règle, écrire un test qui se connecte avec **2 comptes de test** e
 - Onglet Réseau : des coordonnées passent-elles sans être affichées ?
 - Chercher des clés dans le code GitHub et dans le JS du site (`sb_secret`, `service_role`, `sk-`).
 - Pour chaque faille : ce que j'ai fait, ce que j'ai vu, pourquoi c'est grave. Corriger **côté base**, écrire le test, puis rejouer l'attaque.
+
+## Modèles de code (tirés du projet, à copier)
+- [modeles/migration-table.sql](modeles/migration-table.sql) : une table et ses 4 policies dans la même migration.
+- [modeles/test-rls.sql](modeles/test-rls.sql) : tester une règle avec 2 comptes fictifs dans une transaction annulée.
+- [modeles/client-serveur.ts](modeles/client-serveur.ts) : client Supabase serveur et `getUtilisateur()`.
+- [modeles/proxy-session.ts](modeles/proxy-session.ts) : rafraîchissement de session et pages protégées (Next.js 16).

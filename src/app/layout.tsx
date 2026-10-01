@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getUtilisateur } from "@/lib/supabase/server";
 import { deconnecter } from "./(auth)/actions";
+import { BoutonLien } from "@/components/ui/bouton";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col font-sans">
         <header className="border-b border-ligne">
           <nav className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3">
-            <Link href="/" className="font-semibold">
+            <Link href="/" className="font-titre font-semibold">
               L&apos;entraide du campus
             </Link>
             <div className="flex items-center gap-4 text-sm">
@@ -35,9 +36,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
                   <Link href="/connexion" className="underline-offset-4 hover:underline">
                     Se connecter
                   </Link>
-                  <Link href="/inscription" className="rounded-md bg-encre px-3 py-1.5 text-papier">
+                  <BoutonLien href="/inscription" className="px-3 py-1.5">
                     Créer un compte
-                  </Link>
+                  </BoutonLien>
                 </>
               )}
             </div>

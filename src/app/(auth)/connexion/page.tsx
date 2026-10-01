@@ -15,7 +15,7 @@ export default async function PageConnexion({
 
   return (
     <section className="mx-auto w-full max-w-sm py-12">
-      <h1 className="mb-8 text-3xl font-semibold tracking-tight">Se connecter</h1>
+      <h1 className="font-titre mb-8 text-3xl font-semibold tracking-tight">Se connecter</h1>
       {lien === "invalide" && (
         <p role="alert" className="mb-6 text-sm text-alerte">
           Ce lien de confirmation est invalide ou a expiré. Connecte-toi ou recrée ton compte.

@@ -1,15 +1,29 @@
 @import "tailwindcss";
 
-/* Jetons de couleur PROVISOIRES : la direction artistique sera choisie parmi
-   les 3 pistes de docs/DA.md. Changer de DA = changer ces valeurs. */
+/* ============================================================
+   JETONS DU THÈME : la seule source de la direction artistique.
+   Les composants n'utilisent que ces noms (bg-encre, text-accent,
+   rounded-ui, font-titre...). Jamais de couleur en dur ailleurs :
+   le test src/__tests__/front-portable.test.ts le vérifie.
+   Changer de référence visuelle = skill `adapter-front`.
+   Valeurs actuelles : PROVISOIRES (neutres), en attente du choix dans docs/DA.md.
+   ============================================================ */
 @theme {
-  --color-papier: #f6f3ee;
-  --color-papier-fonce: #ece6dc;
-  --color-encre: #1f1b16;
-  --color-encre-douce: #6b6259;
-  --color-ligne: #d8d0c4;
-  --color-alerte: #b42318;
+  /* Couleurs */
+  --color-papier: #f6f3ee;       /* fond de page */
+  --color-papier-fonce: #ece6dc; /* surfaces, encadrés */
+  --color-encre: #1f1b16;        /* texte principal, boutons pleins */
+  --color-encre-douce: #6b6259;  /* texte secondaire */
+  --color-ligne: #d8d0c4;        /* bordures, filets */
+  --color-accent: #3d3833;       /* survol, mise en avant (rare) */
+  --color-alerte: #b42318;       /* erreurs */
+
+  /* Typographie */
   --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-titre: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+
+  /* Forme */
+  --radius-ui: 0.375rem;
 }
 
 body {

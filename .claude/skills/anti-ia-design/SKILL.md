@@ -27,3 +27,6 @@ Compte les signaux présents sur la page : **0–1 = OK, 2–3 = moyen, 4+ = « 
 | Signal | Preuve dans le code | Gravité | Correction |
 |---|---|---|---|
 Puis « Ce qu'on garde », puis la liste des corrections, de la plus visible à la moins visible.
+
+## Lien avec le thème
+La DA vit dans les jetons de `globals.css`. Pour en changer, utilise le skill `adapter-front`. Le test `front-portable` bloque les emojis, les tirets cadratins et les couleurs en dur.

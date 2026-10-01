@@ -30,3 +30,8 @@ Vérifier que la réponse est un JSON valide (schéma validé côté serveur) et
 - Sur téléphone, sur l'adresse Vercel.
 - Avec le 2e compte en navigation privée.
 - Avec une saisie bizarre (champ vide, 2 000 caractères, emoji, balise `<script>`).
+
+## Modèles
+- [modeles/regle-metier.test.ts](modeles/regle-metier.test.ts) et [modeles/regle-metier.ts](modeles/regle-metier.ts) : un test écrit avant le code, puis le code qui le fait passer.
+- Tests de sécurité SQL : voir `supabase-rls-securite/modeles/test-rls.sql`.
+- Garde-fou du front : `src/__tests__/front-portable.test.ts` (pas de couleur en dur, pas d'emoji ni de tiret cadratin).

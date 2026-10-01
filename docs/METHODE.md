@@ -49,6 +49,9 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Dépôt GitHub **public** et séparé du reste de mes cours | Le prof doit voir le code, et aucun secret ne doit s'y trouver. |
 | 01/10 | Supabase dans une **organisation gratuite** séparée | L'organisation padel-snipe est payante (10 $/mois par projet). Ça évite aussi de mélanger les deux projets. |
 | 01/10 | IA inventée = **modération des annonces** + espace admin | Besoin réel sur une appli ouverte à tout le campus. Un humain valide, et il y a un plan si l'IA tombe en panne. Elle protège aussi la règle d'or n°1 (pas de coordonnées dans le texte). |
+| 01/10 | Consigne du prof : des skills avec **références et modèles de code**, et un front **migrable vers n'importe quelle référence** | Chaque skill a un dossier `modeles/` copié du vrai code (migration + RLS, test RLS, Server Action, test de règle, thème). Le front n'utilise que des jetons (`globals.css`) et des composants partagés (`src/components/ui`). Nouveau skill `adapter-front`, et un test qui refuse toute couleur en dur. |
+| 01/10 | Recherche avant de designer : écoles, concurrents, 3 pistes de DA | Un agent a fait la recherche web (ESD et ESP, Groupe ESP-ESD / AD Education, campus Victor Hugo, concurrents, catégories réalistes). Résultat dans `docs/DA.md`. La DA reste au choix de Hadriel. |
+| 01/10 | Étape 3 : test d'abord, puis base, puis code | 9 tests de validation écrits et vus en échec avant le code. Table `profils` + RLS + trigger, testée en SQL avec 2 comptes fictifs (transaction annulée). Fiche de l'étape : `docs/etapes/03-comptes.md`. |
 | 01/10 | Gamification repoussée après le palier 1 | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)

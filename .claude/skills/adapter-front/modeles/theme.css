@@ -1,0 +1,22 @@
+/* Modèle de thème : copier le bloc @theme dans src/app/globals.css et remplacer les valeurs.
+   Exemple rempli avec la piste C « La Gazette des petites annonces » (docs/DA.md). */
+@theme {
+  --color-papier: #f5f1ea;       /* papier journal */
+  --color-papier-fonce: #ebe4d8;
+  --color-encre: #2a1a1d;        /* encre presque noire, teintée bordeaux */
+  --color-encre-douce: #6e5f5a;
+  --color-ligne: #d6cbbd;
+  --color-accent: #6b1e2e;       /* bordeaux */
+  --color-alerte: #a3261b;
+
+  --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-titre: var(--font-instrument-serif), ui-serif, Georgia, serif;
+
+  --radius-ui: 0.125rem;         /* quasi carré : esprit imprimé */
+}
+
+/* Dans src/app/layout.tsx :
+   import { Instrument_Serif, Public_Sans } from "next/font/google";
+   const titre = Instrument_Serif({ weight: "400", subsets: ["latin"], variable: "--font-instrument-serif" });
+   const texte = Public_Sans({ subsets: ["latin"], variable: "--font-public-sans" });
+   <html className={`${titre.variable} ${texte.variable}`}> */

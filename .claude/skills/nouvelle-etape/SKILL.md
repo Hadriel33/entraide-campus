@@ -34,3 +34,7 @@ La méthode compte pour 30 % de la note. Suis ces étapes dans l'ordre, sans en 
 - Après 2 corrections ratées : reviens à la dernière version qui marchait (`git restore` / `git revert`) et reformule la demande.
 - Pour un bug, demande : ce que j'ai fait, ce que j'attendais, ce qui s'est passé, et l'erreur complète de la console.
 - Bloqué plus de 20 minutes : rédige un message court pour le mur des blocages.
+
+## Modèles
+- [modeles/fiche-etape-exemple.md](modeles/fiche-etape-exemple.md) : la fiche d'une étape (demande vérifiable, questions et réponses, plan, choix techniques). À recopier dans `docs/etapes/NN-nom.md` au début de chaque étape.
+- [modeles/server-action.ts](modeles/server-action.ts) : valider, vérifier l'identité côté serveur, écrire sous RLS.
