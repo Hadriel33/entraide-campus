@@ -32,8 +32,9 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 - [ ] Failles trouvées le 26 novembre ajoutées et corrigées dans `docs/securite/FAILLES.md`
 
 ## Campus de démo
-- [ ] Lancer `supabase/demo/campus-demo.sql` dans Supabase › SQL Editor (16 étudiants, 21 annonces, 9 entraides, sans mot de passe)
-- [ ] Avant l'ouverture au vrai campus : lancer `supabase/demo/nettoyage-demo.sql`
+- [ ] Lancer `supabase/demo/1-comptes-demo.sql` dans Supabase › SQL Editor (40 étudiants fictifs, 20 ESD et 20 ESP, sans mot de passe)
+- [ ] Puis `supabase/demo/2-vie-du-campus.sql` : classes, Colette personnalisées, ~80 annonces, entraides étalées sur 30 jours, avis, une annonce à corriger, une arnaque masquée, et le compte @hadri rempli (3 annonces, 5 demandes reçues, 2 envoyées, 3 avis à 5 étoiles)
+- [ ] Avant l'ouverture au vrai campus : lancer `supabase/demo/3-nettoyage-demo.sql`
 
 ## Risque repéré par la mesure de l'IA
 - [ ] L'offre gratuite de la passerelle IA accepte 5 appels simultanés. Pour l'ouverture au campus : passer sur une offre payante, ou accepter que certaines annonces attendent l'admin aux heures de pointe.
