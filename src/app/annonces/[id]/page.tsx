@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { SELECT_ANNONCE, dateCourte, type Annonce } from "@/lib/annonces/requetes";
 import { CATEGORIES, CONTREPARTIES, QUARTIERS, TYPES } from "@/lib/annonces/validation";
 import { joursRestants } from "@/lib/annonces/expiration";
 import { BoutonFavori } from "@/components/annonces/bouton-favori";
+import { BoutonPartager } from "@/components/annonces/bouton-partager";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
@@ -66,7 +68,9 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
         {annonce.statut === "masquee" && <Badge>Masquée par la modération</Badge>}
         {jours === 0 && annonce.statut === "publiee" && <Badge variante="besoin">Expirée</Badge>}
       </div>
-      <h1 className="titre-charte text-3xl sm:text-4xl">{annonce.titre}</h1>
+      <ViewTransition name={`titre-${annonce.id}`} share="morph" default="none">
+        <h1 className="titre-charte text-3xl sm:text-4xl">{annonce.titre}</h1>
+      </ViewTransition>
 
       <Link href={`/profils/${annonce.auteur?.pseudo}`} className="presse flex items-center gap-3 self-start rounded-ui pr-3 hover:bg-papier-fonce">
         <Avatar chemin={annonce.auteur?.avatar_chemin} nom={annonce.auteur?.pseudo ?? "?"} taille="lg" />
@@ -197,11 +201,10 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
         </section>
       )}
 
-      {!estAuteur && (
-        <div className="self-start">
-          <BoutonFavori annonceId={annonce.id} favori={!!favori} />
-        </div>
-      )}
+      <div className="flex flex-wrap gap-2">
+        {!estAuteur && <BoutonFavori annonceId={annonce.id} favori={!!favori} />}
+        <BoutonPartager titre={annonce.titre} />
+      </div>
 
       {!estAuteur && (
         <details className="text-sm">

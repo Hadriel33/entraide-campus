@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ViewTransition } from "react";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { CATEGORIES, CONTREPARTIES, QUARTIERS, TYPES } from "@/lib/annonces/validation";
 import { joursRestants } from "@/lib/annonces/expiration";
@@ -10,7 +11,7 @@ export function CarteAnnonce({ annonce, index = 0, afficherExpiration = false }:
 
   return (
     <article
-      className="apparition souleve relative flex flex-col gap-2.5 rounded-carte border border-ligne bg-surface p-4 hover:border-ligne-forte"
+      className="group apparition souleve relative flex flex-col gap-2.5 rounded-carte border border-ligne bg-surface p-4 hover:border-ligne-forte"
       style={{ "--i": index } as React.CSSProperties}
     >
       <div className="flex flex-wrap items-center gap-1.5">
@@ -24,8 +25,11 @@ export function CarteAnnonce({ annonce, index = 0, afficherExpiration = false }:
       </div>
       <h3 className="text-base leading-snug font-semibold">
         {/* Le lien couvre toute la carte (pseudo-élément), le texte reste sélectionnable. */}
-        <Link href={`/annonces/${annonce.id}`} className="after:absolute after:inset-0 after:content-['']">
-          {annonce.titre}
+        <Link href={`/annonces/${annonce.id}`} className="decoration-2 underline-offset-4 group-hover:underline after:absolute after:inset-0 after:content-['']">
+          {/* Le titre « glisse » de la carte vers la page de l'annonce (View Transitions). */}
+          <ViewTransition name={`titre-${annonce.id}`} share="morph" default="none">
+            <span>{annonce.titre}</span>
+          </ViewTransition>
         </Link>
       </h3>
       <p className="line-clamp-2 text-sm text-encre-douce">{annonce.description}</p>
@@ -41,8 +45,11 @@ export function CarteAnnonce({ annonce, index = 0, afficherExpiration = false }:
           @{annonce.auteur?.pseudo}
           {annonce.auteur?.ecole && <BadgeEcole ecole={annonce.auteur.ecole} />}
         </span>
-        <span className="text-xs text-encre-douce">
+        <span className="flex items-center gap-1 text-xs text-encre-douce">
           {CONTREPARTIES[annonce.contrepartie]} · {dateCourte(annonce.cree_le)}
+          <svg viewBox="0 0 24 24" className="size-3.5 -translate-x-1 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </span>
       </div>
     </article>

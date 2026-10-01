@@ -6,6 +6,7 @@ import { getSession } from "@/lib/session";
 import { BarreLaterale, EnTetePublic } from "@/components/app/navigation";
 import { Avatar } from "@/components/ui/avatar";
 import { Toast } from "@/components/ui/toast";
+import { Palette } from "@/components/app/palette";
 import "./globals.css";
 
 // Polices de la DA « Campus 2026 » : Archivo (axe de largeur pour les titres condensés),
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </Suspense>
         {user && profil ? (
           <div className="flex min-h-dvh flex-col md:flex-row">
+            <Palette />
             <BarreLaterale
               pseudo={profil.pseudo}
               ecole={profil.ecole}
@@ -63,7 +65,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               notificationsNonLues={nonLues ?? 0}
             />
             <div className="flex min-w-0 flex-1 flex-col">
-              <main className="flex-1 px-4 py-8 sm:px-8">{children}</main>
+              <main className="flex-1 px-4 pt-6 pb-28 sm:px-8 md:py-8">{children}</main>
               <PiedDePage />
             </div>
           </div>

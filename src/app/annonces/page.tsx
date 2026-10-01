@@ -4,7 +4,8 @@ import { getSession } from "@/lib/session";
 import { suggerer } from "@/lib/matching/suggestions";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { normaliserRecherche } from "@/lib/annonces/recherche";
-import { CATEGORIES, QUARTIERS, TRAMS, TYPES, type Categorie } from "@/lib/annonces/validation";
+import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES, type Categorie } from "@/lib/annonces/validation";
+import { ECOLES } from "@/lib/auth/validation";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
@@ -13,12 +14,24 @@ import { TitrePage } from "@/components/ui/titre-page";
 
 export const metadata: Metadata = { title: "Annonces" };
 
-type Filtres = { type?: string; categorie?: string; q?: string; quartier?: string; tram?: string };
+type Filtres = {
+  type?: string;
+  categorie?: string;
+  q?: string;
+  quartier?: string;
+  tram?: string;
+  ecole?: string;
+  contrepartie?: string;
+  tri?: string;
+  page?: string;
+};
+
+const PAR_PAGE = 30;
 
 function lienFiltre(actuels: Filtres, change: Filtres) {
   const p = new URLSearchParams();
   const f = { ...actuels, ...change };
-  for (const cle of ["q", "type", "categorie", "quartier", "tram"] as const) if (f[cle]) p.set(cle, f[cle]!);
+  for (const cle of ["q", "type", "categorie", "quartier", "tram", "ecole", "contrepartie", "tri", "page"] as const) if (f[cle]) p.set(cle, f[cle]!);
   const q = p.toString();
   return q ? `/annonces?${q}` : "/annonces";
 }
@@ -34,27 +47,51 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
     quartier: brut.quartier && brut.quartier in QUARTIERS ? brut.quartier : undefined,
     tram: brut.tram && (TRAMS as readonly string[]).includes(brut.tram) ? brut.tram : undefined,
     q: typeof brut.q === "string" && brut.q.trim() ? brut.q.trim().slice(0, 80) : undefined,
+    ecole: brut.ecole && (ECOLES as readonly string[]).includes(brut.ecole) ? brut.ecole : undefined,
+    contrepartie: brut.contrepartie && brut.contrepartie in CONTREPARTIES ? brut.contrepartie : undefined,
+    tri: brut.tri === "bientot" ? "bientot" : undefined,
+    page: brut.page && /^[2-5]$/.test(brut.page) ? brut.page : undefined,
   };
+  const limite = PAR_PAGE * Number(filtres.page ?? 1);
   const recherche = filtres.q ? normaliserRecherche(filtres.q) : "";
 
   const { supabase, user, profil } = await getSession();
+  const maintenant = new Date().toISOString();
+  // Filtre par école : jointure obligatoire (!inner) sur le profil de l'auteur.
+  const select = filtres.ecole ? SELECT_ANNONCE.replace("auteur:profils(", "auteur:profils!inner(") : SELECT_ANNONCE;
   let requete = supabase
     .from("annonces")
-    .select(SELECT_ANNONCE)
+    .select(select)
     .eq("statut", "publiee")
-    .gt("expire_le", new Date().toISOString()) // les annonces expirées disparaissent de la liste
-    .order("cree_le", { ascending: false })
-    .limit(60);
+    .gt("expire_le", maintenant) // les annonces expirées disparaissent de la liste
+    .order(filtres.tri === "bientot" ? "expire_le" : "cree_le", { ascending: filtres.tri === "bientot" })
+    .limit(limite);
+  if (filtres.ecole) requete = requete.eq("auteur.ecole", filtres.ecole);
+  if (filtres.contrepartie) requete = requete.eq("contrepartie", filtres.contrepartie);
   if (filtres.type) requete = requete.eq("type", filtres.type);
   if (filtres.categorie) requete = requete.eq("categorie", filtres.categorie);
   if (filtres.quartier) requete = requete.eq("quartier", filtres.quartier);
   if (filtres.tram) requete = requete.eq("tram", filtres.tram);
   if (recherche) requete = requete.textSearch("recherche", recherche, { type: "websearch", config: "french" });
-  const { data } = await requete;
+  const [{ data }, { data: toutes }] = await Promise.all([
+    requete,
+    // Nombre d'annonces actives par catégorie (affiché sur les filtres).
+    supabase.from("annonces").select("categorie").eq("statut", "publiee").gt("expire_le", maintenant).limit(2000),
+  ]);
   const annonces = (data ?? []) as unknown as Annonce[];
+  const parCategorie = (toutes ?? []).reduce<Record<string, number>>((acc, a) => ({ ...acc, [a.categorie]: (acc[a.categorie] ?? 0) + 1 }), {});
+  const actifs = [
+    filtres.q && { cle: "q", label: `« ${filtres.q} »` },
+    filtres.type && { cle: "type", label: TYPES[filtres.type as keyof typeof TYPES] },
+    filtres.categorie && { cle: "categorie", label: CATEGORIES[filtres.categorie as Categorie] },
+    filtres.quartier && { cle: "quartier", label: QUARTIERS[filtres.quartier as keyof typeof QUARTIERS] },
+    filtres.tram && { cle: "tram", label: `Tram ${filtres.tram}` },
+    filtres.ecole && { cle: "ecole", label: filtres.ecole },
+    filtres.contrepartie && { cle: "contrepartie", label: CONTREPARTIES[filtres.contrepartie as keyof typeof CONTREPARTIES] },
+  ].filter(Boolean) as { cle: keyof Filtres; label: string }[];
 
   // Palier 3 : suggestions « Pour toi », et accueil guidé, seulement sur la vue sans filtre.
-  const sansFiltre = !filtres.type && !filtres.categorie && !filtres.quartier && !filtres.tram && !recherche;
+  const sansFiltre = actifs.length === 0;
   let pourToi: ReturnType<typeof suggerer<Annonce>> = [];
   let etatAccueil = null;
   if (sansFiltre && user && profil) {
@@ -87,6 +124,7 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
       <form action="/annonces" className="flex flex-wrap items-end gap-2" role="search">
         {filtres.type && <input type="hidden" name="type" value={filtres.type} />}
         {filtres.categorie && <input type="hidden" name="categorie" value={filtres.categorie} />}
+        {filtres.tri && <input type="hidden" name="tri" value={filtres.tri} />}
         <label className="flex min-w-60 flex-1 flex-col gap-1 text-xs font-semibold">
           Rechercher
           <input
@@ -119,22 +157,62 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
             ))}
           </select>
         </label>
+        <label className="flex flex-col gap-1 text-xs font-semibold">
+          École
+          <select name="ecole" defaultValue={filtres.ecole ?? ""} className={CLASSE_SAISIE}>
+            <option value="">Les deux</option>
+            {ECOLES.map((e) => (
+              <option key={e} value={e}>
+                {e}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-xs font-semibold">
+          Contrepartie
+          <select name="contrepartie" defaultValue={filtres.contrepartie ?? ""} className={CLASSE_SAISIE}>
+            <option value="">Toutes</option>
+            {Object.entries(CONTREPARTIES).map(([v, l]) => (
+              <option key={v} value={v}>
+                {l}
+              </option>
+            ))}
+          </select>
+        </label>
         <Bouton>Chercher</Bouton>
-        {(filtres.q || filtres.quartier || filtres.tram) && (
-          <BoutonLien href={lienFiltre({ type: filtres.type, categorie: filtres.categorie }, {})} variante="discret">
-            Effacer
-          </BoutonLien>
-        )}
       </form>
 
+      {/* Filtres actifs : une pastille par filtre, la croix le retire. */}
+      {actifs.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5" aria-label="Filtres actifs">
+          {actifs.map((f) => (
+            <Link
+              key={f.cle}
+              href={lienFiltre({ ...filtres, page: undefined }, { [f.cle]: undefined })}
+              className="pop presse flex items-center gap-1.5 rounded-full bg-encre py-1 pr-2 pl-3 text-sm text-surface hover:bg-encre/85"
+              aria-label={`Retirer le filtre ${f.label}`}
+            >
+              {f.label}
+              <svg viewBox="0 0 24 24" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
+                <path d="M6 6l12 12M18 6 6 18" />
+              </svg>
+            </Link>
+          ))}
+          <Link href="/annonces" className="px-2 text-sm text-encre-douce underline-offset-2 hover:underline">
+            Tout effacer
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-col gap-3">
-        <nav className="inline-flex self-start rounded-ui bg-papier-fonce p-1" aria-label="Type d'annonce">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <nav className="inline-flex self-start rounded-ui bg-papier-fonce p-1" aria-label="Type d'annonce">
           {onglets.map((o) => {
             const actif = filtres.type === o.valeur;
             return (
               <Link
                 key={o.label}
-                href={lienFiltre(filtres, { type: o.valeur })}
+                href={lienFiltre({ ...filtres, page: undefined }, { type: o.valeur })}
                 aria-current={actif ? "page" : undefined}
                 className="rounded-[4px] px-3.5 py-1.5 text-sm font-medium text-encre-douce aria-[current=page]:bg-surface aria-[current=page]:text-encre aria-[current=page]:shadow-sm"
               >
@@ -142,18 +220,36 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
               </Link>
             );
           })}
-        </nav>
+          </nav>
+          <nav className="inline-flex rounded-ui bg-papier-fonce p-1 text-sm" aria-label="Tri">
+            {[
+              { tri: undefined, label: "Plus récentes" },
+              { tri: "bientot", label: "Expirent bientôt" },
+            ].map((o) => (
+              <Link
+                key={o.label}
+                href={lienFiltre({ ...filtres, page: undefined }, { tri: o.tri })}
+                aria-current={filtres.tri === o.tri ? "page" : undefined}
+                className="rounded-[4px] px-3 py-1.5 font-medium text-encre-douce aria-[current=page]:bg-surface aria-[current=page]:text-encre aria-[current=page]:shadow-sm"
+              >
+                {o.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
         <nav className="flex flex-wrap gap-1.5" aria-label="Catégories">
           {[["", "Toutes"] as const, ...Object.entries(CATEGORIES)].map(([valeur, label]) => {
             const actif = (filtres.categorie ?? "") === valeur;
+            const nombre = valeur ? (parCategorie[valeur] ?? 0) : (toutes?.length ?? 0);
             return (
               <Link
                 key={valeur || "toutes"}
-                href={lienFiltre(filtres, { categorie: valeur || undefined })}
+                href={lienFiltre({ ...filtres, page: undefined }, { categorie: valeur || undefined })}
                 aria-current={actif ? "page" : undefined}
-                className="rounded-full border border-ligne bg-surface px-3 py-1 text-sm hover:border-ligne-forte aria-[current=page]:border-encre aria-[current=page]:bg-encre aria-[current=page]:text-surface"
+                className="presse group/chip flex items-center gap-1.5 rounded-full border border-ligne bg-surface px-3 py-1 text-sm hover:border-ligne-forte aria-[current=page]:border-encre aria-[current=page]:bg-encre aria-[current=page]:text-surface"
               >
                 {label}
+                <span className="text-xs text-encre-douce group-aria-[current=page]/chip:text-surface/70">{nombre}</span>
               </Link>
             );
           })}
@@ -188,7 +284,7 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
       {annonces.length > 0 ? (
         <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {annonces.map((a, i) => (
-            <CarteAnnonce key={a.id} annonce={a} index={i} />
+            <CarteAnnonce key={a.id} annonce={a} index={i % PAR_PAGE} />
           ))}
         </div>
       ) : (
@@ -201,6 +297,12 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
             Publier une annonce
           </BoutonLien>
         </div>
+      )}
+
+      {annonces.length === limite && limite < PAR_PAGE * 5 && (
+        <BoutonLien href={lienFiltre(filtres, { page: String(Number(filtres.page ?? 1) + 1) })} variante="contour" className="self-center" scroll={false}>
+          Voir plus d&apos;annonces
+        </BoutonLien>
       )}
     </div>
   );
