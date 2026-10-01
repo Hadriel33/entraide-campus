@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Logo } from "./logo";
+import { BoutonTheme } from "./theme";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { deconnecter } from "@/app/(auth)/actions";
@@ -15,6 +16,7 @@ function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
     { href: "/bureau", label: "Mon bureau" },
     { href: "/annonces", label: "Annonces" },
     { href: "/mur", label: "Le mur en direct" },
+    { href: "/carte", label: "La carte" },
     { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
     { href: "/mes-annonces", label: "Mes annonces" },
     { href: "/favoris", label: "Favoris" },
@@ -87,6 +89,7 @@ export function BarreLaterale({
               <BadgeEcole ecole={ecole} />
             </span>
           </Link>
+          <BoutonTheme className="px-2.5 py-2 text-encre-douce hover:text-encre" />
           <p className="px-2.5 text-xs text-encre-douce">
             <kbd className="rounded border border-ligne-forte px-1 font-sans">Ctrl</kbd> + <kbd className="rounded border border-ligne-forte px-1 font-sans">K</kbd> pour aller n&apos;importe où
           </p>
@@ -118,6 +121,7 @@ export function EnTetePublic() {
           <Logo compact />
         </Link>
         <div className="flex items-center gap-2 text-sm">
+          <BoutonTheme className="hidden px-3 py-2 sm:flex" />
           <Link href="/connexion" className="presse rounded-ui px-3 py-2 font-medium hover:bg-papier-fonce">
             Se connecter
           </Link>
@@ -167,6 +171,7 @@ function OngletsMobile({
   const plus = [
     { href: "/classement", label: "Classement" },
     { href: "/mur", label: "Le mur en direct" },
+    { href: "/carte", label: "La carte" },
     { href: "/mes-annonces", label: "Mes annonces" },
     { href: "/favoris", label: "Favoris" },
     { href: "/compte", label: "Mon profil" },
@@ -222,6 +227,7 @@ function OngletsMobile({
                 {l.label}
               </Link>
             ))}
+            <BoutonTheme className="px-3 py-3 font-medium" />
             <form action={deconnecter}>
               <button className="presse w-full rounded-ui px-3 py-3 text-left text-encre-douce hover:bg-papier-fonce">Se déconnecter</button>
             </form>

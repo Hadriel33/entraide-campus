@@ -18,6 +18,14 @@ La même interface est déclinée en 3 pistes : **seuls les jetons changent**, c
 
 ---
 
+## V6 (01/10, nuit) : saisons, Colette qui parle, carte, tableau noir
+
+- **Costumes de saison automatiques** : la mascotte s'habille selon le calendrier du campus (cartable à la rentrée, chapeau de sorcière à Halloween, café pendant les partiels, bonnet à Noël, lunettes au nouvel an et l'été). Les avatars choisis par les étudiants ne changent pas.
+- **Colette te parle** : une bulle sur le bureau, la phrase la plus utile du moment (rang de ta classe et points à gagner, ton rang, ton défi, la saison, sinon une astuce du jour).
+- **Le fil du campus** : « @lea (ESP) a aidé @tom (ESD) », seulement si les deux ont dit oui (réglage dans le profil, désactivé par défaut).
+- **La carte** : plan schématique de Bordeaux (Garonne, trams A à D), un post-it punaisé par quartier avec le nombre d'annonces.
+- **Mode tableau noir** : fond ardoise et poussière de craie ; les post-it, Colette et les bandeaux restent des papiers clairs, donc ressortent encore plus. Choix mémorisé, appliqué avant l'affichage (pas de flash).
+
 ## V5 (01/10, nuit) : Post-it campus et Colette
 
 - **Nouveau nom : Post-it campus** (usage interne à l'école). Logo : un post-it jaune penché avec un « P », la punaise rouge à la place du tiret, « campus » écrit à la main. Favicon et image de partage refaits.

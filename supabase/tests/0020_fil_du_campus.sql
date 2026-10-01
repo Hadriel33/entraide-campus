@@ -1,0 +1,5 @@
+-- Fil du campus (01/10/2026). Transaction annulée. Attendu : « 5 tests fil du campus OK ».
+-- 1 une entraide acceptée n'apparaît pas sans accord · 2 ni avec l'accord d'un seul des deux
+-- 3 un tiers ne peut pas cocher le fil à la place d'un autre · 4 avec les deux accords : bon sens (qui aide qui) et catégorie
+-- 5 un visiteur non connecté ne peut pas lire le fil
+-- Script exécuté via le MCP Supabase (la demande est créée par le demandeur connecté, puis acceptée par l'auteur).

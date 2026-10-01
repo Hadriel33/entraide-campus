@@ -94,6 +94,7 @@ export function AtelierColette({
             humeur={h as Humeur}
             accessoire={a as Accessoire}
             motif={m as Motif}
+            saison={false}
             anim="flotte"
             taille={150}
             titre="Aperçu de ta Colette"

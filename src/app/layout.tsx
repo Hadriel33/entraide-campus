@@ -9,6 +9,7 @@ import { Toast } from "@/components/ui/toast";
 import { Palette } from "@/components/app/palette";
 import { Confettis } from "@/components/ui/confettis";
 import { TutoColette } from "@/components/colette/tuto";
+import { SCRIPT_THEME } from "@/components/app/theme";
 import "./globals.css";
 
 // Polices de la DA « Campus 2026 » : Archivo (axe de largeur pour les titres condensés),
@@ -51,7 +52,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     : { count: 0 };
 
   return (
-    <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} ${kalam.variable} h-full antialiased`}>
+    <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} ${kalam.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        {/* Tableau noir : appliqué avant l'affichage pour éviter un flash clair. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_THEME }} />
+      </head>
       <body className="min-h-full font-sans">
         <Suspense>
           <Toast />

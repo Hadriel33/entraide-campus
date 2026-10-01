@@ -1,3 +1,5 @@
+import { saisonDu } from "@/lib/design/saisons";
+
 // Colette, la mascotte : un post-it avec une punaise sur la tête.
 // Pur SVG + CSS (animations dans globals.css, section « Colette »), utilisable côté serveur.
 // Les couleurs viennent des jetons du thème (test front-portable) : aucune couleur en dur ici.
@@ -20,7 +22,11 @@ export type Accessoire =
   | "echarpe"
   | "cape"
   | "etoile"
-  | "couronne";
+  | "couronne"
+  // Tenues de saison (portées par la mascotte, pas choisissables en avatar)
+  | "cartable"
+  | "sorciere"
+  | "cafe";
 export type Motif = "uni" | "ligne" | "pois" | "quadrille" | "dore";
 export type AnimColette = "flotte" | "coucou" | "lit" | "tampon" | "accroche" | "saute" | "dort" | "cherche" | "reflechit" | "debordee";
 
@@ -285,6 +291,26 @@ function AccessoireDevant({ a }: { a: Accessoire }) {
           <circle cx="100" cy="27" r="3" fill="var(--color-ciel)" />
         </g>
       );
+    case "cartable":
+      return <path d="M44 34 Q40 80 50 110 M122 34 Q126 80 116 110" stroke="var(--color-bois)" strokeWidth="6" fill="none" strokeLinecap="round" />;
+    case "sorciere":
+      return (
+        <g stroke={K} strokeWidth="2.5" strokeLinejoin="round">
+          <path d="M22 38 Q83 24 144 38 Q83 50 22 38 Z" fill={K} />
+          <path d="M54 36 L92 -30 Q96 -22 104 -26 L110 36 Z" fill={K} />
+          <path d="M58 30 Q83 24 108 30 L108 36 Q83 30 58 36 Z" fill="var(--color-ocre)" stroke="none" />
+        </g>
+      );
+    case "cafe":
+      return (
+        <g>
+          <path d="M58 88 Q66 92 74 88 M92 88 Q100 92 108 88" stroke="var(--color-lilas)" strokeWidth="3" fill="none" strokeLinecap="round" />
+          <rect x="132" y="104" width="26" height="30" rx="3" fill={BLANC} stroke={K} strokeWidth="2.5" />
+          <path d="M158 112 q10 2 0 14" stroke={K} strokeWidth="2.5" fill="none" />
+          <rect x="136" y="114" width="18" height="6" fill="var(--color-bois)" />
+          <path className="col-vapeur" d="M140 98 q4 -6 0 -12 M150 98 q4 -6 0 -12" stroke="var(--color-encre-douce)" strokeWidth="2" fill="none" strokeLinecap="round" />
+        </g>
+      );
     case "noel":
       return (
         <g>
@@ -298,8 +324,10 @@ function AccessoireDevant({ a }: { a: Accessoire }) {
   }
 }
 
-// Pièces portées derrière le corps (la cape).
+// Pièces portées derrière le corps (la cape, le cartable).
 function AccessoireDerriere({ a }: { a: Accessoire }) {
+  if (a === "cartable")
+    return <rect x="18" y="52" width="130" height="78" rx="14" fill="var(--color-bois)" stroke={K} strokeWidth="2.5" />;
   if (a !== "cape") return null;
   return <path d="M34 40 Q8 110 22 170 L144 170 Q158 110 132 40 Z" fill={ROUGE} stroke={K} strokeWidth="2.5" strokeLinejoin="round" />;
 }
@@ -446,6 +474,7 @@ export function Colette({
   humeur = "contente",
   accessoire = "aucun",
   motif = "uni",
+  saison = true,
   anim,
   taille = 120,
   titre,
@@ -456,6 +485,8 @@ export function Colette({
   humeur?: Humeur;
   accessoire?: Accessoire;
   motif?: Motif;
+  /** La mascotte s'habille selon la date (rentrée, partiels, Noël...). Désactivé pour les avatars. */
+  saison?: boolean;
   anim?: AnimColette;
   taille?: number;
   titre?: string;
@@ -464,9 +495,11 @@ export function Colette({
   className?: string;
 }) {
   const h = (anim && HUMEUR_ANIM[anim]) ?? humeur;
+  const deSaison = saison && accessoire === "aucun" ? saisonDu(new Date()) : null;
+  if (deSaison) accessoire = deSaison.tenue;
   const [fond, coin] = PAPIER[couleur];
   const joue = couleur === "lilas" ? "var(--color-ocre)" : "var(--color-lilas)";
-  const cachePunaise = accessoire === "diplome" || accessoire === "noel" || accessoire === "couronne" || accessoire === "casque";
+  const cachePunaise = ["diplome", "noel", "couronne", "casque", "sorciere"].includes(accessoire);
   const corps = anim === "flotte" || anim === "coucou" ? "col-flotte" : anim === "saute" ? "col-saute" : anim === "dort" ? "col-respire" : anim === "cherche" ? "col-cherche" : anim === "debordee" ? "col-tremble" : anim === "reflechit" ? "col-penche" : "";
 
   return (

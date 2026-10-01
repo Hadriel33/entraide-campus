@@ -51,6 +51,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
               humeur={(profil.colette_humeur || "contente") as Humeur}
               accessoire={(profil.colette_accessoire || "aucun") as Accessoire}
               motif={(profil.colette_motif || "uni") as Motif}
+              saison={false}
               anim="flotte"
               taille={54}
               className="absolute -right-6 -bottom-3"

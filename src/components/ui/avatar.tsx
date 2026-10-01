@@ -38,6 +38,7 @@ export function Avatar({
         humeur={(colette?.colette_humeur as Humeur) || "contente"}
         accessoire={px >= 40 ? ((colette?.colette_accessoire as Accessoire) || "aucun") : "aucun"}
         motif={(colette?.colette_motif as Motif) || "uni"}
+        saison={false}
       />
     </span>
   );

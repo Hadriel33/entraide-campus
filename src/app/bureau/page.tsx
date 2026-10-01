@@ -12,6 +12,10 @@ import { etapesAccueil } from "@/lib/profils/accueil";
 import { inclinaison, teinte } from "@/lib/design/teintes";
 import { Colette, type Accessoire, type CouleurColette } from "@/components/colette/colette";
 import { CarteDefi } from "@/components/profil/carte-defi";
+import { FilCampus } from "@/components/campus/fil";
+import { messageColette } from "@/lib/gamification/message-colette";
+import { defiDeLaSemaine } from "@/lib/gamification/defis";
+import { saisonDu } from "@/lib/design/saisons";
 import { Avatar } from "@/components/ui/avatar";
 import { Bouton } from "@/components/ui/bouton";
 
@@ -110,17 +114,41 @@ export default async function PageBureau() {
 
   const nbAttente = aFaire.length;
 
+  // Ce que Colette dit cette semaine
+  const { data: monDefi } = await supabase.rpc("mon_defi");
+  const defi = defiDeLaSemaine();
+  const progressionDefi = (monDefi ?? {}) as { progression?: number; objectif?: number };
+  const classeLigne = rangClasse > 0 ? parClasse[rangClasse - 1] : null;
+  const devantClasse = rangClasse > 1 ? parClasse[rangClasse - 2] : null;
+  const devantMoi = monRang > 1 ? top[monRang - 2] : null;
+  const bulle = messageColette({
+    classe: maClasse && classeLigne ? { nom: maClasse.nom, rang: rangClasse, ecart: devantClasse ? devantClasse.score - classeLigne.score + 1 : 0 } : null,
+    aUneClasse: !!profil.classe_id,
+    rang: monRang,
+    ecartRang: devantMoi && monRang > 1 ? devantMoi.points - top[monRang - 1].points + 1 : 0,
+    defi: { titre: defi.titre, reussi: (progressionDefi.progression ?? 0) >= (progressionDefi.objectif ?? defi.objectif) },
+    phraseSaison: saisonDu(new Date())?.phrase ?? null,
+    jour: new Date().getDay(),
+  });
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
       <header className="flex flex-wrap items-end justify-between gap-6">
-        <div className="flex items-end gap-4">
-          <Colette
-            anim={nbAttente > 2 ? "debordee" : "coucou"}
-            couleur={(profil.colette_couleur || "jaune") as CouleurColette}
-            accessoire={(profil.colette_accessoire || "aucun") as Accessoire}
-            taille={92}
-            className="hidden shrink-0 sm:block"
-          />
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex items-end gap-2">
+            <Colette
+              anim={nbAttente > 2 ? "debordee" : "coucou"}
+              couleur={(profil.colette_couleur || "jaune") as CouleurColette}
+              accessoire={(profil.colette_accessoire || "aucun") as Accessoire}
+              taille={92}
+              className="shrink-0"
+            />
+            {/* La bulle de Colette : une phrase sur ta semaine (classe, rang, défi, saison). */}
+            <p className="pop relative mb-10 max-w-64 rounded-carte border border-encre bg-surface px-3.5 py-2.5 text-sm leading-snug shadow-[3px_3px_0_0_var(--color-bandeau)]">
+              {bulle}
+              <span className="absolute bottom-3 -left-[7px] size-3 rotate-45 border-b border-l border-encre bg-surface" aria-hidden />
+            </p>
+          </div>
           <div className="flex flex-col gap-2">
             <h1 className="titre-charte couche-fixe self-start bg-bandeau px-3 pt-1 text-titre">Salut {profil.prenom}</h1>
             <p className="-rotate-1 font-main text-2xl text-alerte">
@@ -228,6 +256,8 @@ export default async function PageBureau() {
 
         <aside className="flex flex-col gap-6">
           <CarteDefi supabase={supabase} />
+
+          <FilCampus supabase={supabase} moiDansLeFil={profil.fil_public} />
 
           {p && (
             <section className="flex flex-col gap-3 rounded-carte border border-ligne bg-surface p-5">

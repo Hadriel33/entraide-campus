@@ -7,6 +7,7 @@ type Commande = { label: string; aide: string; href: string };
 
 const PAGES: Commande[] = [
   { label: "Annonces", aide: "Toutes les annonces du campus", href: "/annonces" },
+  { label: "La carte", aide: "Les annonces par quartier et ligne de tram", href: "/carte" },
   { label: "Le mur en direct", aide: "À projeter : les annonces arrivent en direct", href: "/mur" },
   { label: "Publier une annonce", aide: "Raccourci : n", href: "/annonces/nouvelle" },
   { label: "Demandes", aide: "Reçues et envoyées", href: "/demandes" },

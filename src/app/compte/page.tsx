@@ -11,7 +11,7 @@ import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./fo
 import { AssistantCompetences } from "./assistant-competences";
 import { ZoneSensible } from "./zone-sensible";
 import { AtelierColette } from "./atelier-colette";
-import { choisirClasse, proposerClasse } from "./actions";
+import { basculerFil, choisirClasse, proposerClasse } from "./actions";
 import { Bouton } from "@/components/ui/bouton";
 import Link from "next/link";
 
@@ -82,12 +82,23 @@ export default async function PageCompte() {
               Classe ({profil.ecole})
               <select name="classe" defaultValue={profil.classe_id ?? ""} className="min-h-11 rounded-ui border border-ligne-forte bg-surface px-3 text-base font-normal">
                 <option value="">Pas de classe</option>
-                {classes.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nom}
-                    {!c.validee ? " (en attente de validation)" : ""}
-                  </option>
-                ))}
+                {[
+                  { titre: "Bachelor", filtre: (n: string) => n.startsWith("B") },
+                  { titre: "Mastère", filtre: (n: string) => n.startsWith("M") },
+                  { titre: "Autres", filtre: (n: string) => !n.startsWith("B") && !n.startsWith("M") },
+                ].map((g) => {
+                  const liste = classes.filter((c) => g.filtre(c.nom));
+                  return liste.length ? (
+                    <optgroup key={g.titre} label={g.titre}>
+                      {liste.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.nom}
+                          {!c.validee ? " (en attente de validation)" : ""}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ) : null;
+                })}
               </select>
             </label>
             <Bouton>Enregistrer</Bouton>
@@ -120,6 +131,16 @@ export default async function PageCompte() {
 
       <Section titre="Mon identité" aide="Ce que les autres étudiants voient sur ton profil et tes annonces.">
         <FormulaireIdentite pseudo={profil.pseudo} prenom={profil.prenom} bio={profil.bio ?? ""} />
+      </Section>
+
+      <Section id="fil" titre="Le fil du campus" aide="Le fil montre « @lea (ESP) a aidé @tom (ESD) ». Une entraide n'y apparaît que si les deux personnes ont dit oui. Jamais de message ni de coordonnées.">
+        <form action={basculerFil} className="flex flex-wrap items-center gap-3">
+          <input type="hidden" name="fil" value={profil.fil_public ? "non" : "oui"} />
+          <span className={`rounded-full px-3 py-1 text-sm font-semibold ${profil.fil_public ? "bg-ok-fond text-ok" : "bg-papier-fonce text-encre-douce"}`}>
+            {profil.fil_public ? "Tu apparais dans le fil" : "Tu n'apparais pas dans le fil"}
+          </span>
+          <Bouton variante="contour">{profil.fil_public ? "Ne plus apparaître" : "Apparaître dans le fil"}</Bouton>
+        </form>
       </Section>
 
       <Section

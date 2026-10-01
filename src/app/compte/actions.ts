@@ -154,3 +154,11 @@ export async function proposerClasse(formData: FormData) {
   revalidatePath("/", "layout");
   redirect("/compte?ok=classe_proposee#classe");
 }
+
+// Apparaître (ou non) dans le fil du campus. Désactivé par défaut ; il faut l'accord des deux pour qu'une entraide s'affiche.
+export async function basculerFil(formData: FormData) {
+  const { supabase, user } = await exigerSession();
+  await supabase.from("profils").update({ fil_public: formData.get("fil") === "oui" }).eq("id", user.id);
+  revalidatePath("/", "layout");
+  redirect("/compte?ok=fil#fil");
+}

@@ -44,6 +44,10 @@
   --color-encre-bleue: #1f5f8b;   /* stylo bleu (gribouillis, code) */
   --color-bois: #8a5a2b;          /* manche de pinceau, cartable */
   --color-or: #e8c25a;            /* Colette dorée (10 personnes aidées) */
+  --color-tram-a: #8e1a4e;        /* lignes de tram de la carte (plan schématique) */
+  --color-tram-b: #b91217;
+  --color-tram-c: #b0307a;
+  --color-tram-d: #6b3fa0;
 
   /* Badges (couleurs de bandeaux adoucies, texte en encre) */
   --color-offre: #faf1a8;         /* « Je propose » */
@@ -80,6 +84,48 @@ body {
   background-image: radial-gradient(color-mix(in oklab, var(--color-encre) 11%, transparent) 1px, transparent 1.3px);
   background-size: 22px 22px;
   color: var(--color-encre);
+}
+
+/* ============ Mode « tableau noir » ============
+   Le fond devient une ardoise verte, le texte de la craie. Les post-it, Colette et les bandeaux
+   restent des papiers clairs (on remet les jetons clairs à l'intérieur) : ils ressortent sur le tableau. */
+:root[data-theme="noir"] {
+  color-scheme: dark;
+  --color-papier: #25322c;
+  --color-surface: #2f3e37;
+  --color-papier-fonce: #2a3832;
+  --color-encre: #f2f0e6;
+  --color-encre-douce: #c2c8bf;
+  --color-ligne: #435549;
+  --color-ligne-forte: #5c6f64;
+  --color-alerte: #ff9a8f;
+  --color-ok: #9fe0b9;
+  --color-ok-fond: #2b4a3b;
+}
+:root[data-theme="noir"] body {
+  background-image:
+    radial-gradient(color-mix(in oklab, var(--color-encre) 9%, transparent) 1px, transparent 1.3px),
+    radial-gradient(ellipse at 18% 25%, color-mix(in oklab, var(--color-encre) 5%, transparent), transparent 55%),
+    radial-gradient(ellipse at 82% 70%, color-mix(in oklab, var(--color-encre) 4%, transparent), transparent 50%);
+  background-size: 22px 22px, 100% 100%, 100% 100%;
+  background-attachment: scroll, fixed, fixed;
+}
+:root[data-theme="noir"] :is(.postit, .colette, [class*="bg-bandeau"], [class*="bg-lilas"], [class*="bg-ciel"], [class*="bg-ocre"], [class*="bg-postit"], [class*="bg-offre"], [class*="bg-besoin"], [class*="bg-or"]) {
+  --color-encre: #111111;
+  --color-encre-douce: #5a5a5a;
+  --color-surface: #ffffff;
+  --color-papier: #fafaf8;
+  --color-papier-fonce: #f1f0ec;
+  --color-ligne: #e6e4df;
+  --color-ligne-forte: #cfccc4;
+  --color-alerte: #b91217;
+  --color-ok: #1f7a4d;
+  --color-ok-fond: #e8f5ee;
+  color: var(--color-encre);
+}
+/* Colette garde son trait noir : un liseré de craie la détache du tableau. */
+:root[data-theme="noir"] .colette {
+  filter: drop-shadow(0 0 1.5px color-mix(in oklab, #ffffff 70%, transparent));
 }
 
 /* ============ Post-it ============
@@ -291,6 +337,8 @@ body {
 @keyframes col-pupille { 25% { translate: 2.5px 0; } 50% { translate: 0 2.5px; } 75% { translate: -2.5px 0; } }
 .colette .col-orbite { animation: col-orbite 3.2s linear infinite; transform-box: view-box; transform-origin: 83px 86px; }
 @keyframes col-orbite { to { rotate: 360deg; } }
+.colette .col-vapeur { animation: col-vapeur 2s ease-in-out infinite; }
+@keyframes col-vapeur { 0%, 100% { opacity: 0.2; translate: 0 2px; } 50% { opacity: 1; translate: 0 -3px; } }
 .colette .col-goutte { animation: col-goutte 1.2s ease-in infinite; }
 @keyframes col-goutte { 0% { translate: 0 0; opacity: 1; } 100% { translate: 2px 22px; opacity: 0; } }
 

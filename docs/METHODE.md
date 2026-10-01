@@ -83,6 +83,8 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Montrer avant de coder : planche de maquettes (accueil, dashboard, logo, mascotte) | Hadriel choisit sur pièces, l'IA code ensuite la piste retenue. Moins d'allers-retours sur le vrai site. |
 | 01/10 | Tenues de Colette à débloquer, règles écrites deux fois (TypeScript pour l'affichage, SQL pour l'interdiction) | La récompense donne envie de s'entraider ; la base refuse un objet verrouillé même via l'API, et un test vérifie que les deux listes de conditions concordent. |
 | 01/10 | Classes : liste officielle préremplie + propositions validées par un admin | On ne connaissait pas toutes les classes : la liste vient des programmes publics, les étudiants complètent, l'admin garde la main. |
+| 01/10 | Fil du campus en double consentement, désactivé par défaut | Montrer l'entraide sans exposer personne : la base ne renvoie une entraide que si les deux ont dit oui, et seulement la catégorie (ni message, ni titre). |
+| 01/10 | Tableau noir par jetons : on redéfinit les couleurs du thème, et on remet les jetons clairs dans les papiers | Aucun composant à réécrire : c'est la preuve que le front est piloté par les jetons (consigne du prof). |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
