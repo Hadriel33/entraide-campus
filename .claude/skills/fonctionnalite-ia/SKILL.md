@@ -23,7 +23,7 @@ Les 4 critères qu'un vrai client vérifie (25 % de la note : conception 15 %, i
 ## 4. Un plan si ça rate
 - Délai maximum (par exemple 15 s), puis un message clair. Jamais d'écran bloqué.
 - Profil CV : la saisie manuelle des compétences reste toujours possible.
-- Modération : si l'IA est en panne, l'annonce part en `a_verifier`, elle n'est pas publiée sans contrôle.
+- Modération : si l'IA est en panne, l'annonce reste « en attente » et apparaît dans la file de l'admin (un humain la relit). Seul un « refus probable » la masque en attendant la décision.
 
 ## Tests minimum
 Voir le skill `tests-comptes` : cas normal, presque vide, texte caché ou injection, panne simulée.
