@@ -27,7 +27,7 @@ export default async function PageMesAnnonces() {
       {annonces.length > 0 ? (
         <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {annonces.map((a, i) => (
-            <CarteAnnonce key={a.id} annonce={a} index={i} />
+            <CarteAnnonce key={a.id} annonce={a} index={i} afficherExpiration />
           ))}
         </div>
       ) : (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { deconnecter } from "@/app/(auth)/actions";
 import { BadgeEcole } from "@/components/ui/badge";
+import { Cloche } from "./cloche";
 
 type Lien = { href: string; label: string; compteur?: number };
 
@@ -12,6 +13,7 @@ function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
     { href: "/annonces", label: "Annonces" },
     { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
     { href: "/mes-annonces", label: "Mes annonces" },
+    { href: "/favoris", label: "Favoris" },
     { href: "/classement", label: "Classement" },
     { href: "/compte", label: "Mon profil" },
     ...(estAdmin ? [{ href: "/admin", label: "Admin" }] : []),
@@ -42,7 +44,11 @@ export function BarreLaterale({
   avatar,
   demandesEnAttente,
   estAdmin,
+  moi,
+  notificationsNonLues,
 }: {
+  moi: string;
+  notificationsNonLues: number;
   pseudo: string;
   ecole: string;
   avatar: React.ReactNode;
@@ -57,10 +63,13 @@ export function BarreLaterale({
     <>
       {/* Bureau : barre latérale */}
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 border-r border-ligne bg-surface px-3.5 py-5 md:flex">
-        <Link href="/annonces" className="flex items-center gap-2.5 px-2 font-semibold">
-          <Monogramme />
-          L&apos;entraide du campus
-        </Link>
+        <div className="flex items-center justify-between gap-1">
+          <Link href="/annonces" className="flex items-center gap-2.5 px-2 font-semibold">
+            <Monogramme />
+            L&apos;entraide du campus
+          </Link>
+          <Cloche moi={moi} nonLues={notificationsNonLues} />
+        </div>
         <nav className="flex flex-col gap-0.5" aria-label="Navigation principale">
           {menu.map((l) => (
             <Link
@@ -97,9 +106,12 @@ export function BarreLaterale({
             <Monogramme />
             <span className="text-sm">L&apos;entraide du campus</span>
           </Link>
-          <Link href={`/profils/${pseudo}`} aria-label="Mon profil public">
-            {avatar}
-          </Link>
+          <div className="flex items-center gap-1">
+            <Cloche moi={moi} nonLues={notificationsNonLues} />
+            <Link href={`/profils/${pseudo}`} aria-label="Mon profil public">
+              {avatar}
+            </Link>
+          </div>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-3 pb-2 text-sm" aria-label="Navigation principale">
           {menu.map((l) => (

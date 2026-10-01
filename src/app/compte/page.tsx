@@ -6,6 +6,7 @@ import { BadgeEcole } from "@/components/ui/badge";
 import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { CarteProgression } from "@/components/profil/progression";
+import { CarteDefi } from "@/components/profil/carte-defi";
 import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
 import { ZoneSensible } from "./zone-sensible";
@@ -13,9 +14,9 @@ import Link from "next/link";
 
 export const metadata: Metadata = { title: "Mon profil" };
 
-function Section({ titre, aide, children }: { titre: string; aide?: string; children: React.ReactNode }) {
+function Section({ id, titre, aide, children }: { id?: string; titre: string; aide?: string; children: React.ReactNode }) {
   return (
-    <section className="apparition flex flex-col gap-4 rounded-carte border border-ligne bg-surface p-5">
+    <section id={id} className="apparition flex scroll-mt-6 flex-col gap-4 rounded-carte border border-ligne bg-surface p-5 target:border-encre">
       <div>
         <h2 className="text-lg font-semibold">{titre}</h2>
         {aide && <p className="text-sm text-encre-douce">{aide}</p>}
@@ -50,12 +51,14 @@ export default async function PageCompte() {
       </div>
 
       {stats && <CarteProgression stats={stats as Stats} moi />}
+      <CarteDefi supabase={supabase} />
 
-      <Section titre="Photo de profil">
+      <Section id="photo" titre="Photo de profil">
         <FormulairePhoto apercu={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" />} />
       </Section>
 
       <Section
+        id="competences"
         titre="Mes compétences"
         aide="Ce que tu peux proposer aux autres. Dépose ton CV : l'IA te fait des propositions, tu gardes ce qui est juste."
       >
@@ -67,6 +70,7 @@ export default async function PageCompte() {
       </Section>
 
       <Section
+        id="coordonnees"
         titre="Mes coordonnées"
         aide="Cachées par défaut. Seules les personnes dont tu acceptes la demande (ou qui acceptent la tienne) peuvent les voir."
       >

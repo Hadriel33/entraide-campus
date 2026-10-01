@@ -12,7 +12,7 @@ export type EtatAnnonce = {
   valeurs?: Record<string, string>;
 };
 
-const CHAMPS = ["type", "categorie", "titre", "description", "contrepartie", "lieu"] as const;
+const CHAMPS = ["type", "categorie", "titre", "description", "contrepartie", "lieu", "quartier", "tram"] as const;
 
 function lireChamps(formData: FormData) {
   return Object.fromEntries(CHAMPS.map((c) => [c, String(formData.get(c) ?? "")])) as Record<(typeof CHAMPS)[number], string>;
@@ -78,4 +78,13 @@ export async function supprimerAnnonce(id: string) {
   revalidatePath("/annonces");
   revalidatePath("/mes-annonces");
   redirect("/mes-annonces?ok=supprimee");
+}
+
+// Prolonger : seule la fonction SQL peut changer la date d'expiration, et seulement pour l'auteur.
+export async function prolongerAnnonce(id: string) {
+  const supabase = await clientConnecte();
+  await supabase.rpc("prolonger_annonce", { p_annonce: id });
+  revalidatePath("/mes-annonces");
+  revalidatePath("/annonces");
+  redirect(`/annonces/${id}?ok=prolongee`);
 }

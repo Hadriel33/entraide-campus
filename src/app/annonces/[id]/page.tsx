@@ -3,14 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { SELECT_ANNONCE, dateCourte, type Annonce } from "@/lib/annonces/requetes";
-import { CATEGORIES, CONTREPARTIES, TYPES } from "@/lib/annonces/validation";
+import { CATEGORIES, CONTREPARTIES, QUARTIERS, TYPES } from "@/lib/annonces/validation";
+import { joursRestants } from "@/lib/annonces/expiration";
+import { BoutonFavori } from "@/components/annonces/bouton-favori";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { BlocCoordonnees, type Coordonnees } from "@/components/demandes/coordonnees";
 import { FormulaireAvis } from "@/components/demandes/formulaire-avis";
 import { annulerDemande, demanderContact, signalerAnnonce } from "@/app/demandes/actions";
-import { changerStatut, supprimerAnnonce } from "../actions";
+import { changerStatut, prolongerAnnonce, supprimerAnnonce } from "../actions";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -45,6 +47,10 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
     demande?.statut === "acceptee"
       ? await supabase.from("coordonnees").select("telephone, email, reseau").eq("id", annonce.auteur_id).maybeSingle<Coordonnees>()
       : { data: null };
+  const { data: favori } = estAuteur
+    ? { data: null }
+    : await supabase.from("favoris").select("annonce_id").eq("profil_id", user!.id).eq("annonce_id", annonce.id).maybeSingle();
+  const jours = joursRestants(annonce.expire_le);
   const { data: monAvis } =
     demande?.statut === "acceptee" ? await supabase.from("avis").select("id").eq("demande_id", demande.id).eq("auteur_id", user!.id).maybeSingle() : { data: null };
 
@@ -58,6 +64,7 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
         <Badge>{CATEGORIES[annonce.categorie]}</Badge>
         {annonce.statut === "archivee" && <Badge>Archivée</Badge>}
         {annonce.statut === "masquee" && <Badge>Masquée par la modération</Badge>}
+        {jours === 0 && annonce.statut === "publiee" && <Badge variante="besoin">Expirée</Badge>}
       </div>
       <h1 className="titre-charte text-3xl sm:text-4xl">{annonce.titre}</h1>
 
@@ -80,10 +87,39 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
           <dt className="text-encre-douce">Contrepartie</dt>
           <dd className="font-medium">{CONTREPARTIES[annonce.contrepartie]}</dd>
         </div>
+        {annonce.quartier && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Quartier</dt>
+            <dd className="font-medium">{QUARTIERS[annonce.quartier]}</dd>
+          </div>
+        )}
+        {annonce.tram && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Tram</dt>
+            <dd>
+              <span className="rounded-ui bg-encre px-2 py-0.5 text-sm font-semibold text-surface">Ligne {annonce.tram}</span>
+            </dd>
+          </div>
+        )}
         {annonce.lieu && (
           <div className="flex justify-between gap-4 px-4 py-3">
             <dt className="text-encre-douce">Lieu</dt>
             <dd className="font-medium">{annonce.lieu}</dd>
+          </div>
+        )}
+        {estAuteur && annonce.statut === "publiee" && (
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Visibilité</dt>
+            <dd className="flex items-center gap-3 font-medium">
+              {jours === 0 ? "Expirée, invisible dans la liste" : `Encore ${jours} jour${jours > 1 ? "s" : ""}`}
+              {jours <= 7 && (
+                <form action={prolongerAnnonce.bind(null, annonce.id)}>
+                  <Bouton variante="contour" className="min-h-8 px-2.5 text-sm">
+                    Prolonger
+                  </Bouton>
+                </form>
+              )}
+            </dd>
           </div>
         )}
       </dl>
@@ -159,6 +195,12 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
             </div>
           )}
         </section>
+      )}
+
+      {!estAuteur && (
+        <div className="self-start">
+          <BoutonFavori annonceId={annonce.id} favori={!!favori} />
+        </div>
       )}
 
       {!estAuteur && (

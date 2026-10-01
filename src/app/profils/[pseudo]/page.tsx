@@ -8,6 +8,8 @@ import { BadgeEcole } from "@/components/ui/badge";
 import { NoteEtoiles } from "@/components/ui/etoiles";
 import { CarteProgression } from "@/components/profil/progression";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
+import { calculerProgression } from "@/lib/gamification/progression";
+import { titrePrincipal } from "@/lib/gamification/titres";
 
 type Avis = { id: string; note: number; commentaire: string | null; cree_le: string; auteur: { pseudo: string; avatar_chemin: string | null } | null };
 
@@ -42,6 +44,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
         <Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" />
         <div className="flex flex-col gap-1.5">
           <h1 className="titre-charte self-start bg-bandeau px-2.5 pt-0.5 text-3xl">@{profil.pseudo}</h1>
+          {s && <p className="pop self-start rounded-ui bg-encre px-2.5 py-1 text-xs font-semibold text-surface">{titrePrincipal(s.aides_par_categorie ?? {}, calculerProgression(s).niveau.nom)}</p>}
           <p className="flex flex-wrap items-center gap-2 text-encre-douce">
             {profil.prenom} <BadgeEcole ecole={profil.ecole} />
             {profil.role === "admin" && <span className="text-xs font-semibold text-accent">Modération</span>}

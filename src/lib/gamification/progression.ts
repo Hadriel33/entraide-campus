@@ -9,6 +9,8 @@ export type Stats = {
   croisements: number; // entraides avec un étudiant de l'autre école
   nb_avis: number;
   note_moyenne: number | null;
+  defis_reussis?: number; // défis de la semaine réussis (26 dernières semaines)
+  aides_par_categorie?: Partial<Record<string, number>>; // pour les titres de spécialité
 };
 
 export const BAREME = {
@@ -18,6 +20,7 @@ export const BAREME = {
   aideRecue: 10,
   croisement: 10,
   avisRecu: 5,
+  defi: 20,
 } as const;
 
 export const NIVEAUX = [
@@ -36,7 +39,8 @@ export function calculerPoints(s: Stats) {
     s.aides_donnees * BAREME.aideDonnee +
     s.aides_recues * BAREME.aideRecue +
     s.croisements * BAREME.croisement +
-    s.nb_avis * BAREME.avisRecu
+    s.nb_avis * BAREME.avisRecu +
+    (s.defis_reussis ?? 0) * BAREME.defi
   );
 }
 
@@ -55,6 +59,8 @@ export function calculerProgression(s: Stats) {
     { code: "bien_entoure", nom: "Bien entouré", description: "Recevoir 5 coups de main", obtenu: s.aides_recues >= 5 },
     { code: "bien_note", nom: "Bien noté", description: "3 avis ou plus, avec une moyenne de 4,5 minimum", obtenu: s.nb_avis >= 3 && (s.note_moyenne ?? 0) >= 4.5 },
     { code: "pilier", nom: "Pilier du campus", description: "Aider 10 étudiants", obtenu: s.aides_donnees >= 10 },
+    { code: "defi", nom: "Défi relevé", description: "Réussir un défi de la semaine", obtenu: (s.defis_reussis ?? 0) >= 1 },
+    { code: "serie", nom: "Régulier", description: "Réussir 4 défis de la semaine", obtenu: (s.defis_reussis ?? 0) >= 4 },
   ];
 
   return { points, niveau, suivant, progression: Math.min(100, Math.max(0, progression)), badges };

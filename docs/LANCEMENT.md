@@ -13,6 +13,7 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 - [x] Mot de passe minimum 8 caractères, imposé aussi par Supabase
 - [x] Écran de chargement, page 404, page d'erreur avec « Réessayer », aperçu soigné quand on partage le lien
 - [x] Responsive mobile vérifié, animations coupées si l'utilisateur le demande
+- [x] Notifications en direct, accueil guidé, recherche, quartier et tram, expiration et relance, favoris, défi de la semaine, titres, classement de la semaine, compteur d'impact
 
 ## À faire par Hadriel (je ne manipule ni mots de passe ni clés secrètes)
 - [ ] Créer son compte, puis me donner son pseudo : je le nomme **admin**

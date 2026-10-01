@@ -15,7 +15,7 @@ export default async function PageModifierAnnonce({ params }: PageProps<"/annonc
   } = await supabase.auth.getUser();
   const { data: annonce } = await supabase
     .from("annonces")
-    .select("id, auteur_id, type, categorie, titre, description, contrepartie, lieu")
+    .select("id, auteur_id, type, categorie, titre, description, contrepartie, lieu, quartier, tram")
     .eq("id", id)
     .maybeSingle();
 
@@ -27,7 +27,7 @@ export default async function PageModifierAnnonce({ params }: PageProps<"/annonc
       <TitrePage>Modifier l&apos;annonce</TitrePage>
       <FormulaireAnnonce
         action={modifierAnnonce.bind(null, annonce.id)}
-        initial={{ ...annonce, lieu: annonce.lieu ?? "" }}
+        initial={{ ...annonce, lieu: annonce.lieu ?? "", quartier: annonce.quartier ?? "", tram: annonce.tram ?? "" }}
         libelle="Enregistrer"
         annulerVers={`/annonces/${annonce.id}`}
       />

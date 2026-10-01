@@ -41,6 +41,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         .eq("destinataire_id", user.id)
         .eq("statut", "en_attente")
     : { count: 0 };
+  const { count: nonLues } = user
+    ? await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("lu", false)
+    : { count: 0 };
 
   return (
     <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} h-full antialiased`}>
@@ -56,6 +59,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               avatar={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} />}
               demandesEnAttente={enAttente ?? 0}
               estAdmin={profil.role === "admin"}
+              moi={user.id}
+              notificationsNonLues={nonLues ?? 0}
             />
             <div className="flex min-w-0 flex-1 flex-col">
               <main className="flex-1 px-4 py-8 sm:px-8">{children}</main>

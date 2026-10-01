@@ -19,6 +19,6 @@ export async function GET(request: NextRequest) {
   }
 
   // Destination choisie dans une liste fermée (jamais une URL reçue en paramètre : pas d'open redirect).
-  const suite = searchParams.get("suite") === "mot-de-passe" ? "/compte/mot-de-passe" : "/annonces";
+  const suite = searchParams.get("suite") === "mot-de-passe" ? "/compte/mot-de-passe" : "/bienvenue";
   return NextResponse.redirect(new URL(ok ? suite : "/connexion?lien=invalide", origin));
 }

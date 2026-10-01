@@ -1,0 +1,6 @@
+-- Lot notifications, favoris, Bordeaux, expiration, recherche, impact, défis (01/10/2026).
+-- Transaction annulée. Attendu : « 13 tests du lot OK ». Les 13 attaques et vérifications :
+-- 1 expiration fixée par la base · 2 date d'expiration non modifiable par l'auteur · 3 recherche sans accents
+-- 4 notification fabriquée refusée · 5 notification de demande reçue · 6 un tiers ne voit aucune notification
+-- 7 un tiers ne peut pas prolonger · 8 l'acceptation notifie avec un lien vers la discussion · 9 favoris privés
+-- 10 aides par catégorie et croisement · 11 classement de la semaine · 12 compteur d'impact · 13 défi courant

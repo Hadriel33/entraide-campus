@@ -67,7 +67,7 @@ export async function inscrire(_: EtatFormulaire, formData: FormData): Promise<E
       message: `Presque fini : on t'a envoyé un lien de confirmation à ${champs.email}.`,
     };
   }
-  redirect("/annonces");
+  redirect("/bienvenue?ok=bienvenue");
 }
 
 export async function connecter(_: EtatFormulaire, formData: FormData): Promise<EtatFormulaire> {

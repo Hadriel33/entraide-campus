@@ -13,9 +13,11 @@ Projet du module **Vibe Coding (M2 Data)**, ESD Bordeaux, oct.–déc. 2026. Pro
 - **IA n°2** : modération des annonces, file de l'admin, l'humain décide.
 - **Gamification** : points, niveaux, 7 badges, avis de 1 à 5 étoiles, classement ESD contre ESP.
 - **Admin** : statistiques, modération, signalements, rôles.
+- **Vie de l'appli** : notifications en direct, accueil guidé, recherche, filtres par quartier et ligne de tram, annonces qui expirent avec relance, favoris, défi de la semaine, titres de spécialité, classement de la semaine, compteur d'impact.
+- **Réservé aux étudiants** : emails @mail-esd.com et @mail-esp.com, école déduite automatiquement.
 
 ## Sécurité
-Les 3 règles d'or sont garanties **en base** (RLS et triggers) et testées par des scripts SQL (`supabase/tests/`) : 32 attaques automatisées, toutes bloquées. Rapport : [docs/securite/chasse-aux-failles-a-blanc.md](docs/securite/chasse-aux-failles-a-blanc.md).
+Les 3 règles d'or sont garanties **en base** (RLS et triggers) et testées par des scripts SQL (`supabase/tests/`) : plus de 50 attaques et vérifications automatisées, toutes bloquées. Rapport : [docs/securite/chasse-aux-failles-a-blanc.md](docs/securite/chasse-aux-failles-a-blanc.md).
 
 ## Stack
 Next.js 16 · Supabase (Postgres, Auth, Storage, Realtime) · Vercel (+ AI Gateway, Gemini 2.5 Flash) · Tailwind 4 · Vitest · GitHub Actions.

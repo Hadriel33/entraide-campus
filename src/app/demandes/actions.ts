@@ -34,7 +34,8 @@ export async function repondreDemande(demandeId: string, reponse: "acceptee" | "
   await supabase.from("demandes_contact").update({ statut: reponse }).eq("id", demandeId);
   revalidatePath("/demandes");
   revalidatePath("/", "layout");
-  redirect(`/demandes?ok=${reponse}`);
+  // Acceptée : la fenêtre de discussion s'ouvre directement.
+  redirect(reponse === "acceptee" ? `/demandes/${demandeId}?ok=acceptee` : `/demandes?ok=refusee`);
 }
 
 export async function laisserAvis(demandeId: string, retour: string, formData: FormData) {

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { Champ } from "@/components/ui/champ";
-import { CATEGORIES, CONTREPARTIES, TYPES } from "@/lib/annonces/validation";
+import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES } from "@/lib/annonces/validation";
 import type { EtatAnnonce } from "@/app/annonces/actions";
 
 type Action = (etat: EtatAnnonce, formData: FormData) => Promise<EtatAnnonce>;
@@ -99,7 +99,34 @@ export function FormulaireAnnonce({
         )}
       </label>
 
-      <Champ label="Lieu (facultatif)" name="lieu" erreur={e.lieu} aide="Exemple : Campus Victor Hugo, tram A" defaultValue={v.lieu ?? ""} />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <label className="flex flex-col gap-1.5 text-sm font-semibold">
+          Quartier (facultatif)
+          <select name="quartier" defaultValue={v.quartier ?? ""} aria-invalid={!!e.quartier} className={CLASSE_SAISIE}>
+            <option value="">Pas précisé</option>
+            {Object.entries(QUARTIERS).map(([valeur, label]) => (
+              <option key={valeur} value={valeur}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <Erreur texte={e.quartier} />
+        </label>
+        <label className="flex flex-col gap-1.5 text-sm font-semibold">
+          Tram le plus proche (facultatif)
+          <select name="tram" defaultValue={v.tram ?? ""} aria-invalid={!!e.tram} className={CLASSE_SAISIE}>
+            <option value="">Pas précisé</option>
+            {TRAMS.map((t) => (
+              <option key={t} value={t}>
+                Tram {t}
+              </option>
+            ))}
+          </select>
+          <Erreur texte={e.tram} />
+        </label>
+      </div>
+
+      <Champ label="Précision sur le lieu (facultatif)" name="lieu" erreur={e.lieu} aide="Exemple : arrêt Porte de Bourgogne, studio photo du campus" defaultValue={v.lieu ?? ""} />
 
       {etat.message && (
         <p role="alert" className="text-sm text-alerte">

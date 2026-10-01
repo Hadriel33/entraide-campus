@@ -1,8 +1,8 @@
-import type { Categorie, Contrepartie, TypeAnnonce } from "./validation";
+import type { Categorie, Contrepartie, Quartier, Tram, TypeAnnonce } from "./validation";
 
 // Colonnes lues pour afficher une annonce, avec le prénom et l'école de l'auteur (jamais ses coordonnées).
 export const SELECT_ANNONCE =
-  "id, type, categorie, titre, description, contrepartie, lieu, statut, cree_le, auteur_id, auteur:profils(prenom, pseudo, ecole, avatar_chemin)";
+  "id, type, categorie, titre, description, contrepartie, lieu, quartier, tram, expire_le, statut, cree_le, auteur_id, auteur:profils(prenom, pseudo, ecole, avatar_chemin)";
 
 export type Annonce = {
   id: string;
@@ -12,6 +12,9 @@ export type Annonce = {
   description: string;
   contrepartie: Contrepartie;
   lieu: string | null;
+  quartier: Quartier | null;
+  tram: Tram | null;
+  expire_le: string;
   statut: "publiee" | "archivee" | "masquee";
   cree_le: string;
   auteur_id: string;
