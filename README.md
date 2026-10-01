@@ -26,7 +26,7 @@ Sam est photographe (ESP), Léa organise le gala de son asso (ESD).
 - Aucune clé d'API : Vercel AI Gateway (jeton OIDC), modèle Gemini 2.5 Flash. Défense complète : [docs/IA-DEFENSE.md](docs/IA-DEFENSE.md).
 
 ## La sécurité
-Les 3 règles d'or (coordonnées après accord, mes annonces seulement, conversation à deux) sont garanties **en base** : RLS, triggers, droits par colonne. **84 vérifications SQL** rejouables dans `supabase/tests/`, toutes bloquées. Failles trouvées, corrigées et testées : [docs/securite/FAILLES.md](docs/securite/FAILLES.md).
+Les 3 règles d'or (coordonnées après accord, mes annonces seulement, conversation à deux) sont garanties **en base** : RLS, triggers, droits par colonne. **87 vérifications SQL** rejouables dans `supabase/tests/`, toutes bloquées. Failles trouvées, corrigées et testées : [docs/securite/FAILLES.md](docs/securite/FAILLES.md).
 
 ## Et pour donner envie de revenir
 Mon bureau (ce qui t'attend, punaisé), le tableau d'impact de l'admin (entonnoir, croisement ESD × ESP, offre et demande), l'appli installable sur le téléphone, le mur en direct à projeter, la vraie carte de Bordeaux par quartier, le classement des étudiants, des classes et ESD contre ESP, les badges, le défi de la semaine, la garde-robe de Colette à débloquer, le fil du campus (avec l'accord des deux), le mode tableau noir, les notifications en direct.
