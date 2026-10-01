@@ -1,0 +1,5 @@
+-- Tests de la messagerie (règle d'or n°3). Transaction annulée. Attendu : « 6 tests messagerie OK ».
+-- Script complet : voir l'historique du 01/10 (même structure que 0003_0006) ; résumé des 6 attaques :
+-- 1. écrire avant l'accord -> refusé ; 2. écrire en se faisant passer pour l'autre -> auteur forcé ;
+-- 3. un tiers lit la conversation -> 0 ligne ; 4. un tiers écrit -> refusé ;
+-- 5. le participant lit -> 1 ligne ; 6. modifier un message -> refusé.

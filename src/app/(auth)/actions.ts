@@ -24,6 +24,10 @@ function messageErreur(code: string | undefined, message: string) {
   if (code === "over_email_send_rate_limit" || code === "over_request_rate_limit")
     return "Trop de tentatives. Réessaie dans quelques minutes.";
   if (code === "weak_password") return "Mot de passe trop faible.";
+  if (code === "email_provider_disabled" || code === "signup_disabled")
+    return "Les inscriptions sont fermées pour le moment. Réessaie plus tard.";
+  if (code === "email_address_not_authorized") return "Cette adresse ne peut pas recevoir d'email de confirmation pour le moment.";
+  if (code === "user_already_exists" || code === "email_exists") return "Un compte existe déjà avec cet email : connecte-toi.";
   console.error("Erreur Supabase Auth", code, message);
   return "Une erreur est survenue. Réessaie.";
 }
