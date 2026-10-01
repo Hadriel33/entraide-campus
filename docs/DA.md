@@ -10,6 +10,7 @@ La même interface est déclinée en 3 pistes : **seuls les jetons changent**, c
 | **A · Campus** | Fidèle au système du groupe ESD/ESP, sobre, de type Linear/Notion | fond `#F5F7FA`, encre `#1B2027`, principale `#28367F`, accent `#3D5CF5` | DM Sans | 10 px |
 | **B · Duo** | Une couleur par école : bleu ESD, orange ESP. Sidebar sombre | fond `#F3F4F6`, encre `#12161C`, ESD `#3D5CF5`, ESP `#F6A151` | Schibsted Grotesk + DM Sans | 8 px |
 | **C · Éditorial** | Marine du groupe, titres serif (écho du Minion Pro de l'ESP), rouge en touche | fond `#F6F5F1`, marine `#0A2240`, rouge `#E84545` | Newsreader + DM Sans | 4 px |
+| **D · ESP 2026** | La **nouvelle DA de l'ESP** (Instagram @esp_ecole, sept. 2026) : affiches avec un verbe géant (EXISTER, SIGNER, PENSER) posé sur un bandeau de couleur, « ESP. » noir sur rouge, une ligne en serif | fond `#FAF9F6`, encre `#111111`, rouge `#D7141A` (action), bandeaux jaune `#F3E54A`, lilas `#CDBDEB`, ocre `#C98A1F`, ciel `#BCD3EC` | Archivo condensé 900 en capitales + Source Serif 4 + DM Sans | 0 px |
 
 Écartés : la proposition violette et Fira du skill `ui-ux-pro-max` (le violet est le signal n°4 de la checklist anti-IA), le mode sombre imposé (signal n°5), et les logos officiels (projet non officiel).
 

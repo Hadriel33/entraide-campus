@@ -53,6 +53,7 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Recherche avant de designer : écoles, concurrents, 3 pistes de DA | Un agent a fait la recherche web (ESD et ESP, Groupe ESP-ESD / AD Education, campus Victor Hugo, concurrents, catégories réalistes). Résultat dans `docs/DA.md`. La DA reste au choix de Hadriel. |
 | 01/10 | Étape 3 : test d'abord, puis base, puis code | 9 tests de validation écrits et vus en échec avant le code. Table `profils` + RLS + trigger, testée en SQL avec 2 comptes fictifs (transaction annulée). Fiche de l'étape : `docs/etapes/03-comptes.md`. |
 | 01/10 | DA V2 « dashboard SaaS inspiré ESD/ESP » : maquettes avant le code | Codes couleurs et polices relevés **dans le CSS réel** des deux sites (pas devinés). Une planche de maquettes (kit UI, tableau de bord, mobile) où les 3 pistes partagent la même interface et ne diffèrent que par les jetons. On choisit sur pièce, puis `adapter-front` applique la piste au vrai code. |
+| 01/10 | Piste D ajoutée : la nouvelle DA de l'ESP repérée sur Instagram | Hadriel a signalé la refonte. Relevé visuel du compte @esp_ecole (cookies optionnels refusés, sans connexion). Le rouge est foncé à `#D7141A` pour passer le contraste AA sous du texte blanc. Même interface, nouveaux jetons : la planche le démontre sans réécrire un seul écran. |
 | 01/10 | Gamification repoussée après le palier 1 | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
