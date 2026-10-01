@@ -18,6 +18,14 @@ La même interface est déclinée en 3 pistes : **seuls les jetons changent**, c
 
 ---
 
+## V3 (01/10, soir) : plus de couleur, « effet de couche fin »
+
+Retour de Hadriel : la nouvelle DA de l'ESP a plus de couleur que notre piste E. On reprend les bandeaux de la charte (relevés sur Instagram @esp_ecole : jaune, lilas, ciel, ocre) :
+- **Une teinte par famille de catégories** : lilas = créa (photo, vidéo, design, shooting), ciel = tech (UX/UI, dev, data), jaune = projets (rédaction, binôme, coup de main), ocre = vie de campus (coloc, covoit, matériel). Pastille de couleur devant la catégorie, toujours avec le texte.
+- **Couche fine** : un aplat de couleur décalé de 3 px derrière les cartes, comme deux affiches superposées. Au survol, la carte se soulève et la couche s'élargit. Le titre de page jaune a une couche lilas, le bouton principal une couche jaune au survol, le logo deux couches.
+- **Accueil en affiche** : PROPOSE / CHERCHE / ENTRAIDE-TOI sur trois bandeaux décalés, à la manière des affiches EXISTER / SIGNER de l'ESP.
+- Les couleurs ne servent jamais pour du texte (contraste) ; elles sont dans `globals.css` et `src/lib/design/teintes.ts`, donc migrables avec le skill `adapter-front`.
+
 ## V1 (01/10, matin) : premières pistes, avant la consigne « dashboard SaaS »
 
 Contraintes : ne pas ressembler à padel-snipe (navy et vert fluo, sport), ne pas imiter les chartes ESD et ESP (projet étudiant non officiel : pas de logo, pas de bleu-sarcelle, pas de noir pur dominant), et passer la checklist du skill `anti-ia-design`.

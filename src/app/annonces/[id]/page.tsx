@@ -8,6 +8,7 @@ import { CATEGORIES, CONTREPARTIES, QUARTIERS, TYPES } from "@/lib/annonces/vali
 import { joursRestants } from "@/lib/annonces/expiration";
 import { BoutonFavori } from "@/components/annonces/bouton-favori";
 import { BoutonPartager } from "@/components/annonces/bouton-partager";
+import { teinte } from "@/lib/design/teintes";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
@@ -63,7 +64,7 @@ export default async function PageAnnonce({ params }: PageProps<"/annonces/[id]"
       </Link>
       <div className="flex flex-wrap gap-1.5">
         <Badge variante={annonce.type === "propose" ? "offre" : "besoin"}>{TYPES[annonce.type]}</Badge>
-        <Badge>{CATEGORIES[annonce.categorie]}</Badge>
+        <Badge point={teinte(annonce.categorie).point}>{CATEGORIES[annonce.categorie]}</Badge>
         {annonce.statut === "archivee" && <Badge>Archivée</Badge>}
         {annonce.statut === "masquee" && <Badge>Masquée par la modération</Badge>}
         {jours === 0 && annonce.statut === "publiee" && <Badge variante="besoin">Expirée</Badge>}

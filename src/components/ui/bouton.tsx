@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 
 // Seuls des jetons du thème (globals.css) sont utilisés ici : changer de DA ne touche pas ce fichier.
 const STYLES = {
-  plein: "bg-encre text-surface hover:bg-encre/85",
+  plein: "bg-encre text-surface transition-shadow hover:shadow-[3px_3px_0_0_var(--color-bandeau)]",
   contour: "border border-ligne-forte bg-surface text-encre hover:bg-papier-fonce",
   discret: "text-encre-douce hover:bg-papier-fonce hover:text-encre",
   danger: "border border-alerte bg-surface text-alerte hover:bg-papier-fonce",

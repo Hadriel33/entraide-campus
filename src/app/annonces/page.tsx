@@ -6,6 +6,7 @@ import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { normaliserRecherche } from "@/lib/annonces/recherche";
 import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES, type Categorie } from "@/lib/annonces/validation";
 import { ECOLES } from "@/lib/auth/validation";
+import { teinte } from "@/lib/design/teintes";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
@@ -248,6 +249,7 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
                 aria-current={actif ? "page" : undefined}
                 className="presse group/chip flex items-center gap-1.5 rounded-full border border-ligne bg-surface px-3 py-1 text-sm hover:border-ligne-forte aria-[current=page]:border-encre aria-[current=page]:bg-encre aria-[current=page]:text-surface"
               >
+                {valeur && <span className={`size-2 rounded-full ${teinte(valeur).point}`} aria-hidden />}
                 {label}
                 <span className="text-xs text-encre-douce group-aria-[current=page]/chip:text-surface/70">{nombre}</span>
               </Link>
@@ -257,14 +259,14 @@ export default async function PageAnnonces({ searchParams }: { searchParams: Pro
       </div>
 
       {pourToi.length > 0 && (
-        <section className="apparition flex flex-col gap-3 rounded-carte border border-encre bg-surface p-4" aria-labelledby="pour-toi">
+        <section className="apparition flex flex-col gap-3 rounded-carte border border-ligne bg-papier-fonce p-4" aria-labelledby="pour-toi">
           <h2 id="pour-toi" className="titre-charte text-xl">
             Pour toi
           </h2>
           <ul className="grid gap-2 sm:grid-cols-3">
             {pourToi.map(({ annonce, raison }, i) => (
               <li key={annonce.id} className="apparition" style={{ "--i": i } as React.CSSProperties}>
-                <Link href={`/annonces/${annonce.id}`} className="souleve flex h-full flex-col gap-1 rounded-ui bg-papier-fonce p-3">
+                <Link href={`/annonces/${annonce.id}`} className={`couche ${teinte(annonce.categorie).couche} flex h-full flex-col gap-1 rounded-ui border border-ligne bg-surface p-3 hover:border-encre`}>
                   <span className="text-xs font-semibold">{raison}</span>
                   <span className="font-medium leading-snug">{annonce.titre}</span>
                   <span className="text-xs text-encre-douce">@{annonce.auteur?.pseudo}</span>

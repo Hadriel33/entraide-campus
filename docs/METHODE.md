@@ -76,6 +76,7 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Après l'acceptation, la discussion s'ouvre automatiquement | Demande de Hadriel : celui qui accepte arrive dans le chat, l'autre reçoit une notification qui l'y emmène. Avant l'accord, les coordonnées restent dans une table que la base refuse de transmettre. |
 | 01/10 | Gamification repoussée après le palier 1 (décision initiale, remplacée le jour même) | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
 | 01/10 | Lot UX : barre d'onglets en bas sur mobile, transition fluide carte → détail (View Transitions natives), filtres avancés avec pastilles, palette Ctrl+K, favori instantané, partage natif | Hadriel voulait « un truc sympa » : on a choisi ce qui fait gagner du temps (filtres, raccourcis, pouce sur mobile) plutôt que des effets décoratifs. Aucune librairie ajoutée, et les animations se coupent si l'utilisateur a demandé « réduire les animations ». |
+| 01/10 | DA V3 : la couleur code la famille de catégorie, et une « couche » fine décalée remplace l'ombre floue | Coller à la nouvelle charte ESP (bandeaux colorés superposés) tout en gardant un sens : la couleur aide à repérer le type d'annonce d'un coup d'œil. Jamais de couleur seule, toujours avec le texte. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
@@ -93,3 +94,4 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Claude inaccessible sur l'offre gratuite de la passerelle Vercel | Test de 6 modèles gratuits, puis choix de Gemini 2.5 Flash par Hadriel. Le code reste indépendant du modèle (une constante à changer). |
 | 01/10 | Lint React 19 : setState dans un effet et Date.now() pendant le rendu | Compteur de la cloche calculé (valeur serveur + notifications reçues en direct), calcul de date déplacé dans une fonction de la bibliothèque. |
 | 01/10 | La copie locale de padel-snipe n'était pas à jour (22 commits de retard) | Lecture directe de la version GitHub (`origin/main`), sans toucher à la branche locale. |
+| 01/10 | L'effet de survol des cartes ne marchait pas : l'animation d'apparition gardait `transform: none` | Animation passée sur la propriété CSS `translate`, le survol garde `transform`. Repéré en vérifiant le rendu en local. |

@@ -12,9 +12,11 @@ const STYLES = {
 
 export type VarianteBadge = keyof typeof STYLES;
 
-export function Badge({ variante = "neutre", children }: { variante?: VarianteBadge; children: ReactNode }) {
+// `point` : pastille de couleur (teinte de la catégorie) devant le texte.
+export function Badge({ variante = "neutre", point, children }: { variante?: VarianteBadge; point?: string; children: ReactNode }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold leading-5 ${STYLES[variante]}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold leading-5 ${STYLES[variante]}`}>
+      {point && <span className={`size-2 rounded-full ${point}`} aria-hidden />}
       {children}
     </span>
   );

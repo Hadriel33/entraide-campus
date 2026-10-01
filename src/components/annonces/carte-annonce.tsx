@@ -5,18 +5,20 @@ import { CATEGORIES, CONTREPARTIES, QUARTIERS, TYPES } from "@/lib/annonces/vali
 import { joursRestants } from "@/lib/annonces/expiration";
 import { dateCourte, type Annonce } from "@/lib/annonces/requetes";
 import { Avatar } from "@/components/ui/avatar";
+import { teinte } from "@/lib/design/teintes";
 
 export function CarteAnnonce({ annonce, index = 0, afficherExpiration = false }: { annonce: Annonce; index?: number; afficherExpiration?: boolean }) {
   const jours = joursRestants(annonce.expire_le);
+  const t = teinte(annonce.categorie);
 
   return (
     <article
-      className="group apparition souleve relative flex flex-col gap-2.5 rounded-carte border border-ligne bg-surface p-4 hover:border-ligne-forte"
+      className={`group apparition couche ${t.couche} relative flex flex-col gap-2.5 rounded-carte border border-ligne bg-surface p-4 hover:border-encre`}
       style={{ "--i": index } as React.CSSProperties}
     >
       <div className="flex flex-wrap items-center gap-1.5">
         <Badge variante={annonce.type === "propose" ? "offre" : "besoin"}>{TYPES[annonce.type]}</Badge>
-        <Badge>{CATEGORIES[annonce.categorie]}</Badge>
+        <Badge point={t.point}>{CATEGORIES[annonce.categorie]}</Badge>
         {annonce.statut === "archivee" && <Badge>Archivée</Badge>}
         {annonce.statut === "masquee" && <Badge>Masquée par la modération</Badge>}
         {afficherExpiration && annonce.statut === "publiee" && (

@@ -23,7 +23,13 @@
 
   /* Signatures de la charte (avec parcimonie) */
   --color-accent: #d7141a;        /* rouge : compteurs, alertes, focus */
-  --color-bandeau: #f3e54a;       /* jaune : UN bandeau, le titre de page */
+  --color-bandeau: #f3e54a;       /* jaune : bandeau du titre de page */
+
+  /* Bandeaux de la charte ESP 2026 : une teinte par famille de catégories,
+     utilisée en « couche » fine décalée derrière les cartes (jamais pour du texte). */
+  --color-lilas: #b9a4de;         /* créa : photo, vidéo, design, shooting */
+  --color-ciel: #9fc2e8;          /* tech : UX/UI, dev, data */
+  --color-ocre: #c98a1f;          /* vie de campus : coloc, covoit, matériel */
 
   /* Badges (couleurs de bandeaux adoucies, texte en encre) */
   --color-offre: #faf1a8;         /* « Je propose » */
@@ -51,9 +57,10 @@ body {
 }
 
 /* ============ Animations : courtes, utiles, désactivées si l'utilisateur le demande ============ */
+/* `translate` (et non `transform`) : l'animation ne bloque pas l'effet de survol des cartes. */
 @keyframes apparition {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; translate: 0 6px; }
+  to { opacity: 1; translate: none; }
 }
 @keyframes toast {
   0% { opacity: 0; transform: translateY(-8px); }
@@ -97,6 +104,21 @@ body {
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
   &:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -10px color-mix(in oklab, var(--color-encre) 35%, transparent); }
 }
+/* Couche fine : un aplat de couleur décalé derrière l'élément, comme deux affiches
+   superposées. La couleur vient de --teinte (utilitaires teinte-*), jaune par défaut. */
+@utility couche {
+  box-shadow: 3px 3px 0 0 var(--teinte, var(--color-bandeau));
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  &:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 0 var(--teinte, var(--color-bandeau)); }
+}
+/* Même couche, sans mouvement (titres, blocs fixes). */
+@utility couche-fixe {
+  box-shadow: 4px 4px 0 0 var(--teinte, var(--color-lilas));
+}
+@utility teinte-* {
+  --teinte: --value(--color-*);
+}
+
 /* Retour tactile au clic. */
 @utility presse {
   transition: transform 90ms ease, background-color 150ms ease, color 150ms ease, border-color 150ms ease;

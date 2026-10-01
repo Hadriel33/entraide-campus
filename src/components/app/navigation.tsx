@@ -23,8 +23,10 @@ function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
 
 function Monogramme() {
   return (
-    <span className="flex size-8 items-center justify-center rounded-ui bg-encre text-[13px] font-bold text-surface" aria-hidden>
-      ec
+    <span className="relative flex size-8 shrink-0" aria-hidden>
+      <span className="absolute inset-0 translate-x-[3px] translate-y-[3px] rounded-ui bg-lilas" />
+      <span className="absolute inset-0 translate-x-[1.5px] translate-y-[1.5px] rounded-ui bg-bandeau" />
+      <span className="relative flex size-full items-center justify-center rounded-ui bg-encre text-[13px] font-bold text-surface">ec</span>
     </span>
   );
 }
@@ -77,7 +79,7 @@ export function BarreLaterale({
               key={l.href}
               href={l.href}
               aria-current={actif(l.href) ? "page" : undefined}
-              className="presse flex items-center rounded-ui px-2.5 py-2 font-medium text-encre-douce hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-papier-fonce aria-[current=page]:text-encre"
+              className="presse flex items-center rounded-ui px-2.5 py-2 font-medium text-encre-douce hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-papier-fonce aria-[current=page]:text-encre aria-[current=page]:shadow-[inset_3px_0_0_var(--color-accent)]"
             >
               {l.label}
               <Compteur n={l.compteur} />
