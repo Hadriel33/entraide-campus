@@ -77,6 +77,7 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Gamification repoussée après le palier 1 (décision initiale, remplacée le jour même) | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
 | 01/10 | Lot UX : barre d'onglets en bas sur mobile, transition fluide carte → détail (View Transitions natives), filtres avancés avec pastilles, palette Ctrl+K, favori instantané, partage natif | Hadriel voulait « un truc sympa » : on a choisi ce qui fait gagner du temps (filtres, raccourcis, pouce sur mobile) plutôt que des effets décoratifs. Aucune librairie ajoutée, et les animations se coupent si l'utilisateur a demandé « réduire les animations ». |
 | 01/10 | DA V3 : la couleur code la famille de catégorie, et une « couche » fine décalée remplace l'ombre floue | Coller à la nouvelle charte ESP (bandeaux colorés superposés) tout en gardant un sens : la couleur aide à repérer le type d'annonce d'un coup d'œil. Jamais de couleur seule, toujours avec le texte. |
+| 01/10 | DA V4 : une seule métaphore, le tableau d'affichage (post-it, scotch, punaises), et un mur en direct pour la démo | Une DA qui « s'amuse » mais reste lisible : la métaphore explique l'appli (on affiche ce qu'on propose ou cherche). Le temps réel ne sert qu'à relancer la lecture serveur : la RLS reste la seule porte d'entrée des données. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |

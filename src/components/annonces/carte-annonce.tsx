@@ -1,57 +1,81 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
-import { Badge, BadgeEcole } from "@/components/ui/badge";
-import { CATEGORIES, CONTREPARTIES, QUARTIERS, TYPES } from "@/lib/annonces/validation";
+import { BadgeEcole } from "@/components/ui/badge";
+import { CATEGORIES, QUARTIERS, TYPES, type Contrepartie } from "@/lib/annonces/validation";
 import { joursRestants } from "@/lib/annonces/expiration";
 import { dateCourte, type Annonce } from "@/lib/annonces/requetes";
 import { Avatar } from "@/components/ui/avatar";
-import { teinte } from "@/lib/design/teintes";
+import { inclinaison, teinte } from "@/lib/design/teintes";
 
+// Version courte de la contrepartie, écrite au feutre sur le post-it.
+const ANNOTATION: Record<Contrepartie, string> = {
+  gratuit: "Gratuit !",
+  troc: "Troc",
+  partage_frais: "Frais partagés",
+  remunere: "Rémunéré",
+  a_discuter: "À discuter",
+};
+
+// Une annonce = un post-it sur le mur du campus. Couleur = famille de la catégorie,
+// légère inclinaison propre à chaque annonce, scotch en haut, annotation écrite à la main.
 export function CarteAnnonce({ annonce, index = 0, afficherExpiration = false }: { annonce: Annonce; index?: number; afficherExpiration?: boolean }) {
   const jours = joursRestants(annonce.expire_le);
   const t = teinte(annonce.categorie);
+  const cherche = annonce.type === "cherche";
 
   return (
     <article
-      className={`group apparition couche ${t.couche} relative flex flex-col gap-2.5 rounded-carte border border-ligne bg-surface p-4 hover:border-encre`}
-      style={{ "--i": index } as React.CSSProperties}
+      className={`group colle postit ${t.papier} flex min-h-56 flex-col gap-3 p-5 pt-6`}
+      style={{ "--i": index, "--rot": `${inclinaison(annonce.id)}deg` } as React.CSSProperties}
     >
-      <div className="flex flex-wrap items-center gap-1.5">
-        <Badge variante={annonce.type === "propose" ? "offre" : "besoin"}>{TYPES[annonce.type]}</Badge>
-        <Badge point={t.point}>{CATEGORIES[annonce.categorie]}</Badge>
-        {annonce.statut === "archivee" && <Badge>Archivée</Badge>}
-        {annonce.statut === "masquee" && <Badge>Masquée par la modération</Badge>}
-        {afficherExpiration && annonce.statut === "publiee" && (
-          <Badge variante={jours <= 3 ? "besoin" : "neutre"}>{jours === 0 ? "Expirée" : `Expire dans ${jours} j`}</Badge>
-        )}
+      <span className="scotch" aria-hidden />
+      <div className="flex items-center justify-between gap-2">
+        <span
+          className={`titre-charte rounded-[3px] px-1.5 pt-0.5 text-sm ${cherche ? "bg-encre text-surface" : "border-[1.5px] border-encre"}`}
+        >
+          {TYPES[annonce.type]}
+        </span>
+        <span className="flex items-center gap-1.5 text-xs font-semibold">
+          <span className={`size-2 rounded-full ${t.point} ring-1 ring-encre/20`} aria-hidden />
+          {CATEGORIES[annonce.categorie]}
+        </span>
       </div>
-      <h3 className="text-base leading-snug font-semibold">
-        {/* Le lien couvre toute la carte (pseudo-élément), le texte reste sélectionnable. */}
-        <Link href={`/annonces/${annonce.id}`} className="decoration-2 underline-offset-4 group-hover:underline after:absolute after:inset-0 after:content-['']">
-          {/* Le titre « glisse » de la carte vers la page de l'annonce (View Transitions). */}
+
+      <h3 className="text-lg leading-tight font-bold text-balance">
+        {/* Le lien couvre tout le post-it (pseudo-élément), le texte reste sélectionnable. */}
+        <Link href={`/annonces/${annonce.id}`} className="decoration-2 underline-offset-4 group-hover:underline after:absolute after:inset-0 after:content-[''] focus-visible:outline-none">
+          {/* Le titre « glisse » du post-it vers la page de l'annonce (View Transitions). */}
           <ViewTransition name={`titre-${annonce.id}`} share="morph" default="none">
             <span>{annonce.titre}</span>
           </ViewTransition>
         </Link>
       </h3>
-      <p className="line-clamp-2 text-sm text-encre-douce">{annonce.description}</p>
-      {(annonce.quartier || annonce.tram) && (
-        <p className="flex flex-wrap items-center gap-1.5 text-xs font-medium">
-          {annonce.tram && <span className="rounded-ui bg-encre px-1.5 py-0.5 text-surface">Tram {annonce.tram}</span>}
-          {annonce.quartier && <span className="text-encre-douce">{QUARTIERS[annonce.quartier]}</span>}
+      <p className="line-clamp-3 text-[0.9375rem] leading-relaxed text-encre/75">{annonce.description}</p>
+
+      {(annonce.quartier || annonce.tram || (afficherExpiration && annonce.statut === "publiee") || annonce.statut !== "publiee") && (
+        <p className="flex flex-wrap items-center gap-1.5 text-xs font-semibold">
+          {annonce.tram && <span className="rounded-[3px] bg-encre px-1.5 py-0.5 text-surface">Tram {annonce.tram}</span>}
+          {annonce.quartier && <span className="text-encre/70">{QUARTIERS[annonce.quartier]}</span>}
+          {annonce.statut === "archivee" && <span className="rounded-[3px] bg-surface/70 px-1.5 py-0.5">Archivée</span>}
+          {annonce.statut === "masquee" && <span className="rounded-[3px] bg-surface/70 px-1.5 py-0.5">Masquée par la modération</span>}
+          {afficherExpiration && annonce.statut === "publiee" && (
+            <span className={`rounded-[3px] px-1.5 py-0.5 ${jours <= 3 ? "bg-accent text-surface" : "bg-surface/70"}`}>
+              {jours === 0 ? "Expirée" : `Expire dans ${jours} j`}
+            </span>
+          )}
         </p>
       )}
-      <div className="mt-auto flex items-center justify-between gap-2 border-t border-ligne pt-2.5 text-sm">
-        <span className="flex items-center gap-2 font-medium">
+
+      <div className="mt-auto flex items-end justify-between gap-2 pt-1">
+        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <Avatar chemin={annonce.auteur?.avatar_chemin} nom={annonce.auteur?.pseudo ?? "?"} taille="sm" />
-          @{annonce.auteur?.pseudo}
+          <span className="truncate">@{annonce.auteur?.pseudo}</span>
           {annonce.auteur?.ecole && <BadgeEcole ecole={annonce.auteur.ecole} />}
         </span>
-        <span className="flex items-center gap-1 text-xs text-encre-douce">
-          {CONTREPARTIES[annonce.contrepartie]} · {dateCourte(annonce.cree_le)}
-          <svg viewBox="0 0 24 24" className="size-3.5 -translate-x-1 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
+        <span className="flex shrink-0 flex-col items-end leading-none">
+          {/* Annotation au feutre : la contrepartie, comme griffonnée sur le post-it. */}
+          <span className="-rotate-3 font-main text-xl font-bold text-alerte">{ANNOTATION[annonce.contrepartie]}</span>
+          <span className="mt-1 text-[11px] text-encre/60">{dateCourte(annonce.cree_le)}</span>
         </span>
       </div>
     </article>

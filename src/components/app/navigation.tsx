@@ -12,6 +12,7 @@ type Lien = { href: string; label: string; compteur?: number };
 function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
   return [
     { href: "/annonces", label: "Annonces" },
+    { href: "/mur", label: "Le mur en direct" },
     { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
     { href: "/mes-annonces", label: "Mes annonces" },
     { href: "/favoris", label: "Favoris" },
@@ -173,6 +174,7 @@ function OngletsMobile({
   const [ouvert, setOuvert] = useState(false);
   const onglet = "presse flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium text-encre-douce aria-[current=page]:text-encre";
   const plus = [
+    { href: "/mur", label: "Le mur en direct" },
     { href: "/mes-annonces", label: "Mes annonces" },
     { href: "/favoris", label: "Favoris" },
     { href: "/compte", label: "Mon profil" },

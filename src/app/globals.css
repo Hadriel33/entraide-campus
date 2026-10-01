@@ -31,6 +31,13 @@
   --color-ciel: #9fc2e8;          /* tech : UX/UI, dev, data */
   --color-ocre: #c98a1f;          /* vie de campus : coloc, covoit, matériel */
 
+  /* Post-it : papiers pâles des 4 bandeaux (texte en encre, contraste AA vérifié) */
+  --color-postit-jaune: #fcf08f;
+  --color-postit-lilas: #e5daf7;
+  --color-postit-ciel: #d4e6f8;
+  --color-postit-ocre: #f6dfb4;
+  --color-postit-gris: #ecebe6;
+
   /* Badges (couleurs de bandeaux adoucies, texte en encre) */
   --color-offre: #faf1a8;         /* « Je propose » */
   --color-besoin: #e6ddf7;        /* « Je cherche » */
@@ -45,15 +52,99 @@
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-titre: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
+  --font-main: var(--font-kalam), ui-serif, cursive; /* annotations écrites à la main */
+
+  /* Échelle des textes : fluide pour les grands titres, fixe pour le reste */
+  --text-affiche: clamp(2.75rem, 1.4rem + 5.6vw, 5.5rem);
+  --text-affiche--line-height: 0.95;
+  --text-titre: clamp(2.1rem, 1.5rem + 2.4vw, 3.25rem);
+  --text-titre--line-height: 1;
+  --text-section: 1.5rem;
+  --text-section--line-height: 1.1;
 
   /* Forme */
   --radius-ui: 6px;
   --radius-carte: 10px;
 }
 
+/* Fond pointillé discret, comme une feuille de carnet ou un tableau d'affichage. */
 body {
-  background: var(--color-papier);
+  background-color: var(--color-papier);
+  background-image: radial-gradient(color-mix(in oklab, var(--color-encre) 11%, transparent) 1px, transparent 1.3px);
+  background-size: 22px 22px;
   color: var(--color-encre);
+}
+
+/* ============ Post-it ============
+   Papier coloré (--postit), légèrement incliné (--rot, calculé depuis l'id), coin bas
+   arrondi comme un papier qui rebique. Au survol il se redresse et se décolle. */
+@utility postit {
+  position: relative;
+  background-color: var(--postit, var(--color-postit-jaune));
+  border-radius: 3px 3px 18px 3px / 3px 3px 8px 3px;
+  rotate: var(--rot, 0deg);
+  box-shadow:
+    0 1px 1px color-mix(in oklab, var(--color-encre) 10%, transparent),
+    0 12px 20px -14px color-mix(in oklab, var(--color-encre) 55%, transparent);
+  transition: rotate 260ms cubic-bezier(0.2, 0.8, 0.2, 1), transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 260ms ease;
+  &:hover, &:focus-within {
+    rotate: 0deg;
+    transform: translateY(-5px) scale(1.015);
+    z-index: 2;
+    box-shadow:
+      0 2px 2px color-mix(in oklab, var(--color-encre) 8%, transparent),
+      0 26px 34px -18px color-mix(in oklab, var(--color-encre) 50%, transparent);
+  }
+}
+@utility papier-* {
+  --postit: --value(--color-postit-*);
+}
+/* Morceau de scotch translucide en haut du post-it. */
+@utility scotch {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 84px;
+  height: 24px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background-color: color-mix(in oklab, var(--color-surface) 58%, transparent);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--color-encre) 10%, transparent);
+  pointer-events: none;
+}
+/* Punaise rouge (tableau des demandes). */
+@utility punaise {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  translate: -50% 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--color-surface) 70%, transparent) 0 2px, var(--color-accent) 3px);
+  box-shadow: 0 3px 4px -1px color-mix(in oklab, var(--color-encre) 45%, transparent);
+  pointer-events: none;
+}
+/* Arrivée d'un post-it : il se pose sur le mur. */
+@keyframes colle {
+  from { opacity: 0; scale: 1.12; translate: 0 -14px; }
+  to { opacity: 1; scale: 1; translate: none; }
+}
+@utility colle {
+  animation: colle 420ms cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
+  animation-delay: calc(min(var(--i, 0), 12) * 45ms);
+}
+
+/* Confettis (demande acceptée, annonce publiée). */
+@keyframes confetti {
+  0% { opacity: 1; translate: 0 -10vh; rotate: 0deg; }
+  100% { opacity: 0; translate: var(--dx, 0) 105vh; rotate: var(--tour, 540deg); }
+}
+@utility confetti {
+  position: absolute;
+  top: 0;
+  animation: confetti var(--duree, 2.4s) cubic-bezier(0.25, 0.6, 0.4, 1) both;
+  animation-delay: var(--delai, 0ms);
 }
 
 /* ============ Animations : courtes, utiles, désactivées si l'utilisateur le demande ============ */

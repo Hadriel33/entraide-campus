@@ -6,7 +6,7 @@ import { Etoile } from "@/components/ui/etoiles";
 // Les étoiles sont dans l'ordre 5..1 inversé à l'affichage, pour colorer « celle-ci et les précédentes » en CSS.
 export function FormulaireAvis({ demandeId, retour, prenom }: { demandeId: string; retour: string; prenom: string }) {
   return (
-    <form action={laisserAvis.bind(null, demandeId, retour)} className="flex flex-col gap-3 rounded-ui border border-ligne p-3">
+    <form action={laisserAvis.bind(null, demandeId, retour)} className="flex flex-col gap-3 rounded-ui bg-surface/60 p-3">
       <fieldset>
         <legend className="mb-1 text-sm font-semibold">Ton avis sur {prenom}</legend>
         <div className="flex flex-row-reverse justify-end gap-1">

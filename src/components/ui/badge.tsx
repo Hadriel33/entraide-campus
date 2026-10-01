@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 const STYLES = {
   offre: "bg-offre text-encre",
   besoin: "bg-besoin text-encre",
-  esd: "bg-esd text-encre",
+  esd: "bg-surface text-encre ring-1 ring-encre/20",
   esp: "bg-encre text-surface",
   neutre: "bg-papier-fonce text-encre font-medium",
   ok: "bg-ok-fond text-ok",

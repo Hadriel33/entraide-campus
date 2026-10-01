@@ -18,6 +18,16 @@ La même interface est déclinée en 3 pistes : **seuls les jetons changent**, c
 
 ---
 
+## V4 (01/10, soir) : « le mur du campus », on s'amuse
+
+Demande de Hadriel : travailler l'identité, les espacements, la taille des textes, la hiérarchie, des demandes « en post-it », un effet wow pour la démo.
+- **Métaphore unique : le tableau d'affichage du campus.** Fond pointillé de carnet sur toute l'appli. Chaque annonce est un **post-it** : papier pâle de la couleur de sa famille, légère inclinaison propre à l'annonce (calculée depuis son id, stable), scotch translucide, coin bas qui rebique. Au survol il se redresse et se décolle.
+- **Demandes = tableau de post-it punaisés** en deux colonnes « À traiter » / « En contact », les refusées repliées en bas. Le message de l'étudiant est écrit à la main.
+- **Écriture à la main (Kalam)** pour les annotations seulement : la contrepartie griffonnée en rouge (« Gratuit ! », « Troc »), les notes à côté des titres de section, les états vides. Jamais pour un texte long.
+- **Hiérarchie** : échelle de texte en jetons (`text-affiche`, `text-titre` fluides en `clamp()`, `text-section`), titres de page plus grands, accroche serif limitée en largeur, 32 px entre sections, recherche mise en avant et filtres secondaires repliés dans « Plus de filtres ».
+- **Moments de joie** : confettis aux couleurs de la charte quand une demande est acceptée, une annonce publiée ou un avis laissé (CSS pur, coupés si « réduire les animations »).
+- **Le mur en direct** (`/mur`) : à projeter pendant la démo. Les annonces publiées depuis un téléphone tombent sur le mur en temps réel, avec un mode plein écran.
+
 ## V3 (01/10, soir) : plus de couleur, « effet de couche fin »
 
 Retour de Hadriel : la nouvelle DA de l'ESP a plus de couleur que notre piste E. On reprend les bandeaux de la charte (relevés sur Instagram @esp_ecole : jaune, lilas, ciel, ocre) :

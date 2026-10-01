@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
-import { Archivo, DM_Sans, Source_Serif_4 } from "next/font/google";
+import { Archivo, DM_Sans, Kalam, Source_Serif_4 } from "next/font/google";
 import { getSession } from "@/lib/session";
 import { BarreLaterale, EnTetePublic } from "@/components/app/navigation";
 import { Avatar } from "@/components/ui/avatar";
 import { Toast } from "@/components/ui/toast";
 import { Palette } from "@/components/app/palette";
+import { Confettis } from "@/components/ui/confettis";
 import "./globals.css";
 
 // Polices de la DA « Campus 2026 » : Archivo (axe de largeur pour les titres condensés),
@@ -14,6 +15,8 @@ import "./globals.css";
 const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-archivo" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
 const sourceSerif = Source_Serif_4({ subsets: ["latin"], variable: "--font-source-serif" });
+// Kalam : écriture à la main pour les annotations des post-it (« gratuit », flèches, notes).
+const kalam = Kalam({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-kalam" });
 
 export const metadata: Metadata = {
   title: { default: "L'entraide du campus", template: "%s · L'entraide du campus" },
@@ -47,10 +50,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     : { count: 0 };
 
   return (
-    <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} h-full antialiased`}>
+    <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} ${kalam.variable} h-full antialiased`}>
       <body className="min-h-full font-sans">
         <Suspense>
           <Toast />
+          <Confettis />
         </Suspense>
         {user && profil ? (
           <div className="flex min-h-dvh flex-col md:flex-row">
@@ -65,7 +69,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               notificationsNonLues={nonLues ?? 0}
             />
             <div className="flex min-w-0 flex-1 flex-col">
-              <main className="flex-1 px-4 pt-6 pb-28 sm:px-8 md:py-8">{children}</main>
+              <main className="flex-1 px-4 pt-6 pb-28 sm:px-8 md:py-10">{children}</main>
               <PiedDePage />
             </div>
           </div>
