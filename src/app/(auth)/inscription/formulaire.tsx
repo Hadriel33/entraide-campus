@@ -33,6 +33,7 @@ export function FormulaireInscription() {
         </div>
         {etat.erreurs?.ecole && <span className="font-normal text-alerte">{etat.erreurs.ecole}</span>}
       </fieldset>
+      <Champ label="Pseudo" name="pseudo" autoComplete="username" aide="Ton nom sur l'appli, par exemple sam.photo" erreur={etat.erreurs?.pseudo} defaultValue={etat.valeurs?.pseudo} />
       <Champ label="Email" name="email" type="email" autoComplete="email" erreur={etat.erreurs?.email} defaultValue={etat.valeurs?.email} />
       <Champ label="Mot de passe (8 caractères minimum)" name="motDePasse" type="password" autoComplete="new-password" erreur={etat.erreurs?.motDePasse} />
       {etat.message && <p role="alert" className="text-sm text-alerte">{etat.message}</p>}

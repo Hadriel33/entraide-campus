@@ -6,6 +6,7 @@ const inscriptionValide = {
   motDePasse: "photo2026!",
   prenom: "Sam",
   ecole: "ESD",
+  pseudo: "sam.photo",
 };
 
 describe("validerInscription", () => {
@@ -40,6 +41,16 @@ describe("validerInscription", () => {
     const r = validerInscription({ ...inscriptionValide, ecole: "HEC" });
     expect(r.ok).toBe(false);
     expect(r.erreurs.ecole).toBeDefined();
+  });
+
+  it("refuse un pseudo invalide", () => {
+    const r = validerInscription({ ...inscriptionValide, pseudo: "sam photo" });
+    expect(r.ok).toBe(false);
+    expect(r.erreurs.pseudo).toBeDefined();
+  });
+
+  it("normalise le pseudo (arobase, majuscules)", () => {
+    expect(validerInscription({ ...inscriptionValide, pseudo: "@Sam.Photo" }).ok).toBe(true);
   });
 
   it("ignore les espaces autour de l'email", () => {

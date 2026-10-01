@@ -11,7 +11,7 @@ const STYLES = {
 
 type Variante = keyof typeof STYLES;
 const BASE =
-  "inline-flex min-h-10 items-center justify-center gap-2 rounded-ui px-4 py-2 font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50";
+  "presse inline-flex min-h-10 items-center justify-center gap-2 rounded-ui px-4 py-2 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50";
 
 export function Bouton({ variante = "plein", className = "", ...props }: ComponentProps<"button"> & { variante?: Variante }) {
   return <button className={`${BASE} ${STYLES[variante]} ${className}`} {...props} />;

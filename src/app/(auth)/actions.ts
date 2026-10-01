@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { validerConnexion, validerInscription } from "@/lib/auth/validation";
+import { normaliserPseudo } from "@/lib/profils/validation";
 
 export type EtatFormulaire = {
   erreurs?: Partial<Record<string, string>>;
@@ -33,19 +34,23 @@ export async function inscrire(_: EtatFormulaire, formData: FormData): Promise<E
     motDePasse: texte(formData, "motDePasse"),
     prenom: texte(formData, "prenom").trim(),
     ecole: texte(formData, "ecole"),
+    pseudo: normaliserPseudo(texte(formData, "pseudo")),
   };
-  const valeurs = { email: champs.email, prenom: champs.prenom, ecole: champs.ecole };
+  const valeurs = { email: champs.email, prenom: champs.prenom, ecole: champs.ecole, pseudo: champs.pseudo };
 
   const validation = validerInscription(champs);
   if (!validation.ok) return { erreurs: validation.erreurs, valeurs };
 
   const origine = (await headers()).get("origin") ?? "https://entraide-campus.vercel.app";
   const supabase = await createClient();
+  const { data: libre } = await supabase.rpc("pseudo_disponible", { p: champs.pseudo });
+  if (libre === false) return { erreurs: { pseudo: "Ce pseudo est déjà pris." }, valeurs };
+
   const { data, error } = await supabase.auth.signUp({
     email: champs.email,
     password: champs.motDePasse,
     options: {
-      data: { prenom: champs.prenom, ecole: champs.ecole },
+      data: { prenom: champs.prenom, ecole: champs.ecole, pseudo: champs.pseudo },
       emailRedirectTo: `${origine}/auth/confirmer`,
     },
   });

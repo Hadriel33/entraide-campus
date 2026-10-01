@@ -12,8 +12,9 @@ Chaque étape a un moyen de vérification. On ne passe à la suivante que quand 
 | 2 ✅ | S1 · 1er oct | Projet Supabase créé (vide), variables `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` dans Vercel | `vercel env ls` les liste. Le build passe. |
 | 3 🟡 | S2 · 22 oct | Comptes : inscription, connexion, déconnexion (Supabase Auth). URL Vercel dans Auth › URL Configuration. | Je crée un compte, je me déconnecte, je me reconnecte : il existe toujours. |
 | 4 🟡 | S2 · 22 oct | Table `annonces` + RLS (lecture : connectés ; écriture : auteur seulement) | Je publie, je recharge, l'annonce est là. Le 2e compte ne peut pas la modifier (test SQL + test à la main). |
-| 5 | S3 · 5 nov | Demande de contact → accepter / refuser → coordonnées visibles (table `profils_prives` protégée par RLS) | Avec 2 comptes en fenêtre privée : coordonnées invisibles avant accord, y compris dans l'onglet Réseau. |
+| 5 🟡 | S3 · 5 nov | Demande de contact → accepter / refuser → coordonnées visibles (table `profils_prives` protégée par RLS) | Avec 2 comptes en fenêtre privée : coordonnées invisibles avant accord, y compris dans l'onglet Réseau. |
 | 6 | S4 · 19 nov | IA n°1 : CV PDF → compétences en JSON → écran de relecture → profil validé | 3 CV de test (normal, presque vide, texte caché). Si l'IA échoue, la saisie manuelle reste possible. |
 | 7 | S4 · 19 nov | IA n°2 : modération des annonces (voir `IDEES.md`) + espace admin | Une annonce douteuse est signalée et l'admin la supprime. Rien n'est supprimé sans validation humaine. |
 | 8 | S5 · 26 nov | Chasse aux failles : corriger côté base + un test par faille | Je refais l'attaque après correction, elle échoue. |
-| 9 | Bonus | Palier 2 (messagerie), puis gamification (`IDEES.md`) | Seulement si 1 à 8 tournent en ligne. |
+| 9 | Bonus | Palier 2 (messagerie) | Seulement si 1 à 8 tournent en ligne. |
+| 10 🟡 | Ajout 01/10 | Profil (pseudo, photo, bio), rôle admin et modération, gamification (points, niveaux, badges, avis, classement) | 14 tests SQL de sécurité. À la main : nommer un admin, masquer une annonce, laisser un avis. |

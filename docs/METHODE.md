@@ -58,7 +58,12 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | DA E appliquée au vrai site en ne touchant que les jetons et les composants `ui` | Preuve de la portabilité : `globals.css` (jetons + utilitaire `titre-charte`), polices via `next/font`, et les pages reprennent `TitrePage`, `Badge`, `Bouton`. Le test `front-portable` reste vert. |
 | 01/10 | Étape 4 : identifiants d'annonce en UUID, et « annonce introuvable » renvoyé aussi quand ce n'est pas la nôtre | On ne révèle pas l'existence d'une annonce archivée d'un autre. On ne peut pas énumérer les annonces en changeant le numéro dans l'URL (anticipation de la chasse aux failles). |
 | 01/10 | Les tests de bout en bout avec de vrais comptes sont faits par Hadriel | L'IA ne crée pas de comptes ni ne se connecte sur le site en ligne (règle de sécurité). Elle teste la sécurité en SQL avec des comptes fictifs, et Hadriel teste le parcours à la main avec 2 comptes. |
-| 01/10 | Gamification repoussée après le palier 1 | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
+| 01/10 | Hadriel accélère : contact, profil (pseudo, photo), rôle admin et gamification dans la foulée | Ordre imposé : d'abord la demande de contact (le cœur du palier 1), puis le reste. Une fiche commune (`docs/etapes/05-...md`), des tests d'abord (24 nouveaux), 4 migrations et **14 tests de sécurité SQL** en une transaction. |
+| 01/10 | Points, niveaux et badges **calculés**, jamais stockés | Ils sont déduits des faits protégés (demandes acceptées, avis) par `stats_profil()` en SQL, et `progression.ts` (testé) fait le calcul. Personne ne peut s'attribuer des points : c'est la leçon de la faille padel-snipe. On compte des **personnes différentes** aidées pour que deux amis ne puissent pas farmer. |
+| 01/10 | Rôle admin non modifiable par l'utilisateur | Droits par colonne (`role` exclu des colonnes modifiables), fonction `definir_role()` réservée aux admins, premier admin nommé en SQL. Tests : élévation par UPDATE et par la fonction, les deux bloquées. |
+| 01/10 | Destinataire d'une demande et cible d'un avis imposés par la base | Les triggers écrasent ce que le client envoie. Testé : un destinataire détourné est remis à l'auteur de l'annonce, un avis visant un tiers est redirigé vers la bonne personne. |
+| 01/10 | Animations courtes en CSS pur, aucune librairie | `apparition` en cascade, `souleve`, `presse`, `pop`, et un toast de confirmation. Tout est coupé si l'utilisateur active `prefers-reduced-motion`. |
+| 01/10 | Gamification repoussée après le palier 1 (décision initiale, remplacée le jour même) | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
@@ -70,4 +75,7 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Envoi d'emails : le SMTP gratuit de Supabase n'envoie qu'aux membres de l'équipe du projet (vérifié dans la doc officielle) | Confirmation d'email désactivée pendant le développement. On branchera Brevo (SMTP perso) avant d'ouvrir l'appli au campus. |
 | 01/10 | Titres non condensés en ligne : `font-stretch` sans effet avec next/font | Vu en vérifiant le rendu sur le site déployé. Correctif : `font-variation-settings: "wdth" 78`. |
 | 01/10 | `tsc` en erreur sur `PageProps<"/annonces/[id]">` avant le build | Les types de routes de Next.js 16 sont générés au build : on lance `tsc` après `next build`. |
+| 01/10 | Advisors Supabase : fonctions de trigger appelables via l'API | Fermées (migration 0007). Les autres alertes concernent des fonctions appelées volontairement, qui vérifient elles-mêmes les droits : documenté. |
+| 01/10 | Vitest ne résolvait pas l'alias `@/` | Alias ajouté dans `vitest.config.ts`. |
+| 01/10 | Caractère étoile refusé par le test front-portable (c'est un pictogramme) | Étoiles en SVG. Le garde-fou a fonctionné. |
 | 01/10 | La copie locale de padel-snipe n'était pas à jour (22 commits de retard) | Lecture directe de la version GitHub (`origin/main`), sans toucher à la branche locale. |

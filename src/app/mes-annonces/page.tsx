@@ -26,8 +26,8 @@ export default async function PageMesAnnonces() {
       </div>
       {annonces.length > 0 ? (
         <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-          {annonces.map((a) => (
-            <CarteAnnonce key={a.id} annonce={a} />
+          {annonces.map((a, i) => (
+            <CarteAnnonce key={a.id} annonce={a} index={i} />
           ))}
         </div>
       ) : (

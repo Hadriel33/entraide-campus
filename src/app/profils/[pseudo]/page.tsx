@@ -1,0 +1,115 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { exigerSession } from "@/lib/session";
+import type { Stats } from "@/lib/gamification/progression";
+import { SELECT_ANNONCE, dateCourte, type Annonce } from "@/lib/annonces/requetes";
+import { Avatar } from "@/components/ui/avatar";
+import { BadgeEcole } from "@/components/ui/badge";
+import { NoteEtoiles } from "@/components/ui/etoiles";
+import { CarteProgression } from "@/components/profil/progression";
+import { CarteAnnonce } from "@/components/annonces/carte-annonce";
+
+type Avis = { id: string; note: number; commentaire: string | null; cree_le: string; auteur: { pseudo: string; avatar_chemin: string | null } | null };
+
+export async function generateMetadata({ params }: PageProps<"/profils/[pseudo]">): Promise<Metadata> {
+  return { title: `@${decodeURIComponent((await params).pseudo)}` };
+}
+
+export default async function PageProfil({ params }: PageProps<"/profils/[pseudo]">) {
+  const { supabase } = await exigerSession();
+  const pseudo = decodeURIComponent((await params).pseudo).toLowerCase();
+
+  // Profil public : jamais de coordonnées ici (elles sont dans une autre table, protégée).
+  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, role, cree_le").eq("pseudo", pseudo).maybeSingle();
+  if (!profil) notFound();
+
+  const [{ data: stats }, { data: annonces }, { data: avis }] = await Promise.all([
+    supabase.rpc("stats_profil", { cible: profil.id }),
+    supabase.from("annonces").select(SELECT_ANNONCE).eq("auteur_id", profil.id).eq("statut", "publiee").order("cree_le", { ascending: false }),
+    supabase
+      .from("avis")
+      .select("id, note, commentaire, cree_le, auteur:profils!avis_auteur_id_fkey(pseudo, avatar_chemin)")
+      .eq("cible_id", profil.id)
+      .order("cree_le", { ascending: false })
+      .limit(20),
+  ]);
+  const s = stats as Stats | null;
+  const listeAvis = (avis ?? []) as unknown as Avis[];
+
+  return (
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+      <header className="apparition flex flex-wrap items-center gap-5">
+        <Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" />
+        <div className="flex flex-col gap-1.5">
+          <h1 className="titre-charte self-start bg-bandeau px-2.5 pt-0.5 text-3xl">@{profil.pseudo}</h1>
+          <p className="flex flex-wrap items-center gap-2 text-encre-douce">
+            {profil.prenom} <BadgeEcole ecole={profil.ecole} />
+            {profil.role === "admin" && <span className="text-xs font-semibold text-accent">Modération</span>}
+            <span className="text-xs">membre depuis le {dateCourte(profil.cree_le)}</span>
+          </p>
+          {profil.bio && <p className="max-w-xl font-serif text-lg">{profil.bio}</p>}
+          {s?.note_moyenne != null && (
+            <p className="flex items-center gap-2 text-sm">
+              <NoteEtoiles note={s.note_moyenne} /> <strong>{String(s.note_moyenne).replace(".", ",")}</strong>
+              <span className="text-encre-douce">({s.nb_avis} avis)</span>
+            </p>
+          )}
+        </div>
+      </header>
+
+      {s && (
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: "personnes aidées", valeur: s.aides_donnees },
+            { label: "coups de main reçus", valeur: s.aides_recues },
+            { label: "annonces publiées", valeur: s.annonces },
+            { label: "entraides ESD × ESP", valeur: s.croisements },
+          ].map((t, i) => (
+            <div key={t.label} className="apparition rounded-carte border border-ligne bg-surface p-4" style={{ "--i": i } as React.CSSProperties}>
+              <dd className="titre-charte text-3xl">{t.valeur}</dd>
+              <dt className="text-sm text-encre-douce">{t.label}</dt>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {s && <CarteProgression stats={s} />}
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold">Annonces en cours</h2>
+        {annonces?.length ? (
+          <div className="grid gap-3.5 sm:grid-cols-2">
+            {(annonces as unknown as Annonce[]).map((a, i) => (
+              <CarteAnnonce key={a.id} annonce={a} index={i} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-encre-douce">Aucune annonce en cours.</p>
+        )}
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold">Avis reçus</h2>
+        {listeAvis.length ? (
+          <ul className="flex flex-col gap-2.5">
+            {listeAvis.map((a, i) => (
+              <li key={a.id} className="apparition flex flex-col gap-1.5 rounded-carte border border-ligne bg-surface p-4" style={{ "--i": i } as React.CSSProperties}>
+                <div className="flex items-center justify-between gap-2 text-sm">
+                  <span className="flex items-center gap-2 font-medium">
+                    <Avatar chemin={a.auteur?.avatar_chemin} nom={a.auteur?.pseudo ?? "?"} taille="sm" />@{a.auteur?.pseudo}
+                  </span>
+                  <span className="flex items-center gap-2 text-xs text-encre-douce">
+                    <NoteEtoiles note={a.note} /> {dateCourte(a.cree_le)}
+                  </span>
+                </div>
+                {a.commentaire && <p className="font-serif">{a.commentaire}</p>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-encre-douce">Pas encore d&apos;avis. Les avis arrivent après une mise en relation acceptée.</p>
+        )}
+      </section>
+    </div>
+  );
+}

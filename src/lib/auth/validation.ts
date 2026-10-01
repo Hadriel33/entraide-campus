@@ -1,3 +1,5 @@
+import { normaliserPseudo, validerPseudo } from "@/lib/profils/validation";
+
 export const ECOLES = ["ESD", "ESP"] as const;
 export type Ecole = (typeof ECOLES)[number];
 
@@ -10,8 +12,9 @@ export function validerInscription(champs: {
   motDePasse: string;
   prenom: string;
   ecole: string;
-}): Resultat<"email" | "motDePasse" | "prenom" | "ecole"> {
-  const erreurs: Resultat<"email" | "motDePasse" | "prenom" | "ecole">["erreurs"] = {};
+  pseudo: string;
+}): Resultat<"email" | "motDePasse" | "prenom" | "ecole" | "pseudo"> {
+  const erreurs: Resultat<"email" | "motDePasse" | "prenom" | "ecole" | "pseudo">["erreurs"] = {};
   const prenom = champs.prenom.trim();
 
   if (!EMAIL.test(champs.email.trim())) erreurs.email = "Adresse email invalide.";
@@ -19,6 +22,8 @@ export function validerInscription(champs: {
   if (!prenom) erreurs.prenom = "Ton prénom est obligatoire.";
   else if (prenom.length > 40) erreurs.prenom = "40 caractères maximum.";
   if (!ECOLES.includes(champs.ecole as Ecole)) erreurs.ecole = "Choisis ESD ou ESP.";
+  const erreurPseudo = validerPseudo(normaliserPseudo(champs.pseudo));
+  if (erreurPseudo) erreurs.pseudo = erreurPseudo;
 
   return { ok: Object.keys(erreurs).length === 0, erreurs };
 }

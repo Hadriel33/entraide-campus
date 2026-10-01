@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Archivo, DM_Sans, Source_Serif_4 } from "next/font/google";
-import { createClient } from "@/lib/supabase/server";
+import { getSession } from "@/lib/session";
 import { BarreLaterale, EnTetePublic } from "@/components/app/navigation";
+import { Avatar } from "@/components/ui/avatar";
+import { Toast } from "@/components/ui/toast";
 import "./globals.css";
 
 // Polices de la DA « Campus 2026 » : Archivo (axe de largeur pour les titres condensés),
@@ -24,20 +27,30 @@ function PiedDePage() {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const { data: profil } = user
-    ? await supabase.from("profils").select("prenom, ecole").eq("id", user.id).single()
-    : { data: null };
+  const { supabase, user, profil } = await getSession();
+  const { count: enAttente } = user
+    ? await supabase
+        .from("demandes_contact")
+        .select("id", { count: "exact", head: true })
+        .eq("destinataire_id", user.id)
+        .eq("statut", "en_attente")
+    : { count: 0 };
 
   return (
     <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} h-full antialiased`}>
       <body className="min-h-full font-sans">
-        {user ? (
+        <Suspense>
+          <Toast />
+        </Suspense>
+        {user && profil ? (
           <div className="flex min-h-dvh flex-col md:flex-row">
-            <BarreLaterale prenom={profil?.prenom ?? "Moi"} ecole={profil?.ecole ?? ""} />
+            <BarreLaterale
+              pseudo={profil.pseudo}
+              ecole={profil.ecole}
+              avatar={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} />}
+              demandesEnAttente={enAttente ?? 0}
+              estAdmin={profil.role === "admin"}
+            />
             <div className="flex min-w-0 flex-1 flex-col">
               <main className="flex-1 px-4 py-8 sm:px-8">{children}</main>
               <PiedDePage />

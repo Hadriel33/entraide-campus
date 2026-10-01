@@ -41,7 +41,7 @@ export async function creerAnnonce(_: EtatAnnonce, formData: FormData): Promise<
   }
 
   revalidatePath("/annonces");
-  redirect(`/annonces/${data.id}`);
+  redirect(`/annonces/${data.id}?ok=publiee`);
 }
 
 export async function modifierAnnonce(id: string, _: EtatAnnonce, formData: FormData): Promise<EtatAnnonce> {
@@ -57,7 +57,7 @@ export async function modifierAnnonce(id: string, _: EtatAnnonce, formData: Form
   }
 
   revalidatePath("/annonces");
-  redirect(`/annonces/${id}`);
+  redirect(`/annonces/${id}?ok=modifiee`);
 }
 
 export async function changerStatut(id: string, statut: "publiee" | "archivee") {
@@ -65,7 +65,7 @@ export async function changerStatut(id: string, statut: "publiee" | "archivee") 
   await supabase.from("annonces").update({ statut }).eq("id", id);
   revalidatePath("/annonces");
   revalidatePath("/mes-annonces");
-  redirect(`/annonces/${id}`);
+  redirect(`/annonces/${id}?ok=${statut === "archivee" ? "archivee" : "republiee"}`);
 }
 
 export async function supprimerAnnonce(id: string) {
@@ -73,5 +73,5 @@ export async function supprimerAnnonce(id: string) {
   await supabase.from("annonces").delete().eq("id", id);
   revalidatePath("/annonces");
   revalidatePath("/mes-annonces");
-  redirect("/mes-annonces");
+  redirect("/mes-annonces?ok=supprimee");
 }

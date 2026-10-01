@@ -50,6 +50,52 @@ body {
   color: var(--color-encre);
 }
 
+/* ============ Animations : courtes, utiles, désactivées si l'utilisateur le demande ============ */
+@keyframes apparition {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toast {
+  0% { opacity: 0; transform: translateY(-8px); }
+  8%, 85% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-8px); visibility: hidden; }
+}
+@keyframes pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Apparition en cascade : style={{ "--i": index }} décale chaque élément de 40 ms. */
+@utility apparition {
+  animation: apparition 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(min(var(--i, 0), 12) * 40ms);
+}
+@utility pop {
+  animation: pop 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@utility toast-anime {
+  animation: toast 4.5s ease forwards;
+}
+/* Carte qui se soulève légèrement au survol. */
+@utility souleve {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -10px color-mix(in oklab, var(--color-encre) 35%, transparent); }
+}
+/* Retour tactile au clic. */
+@utility presse {
+  transition: transform 90ms ease, background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  &:active { transform: scale(0.97); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
 /* Titres de la charte : Archivo condensé en capitales. */
 @utility titre-charte {
   font-family: var(--font-titre);

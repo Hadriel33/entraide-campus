@@ -1,0 +1,55 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { exigerSession } from "@/lib/session";
+import { validerAvis } from "@/lib/profils/validation";
+
+const MOTIFS = ["arnaque", "inapproprie", "coordonnees", "hors_sujet", "autre"] as const;
+
+function texte(formData: FormData, cle: string, max: number) {
+  return String(formData.get(cle) ?? "").trim().slice(0, max) || null;
+}
+
+// Le destinataire et le demandeur sont fixés par la base (trigger), pas par ce code.
+export async function demanderContact(annonceId: string, formData: FormData) {
+  const { supabase } = await exigerSession();
+  const { error } = await supabase.from("demandes_contact").insert({ annonce_id: annonceId, message: texte(formData, "message", 300) });
+  if (error && error.code !== "23505") console.error("Demande de contact", error); // 23505 = déjà demandé : on ignore
+  revalidatePath(`/annonces/${annonceId}`);
+  redirect(`/annonces/${annonceId}?ok=demande`);
+}
+
+export async function annulerDemande(demandeId: string, annonceId: string) {
+  const { supabase } = await exigerSession();
+  await supabase.from("demandes_contact").delete().eq("id", demandeId);
+  revalidatePath("/demandes");
+  redirect(`/annonces/${annonceId}?ok=annulee`);
+}
+
+// Seul le destinataire peut répondre, une seule fois : garanti par la RLS et le trigger.
+export async function repondreDemande(demandeId: string, reponse: "acceptee" | "refusee") {
+  const { supabase } = await exigerSession();
+  await supabase.from("demandes_contact").update({ statut: reponse }).eq("id", demandeId);
+  revalidatePath("/demandes");
+  revalidatePath("/", "layout");
+  redirect(`/demandes?ok=${reponse}`);
+}
+
+export async function laisserAvis(demandeId: string, retour: string, formData: FormData) {
+  const { supabase } = await exigerSession();
+  const validation = validerAvis({ note: String(formData.get("note") ?? ""), commentaire: String(formData.get("commentaire") ?? "") });
+  if (!validation.ok) redirect(`${retour}?erreur=avis`);
+  // La cible et l'auteur sont imposés par la base, qui vérifie aussi que la mise en relation est acceptée.
+  await supabase.from("avis").insert({ demande_id: demandeId, cible_id: "00000000-0000-0000-0000-000000000000", ...validation.valeurs });
+  revalidatePath(retour);
+  redirect(`${retour}?ok=avis`);
+}
+
+export async function signalerAnnonce(annonceId: string, formData: FormData) {
+  const { supabase } = await exigerSession();
+  const motif = String(formData.get("motif") ?? "");
+  if (!(MOTIFS as readonly string[]).includes(motif)) redirect(`/annonces/${annonceId}`);
+  await supabase.from("signalements").insert({ annonce_id: annonceId, motif, details: texte(formData, "details", 300) });
+  redirect(`/annonces/${annonceId}?ok=signalement`);
+}

@@ -1,0 +1,42 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { notFound, redirect } from "next/navigation";
+import { exigerSession } from "@/lib/session";
+
+// Vérification côté serveur, en plus de la RLS et des fonctions SQL qui refusent déjà un non-admin.
+async function exigerAdmin() {
+  const session = await exigerSession();
+  if (session.profil.role !== "admin") notFound();
+  return session;
+}
+
+export async function modererAnnonce(id: string, statut: "masquee" | "publiee") {
+  const { supabase } = await exigerAdmin();
+  await supabase.from("annonces").update({ statut }).eq("id", id);
+  revalidatePath("/admin");
+  revalidatePath("/annonces");
+  redirect("/admin");
+}
+
+export async function supprimerAnnonceAdmin(id: string) {
+  const { supabase } = await exigerAdmin();
+  await supabase.from("annonces").delete().eq("id", id);
+  revalidatePath("/admin");
+  revalidatePath("/annonces");
+  redirect("/admin");
+}
+
+export async function traiterSignalement(id: string) {
+  const { supabase } = await exigerAdmin();
+  await supabase.from("signalements").update({ statut: "traite" }).eq("id", id);
+  revalidatePath("/admin");
+  redirect("/admin");
+}
+
+export async function changerRole(cible: string, role: "admin" | "etudiant") {
+  const { supabase } = await exigerAdmin();
+  await supabase.rpc("definir_role", { cible, nouveau_role: role });
+  revalidatePath("/admin");
+  redirect("/admin?onglet=etudiants");
+}
