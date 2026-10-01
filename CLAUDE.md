@@ -5,7 +5,7 @@
 > Relis ce fichier avant chaque demande. Si une demande le contredit, demande-moi avant d'agir.
 
 ## En 5 lignes
-- **Pour qui** : les étudiants du campus (ECV Bordeaux).
+- **Pour qui** : les étudiants du campus (ESD Bordeaux, avec les étudiants de l'ESP).
 - **Problème** : on ne sait pas qui, sur le campus, peut nous aider (photo, vidéo, dev, community management…) ni où trouver une coloc ou un covoiturage.
 - **Solution** : chacun publie ce qu'il **propose** et ce qu'il **cherche** avec un seul compte. Les coordonnées ne s'échangent qu'après accord.
 - **3 écrans** : (1) liste et détail des annonces avec « Demander le contact », (2) demandes reçues avec Accepter / Refuser, puis coordonnées visibles, (3) mon profil généré depuis mon CV, à relire et valider.
