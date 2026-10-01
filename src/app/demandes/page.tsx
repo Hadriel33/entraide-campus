@@ -123,7 +123,8 @@ export default async function PageDemandes({
     return (
       <article
         key={d.id}
-        className={`colle postit ${papier} flex flex-col gap-3 p-5 pt-6`}
+        id={`demande-${d.id}`}
+        className={`colle postit ${papier} flex scroll-mt-24 flex-col gap-3 p-5 pt-6 target:outline-4 target:outline-offset-4 target:outline-bandeau`}
         style={
           {
             "--i": i,
@@ -225,7 +226,11 @@ export default async function PageDemandes({
       {demandes.length === 0 && (
         <EtatVide
           anim={onglet === "recues" ? "dort" : "cherche"}
-          titre={onglet === "recues" ? "Aucune demande reçue pour l'instant" : "Tu n'as envoyé aucune demande"}
+          titre={
+            onglet === "recues"
+              ? "Aucune demande reçue pour l'instant"
+              : "Tu n'as envoyé aucune demande"
+          }
         >
           {onglet === "recues"
             ? "Quand quelqu'un voudra te contacter pour une de tes annonces, sa demande sera punaisée ici."
@@ -244,7 +249,9 @@ export default async function PageDemandes({
                 aria-label={col.titre}
               >
                 <h2 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 border-encre pb-2">
-                  <span className="titre-charte text-section whitespace-nowrap">{col.titre}</span>
+                  <span className="titre-charte text-section whitespace-nowrap">
+                    {col.titre}
+                  </span>
                   <span className="titre-charte rounded-[3px] bg-encre px-1.5 pt-0.5 text-sm text-surface">
                     {liste.length}
                   </span>
