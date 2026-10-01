@@ -11,3 +11,4 @@
 | 01/10/2026 | Planche de maquettes DA V2 (3 pistes × kit, dashboard, mobile) sur l'identité réelle ESD/ESP | Le skill ui-ux-pro-max proposait du violet : écarté (checklist anti-IA) |
 | 01/10/2026 | Piste D « ESP 2026 » ajoutée à la planche (kit, dashboard, mobile) d'après le nouvel Instagram de l'ESP | Instagram demande une connexion : la grille reste lisible après avoir refusé les cookies optionnels |
 | 01/10/2026 | Piste E (A + nouvelle charte ESP) ajoutée en tête de la planche | |
+| 01/10/2026 | DA E en ligne (bandeau jaune, titres condensés, sidebar). Étape 4 : table `annonces` + RLS (5 tests SQL OK, advisors OK), pages liste avec filtres, publication, détail, modification, archivage, suppression, Mes annonces. 22 tests Vitest OK | Titres non condensés (corrigé avec font-variation-settings). Types de routes générés au build |

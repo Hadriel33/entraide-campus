@@ -1,8 +1,13 @@
+import { redirect } from "next/navigation";
+import { getUtilisateur } from "@/lib/supabase/server";
 import { BoutonLien } from "@/components/ui/bouton";
 import { Badge } from "@/components/ui/badge";
 import { TitrePage } from "@/components/ui/titre-page";
 
-export default function Home() {
+export default async function Home() {
+  // Connecté : on va directement aux annonces.
+  if (await getUtilisateur()) redirect("/annonces");
+
   return (
     <section className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 py-16">
       <TitrePage accroche="Propose ce que tu sais faire, trouve ce dont tu as besoin. Entre étudiants de l'ESD et de l'ESP Bordeaux.">

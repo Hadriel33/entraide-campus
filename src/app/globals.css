@@ -55,6 +55,8 @@ body {
   font-family: var(--font-titre);
   font-weight: 800;
   font-stretch: 78%;
+  /* next/font ne déclare pas font-stretch : on pilote directement l'axe variable. */
+  font-variation-settings: "wdth" 78;
   text-transform: uppercase;
   letter-spacing: -0.005em;
   line-height: 1.02;

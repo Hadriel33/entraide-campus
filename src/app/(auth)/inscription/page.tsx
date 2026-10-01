@@ -7,7 +7,7 @@ import { TitrePage } from "@/components/ui/titre-page";
 export const metadata: Metadata = { title: "Créer un compte" };
 
 export default async function PageInscription() {
-  if (await getUtilisateur()) redirect("/compte");
+  if (await getUtilisateur()) redirect("/annonces");
 
   return (
     <section className="mx-auto w-full max-w-sm py-12">

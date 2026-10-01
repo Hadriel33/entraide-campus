@@ -11,7 +11,7 @@ export default async function PageConnexion({
 }: {
   searchParams: Promise<{ lien?: string }>;
 }) {
-  if (await getUtilisateur()) redirect("/compte");
+  if (await getUtilisateur()) redirect("/annonces");
   const { lien } = await searchParams;
 
   return (

@@ -18,5 +18,5 @@ export async function GET(request: NextRequest) {
     ok = !(await supabase.auth.verifyOtp({ type, token_hash: tokenHash })).error;
   }
 
-  return NextResponse.redirect(new URL(ok ? "/compte" : "/connexion?lien=invalide", origin));
+  return NextResponse.redirect(new URL(ok ? "/annonces" : "/connexion?lien=invalide", origin));
 }

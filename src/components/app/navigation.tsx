@@ -6,7 +6,11 @@ import { deconnecter } from "@/app/(auth)/actions";
 import { BadgeEcole } from "@/components/ui/badge";
 
 // Entrées du menu de l'application connectée. Ajouter une page = ajouter une ligne ici.
-export const LIENS = [{ href: "/compte", label: "Mon compte" }] as const;
+export const LIENS = [
+  { href: "/annonces", label: "Annonces" },
+  { href: "/mes-annonces", label: "Mes annonces" },
+  { href: "/compte", label: "Mon compte" },
+] as const;
 
 function Monogramme() {
   return (
