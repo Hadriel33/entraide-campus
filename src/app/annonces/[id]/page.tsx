@@ -260,7 +260,10 @@ export default async function PageAnnonce({
               Corriger moi-même
             </BoutonLien>
           </div>
-          <p className="text-xs text-encre-douce">Rien ne change sans ton accord. Un modérateur humain garde le dernier mot.</p>
+          <p className="text-xs text-encre-douce">
+            En attendant, ton annonce est cachée aux autres étudiants (seuls toi et l&apos;admin la voyez). Rien ne change sans ton accord, et un modérateur
+            humain garde le dernier mot.
+          </p>
         </section>
       )}
 
@@ -269,7 +272,7 @@ export default async function PageAnnonce({
           <Colette anim="reflechit" taille={70} className="shrink-0" />
           <p>
             <strong className="block font-main text-xl">Colette a un petit doute</strong>
-            {moderation.moderation_raisons.join(" ") || "Un modérateur va jeter un œil."} Ton annonce reste visible en attendant.
+            {moderation.moderation_raisons.join(" ") || "Un modérateur va jeter un œil."} En attendant, seuls toi et l&apos;admin la voyez.
           </p>
         </div>
       )}

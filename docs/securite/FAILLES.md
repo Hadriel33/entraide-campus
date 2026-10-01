@@ -11,6 +11,7 @@
 | 3 | Lire les conseils de sécurité de Supabase | Les fonctions de trigger étaient appelables directement par l'API | On pouvait déclencher une logique interne hors contexte | Droit d'exécution retiré (migration 0007) | rapport des « advisors » Supabase |
 | 4 | Ouvrir l'appli dans une iframe d'un autre site | Seul HSTS était en place | Clickjacking : faire cliquer sur « Accepter » à l'insu de l'étudiant | `frame-ancestors 'none'`, `X-Frame-Options`, `nosniff`, `Referrer-Policy` (`next.config.ts`) | en-têtes vérifiés en ligne |
 | 5 | S'inscrire avec 7 caractères de mot de passe par l'API | Accepté par Supabase | Comptes faciles à pirater | Minimum 8 dans Supabase Auth, en plus du formulaire | appel direct : `weak_password` |
+| 6 | Regarder le mur après le campus de démo (02/10) | L'annonce « COURS DE MATHS », classée « à vérifier » par l'IA, affichait un numéro et un email à tout le campus | Contourne la règle d'or n°1 : des coordonnées visibles sans accord | Une annonce « à vérifier » n'est visible que de son auteur et de l'admin, et on ne peut plus y demander le contact (migration 0023) | `supabase/tests/0023_annonces_a_verifier_cachees.sql` (6 tests) |
 
 ## Les attaques qui échouent (et doivent continuer d'échouer)
 | Attaque (comme en séance 5) | Règle | Pourquoi elle échoue | Test |
