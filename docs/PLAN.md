@@ -1,11 +1,13 @@
 # Plan de travail
 
+Appli en ligne : **https://entraide-campus.vercel.app**
+
 Chaque étape a un moyen de vérification. On ne passe à la suivante que quand la vérification est verte **en ligne**.
 
 | # | Séance | Étape | Comment on vérifie |
 |---|---|---|---|
-| 1 | S1 · 1er oct | Page vide en ligne (GitHub → Vercel), fiche d'identité à la racine | L'adresse Vercel s'ouvre sur mon téléphone. Un commit poussé apparaît en ligne en moins de 2 min. |
-| 2 | S1 · 1er oct | Projet Supabase créé (vide), variables `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` dans Vercel | `vercel env ls` les liste. Le build passe. |
+| 1 ✅ | S1 · 1er oct | Page vide en ligne (GitHub → Vercel), fiche d'identité à la racine | L'adresse Vercel s'ouvre sur mon téléphone. Un commit poussé apparaît en ligne en moins de 2 min. |
+| 2 ✅ | S1 · 1er oct | Projet Supabase créé (vide), variables `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` dans Vercel | `vercel env ls` les liste. Le build passe. |
 | 3 | S2 · 22 oct | Comptes : inscription, connexion, déconnexion (Supabase Auth). URL Vercel dans Auth › URL Configuration. | Je crée un compte, je me déconnecte, je me reconnecte : il existe toujours. |
 | 4 | S2 · 22 oct | Table `annonces` + RLS (lecture : connectés ; écriture : auteur seulement) | Je publie, je recharge, l'annonce est là. Le 2e compte ne peut pas la modifier (test SQL + test à la main). |
 | 5 | S3 · 5 nov | Demande de contact → accepter / refuser → coordonnées visibles (table `profils_prives` protégée par RLS) | Avec 2 comptes en fenêtre privée : coordonnées invisibles avant accord, y compris dans l'onglet Réseau. |
