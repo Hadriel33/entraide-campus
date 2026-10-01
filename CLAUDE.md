@@ -38,6 +38,14 @@
 - Après 2 essais ratés, on revient à la dernière version qui marchait et on reformule.
 - Les prompts des fonctionnalités IA sont rangés dans `src/lib/ai/prompts/` pour être relus et améliorés.
 
+## Skills du projet (`.claude/skills/`)
+- `nouvelle-etape` : la méthode du cours, à suivre pour chaque nouvelle fonctionnalité.
+- `supabase-rls-securite` : RLS, les 3 règles d'or, l'admin, la chasse aux failles.
+- `fonctionnalite-ia` : brancher le profil CV et la modération IA proprement.
+- `tests-comptes` : Vitest, comptes de test, cas piégés pour l'IA.
+- `anti-ia-design` et `ui-ux-pro-max` : design et textes qui ne font pas « généré par IA ».
+- `gamification-badges` : badges, avis, historique, sans triche (bonus).
+
 ## Liens
 - Plan de travail : `docs/PLAN.md`
 - Idées et bonus : `docs/IDEES.md`
