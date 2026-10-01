@@ -43,3 +43,6 @@ Pour chaque règle, écrire un test qui se connecte avec **2 comptes de test** e
 - [modeles/test-rls.sql](modeles/test-rls.sql) : tester une règle avec 2 comptes fictifs dans une transaction annulée.
 - [modeles/client-serveur.ts](modeles/client-serveur.ts) : client Supabase serveur et `getUtilisateur()`.
 - [modeles/proxy-session.ts](modeles/proxy-session.ts) : rafraîchissement de session et pages protégées (Next.js 16).
+- [modeles/messagerie-regle-or-3.sql](modeles/messagerie-regle-or-3.sql) : conversation lisible par ses 2 participants, auteur imposé, rien avant l'accord, Realtime.
+- [modeles/colonnes-protegees-par-trigger.sql](modeles/colonnes-protegees-par-trigger.sql) : colonnes que seul le serveur (`service_role`) ou un admin peut écrire.
+- Rapport de la chasse aux failles à blanc : `docs/securite/chasse-aux-failles-a-blanc.md`.

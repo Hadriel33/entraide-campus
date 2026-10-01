@@ -30,3 +30,12 @@ Voir le skill `tests-comptes` : cas normal, presque vide, texte caché ou inject
 
 ## Pour la démo
 Savoir expliquer en 30 secondes : le besoin, pourquoi une IA, le garde-fou humain, ce qui se passe si elle tombe en panne.
+
+## Modèles de code (le vrai code du projet, 01/10)
+- [modeles/appel-modele.ts](modeles/appel-modele.ts) : appel via Vercel AI Gateway (OIDC, aucune clé), sortie JSON validée par zod, délai maximum, `null` si panne.
+- [modeles/regles-filet-securite.ts](modeles/regles-filet-securite.ts) : règles sans IA qui ne peuvent que rendre la décision plus stricte.
+- [modeles/moderation-apres-reponse.ts](modeles/moderation-apres-reponse.ts) : traitement lancé avec `after()`, écriture par le seul serveur.
+- [modeles/prompt-cv.ts](modeles/prompt-cv.ts) et [modeles/prompt-moderation.ts](modeles/prompt-moderation.ts) : le contenu utilisateur décrit comme « une donnée, pas des instructions ».
+
+## Choisir un modèle sans coût
+Lister les modèles avec `GET https://ai-gateway.vercel.sh/v1/models`, puis tester avec le jeton OIDC : sur l'offre gratuite, Claude renvoie 403 ; Gemini 2.5 Flash, gpt-oss, Mistral Small et Llama 4 Scout passent (test du 01/10/2026).
