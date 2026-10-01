@@ -1,0 +1,41 @@
+# Garde-fou : à chaque push et pull request, on vérifie que rien n'est cassé.
+# Si une étape échoue, GitHub affiche une croix rouge sur le commit.
+name: Vérifications
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Valeurs PUBLIQUES (déjà visibles dans le navigateur) : nécessaires au build. Aucun secret ici.
+      NEXT_PUBLIC_SUPABASE_URL: https://oobnrocwpyyeaadbhweu.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_pBc7zqK42NB4V8obmVevtQ_YAbmensn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Installer les dépendances
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Tests (règles métier, sécurité du front, IA)
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Typage (après le build, qui génère les types de routes)
+        run: npx tsc --noEmit
+      - name: Aucune clé secrète dans le code
+        run: |
+          if git grep -nE "sb_secret_[A-Za-z0-9]|service_role\"?\s*[:=]\s*\"ey|sk-[A-Za-z0-9]{20,}|AI_GATEWAY_API_KEY=\S" -- ':!.github' ':!*.md'; then
+            echo "Une clé secrète semble présente dans le code." && exit 1
+          fi
