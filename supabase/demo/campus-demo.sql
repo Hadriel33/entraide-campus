@@ -6,9 +6,13 @@
 -- une annonce à corriger (IA n°2), une arnaque masquée, un signalement.
 -- Et le compte de Hadriel (@hadri) : profil complet, 3 annonces, demandes reçues et envoyées, avis, favoris.
 -- Les dates sont étalées sur 30 jours (classement de la semaine et tableau d'impact réalistes).
--- Tout se fait en une transaction : si une erreur survient, rien n'est écrit. On peut le relancer.
+-- Tout tient dans un seul bloc : si une erreur survient, rien n'est écrit. On peut le relancer.
 -- ============================================================================
-begin;
+do $demo$
+declare
+  ann record; aide record; v_dem uuid; v_hadri uuid; nb int := 0; h int; v_cible uuid;
+  msgs text[] := array['Salut ! Toujours dispo ?', 'Oui carrément, tu es libre quand ?', 'Jeudi après les cours ça te va ?', 'Parfait, à jeudi devant la cafét.', 'Merci encore, trop bien !'];
+begin
 
 -- 1. Les 40 comptes (le trigger d'inscription crée leurs profils et leurs coordonnées).
 delete from auth.users where email like 'demo-postit-%';
@@ -63,15 +67,12 @@ create temp table demo_ids on commit drop as
 insert into demo_ids select p.pseudo, p.id, p.ecole, 'M1 Data Marketing & IA', 'dev', 'video' from public.profils p where p.pseudo = 'hadri';
 grant select on demo_ids to authenticated;
 
-do $$
-begin
   if (select count(*) from demo_ids where pseudo <> 'hadri') <> 40 then
     raise exception 'Les 40 comptes de démo n''ont pas été créés';
   end if;
   if not exists (select 1 from demo_ids where pseudo = 'hadri') then
     raise exception 'Profil @hadri introuvable : corrige le pseudo dans ce script';
   end if;
-end $$;
 
 -- 1. Modèles d'annonces crédibles (2 variantes par catégorie quand plusieurs étudiants s'y retrouvent).
 create temp table modeles (categorie text, type text, n int, titre text, description text) on commit drop;
@@ -185,7 +186,7 @@ select d.id, 'propose', 'coup_de_main', 'Gagne 500 euros par semaine', 'Envoie t
 from demo_ids d where d.pseudo = 'arthur.pub';
 
 -- 4. Verdicts de la modération, écrits comme le serveur (rôle service_role).
-select set_config('request.jwt.claims', '{"role":"service_role"}', true);
+perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
 update public.annonces a set moderation = 'ok', modere_le = a.cree_le + interval '3 seconds'
 from demo_ids d where a.auteur_id = d.id and a.titre not in ('COURS DE MATHS', 'Gagne 500 euros par semaine');
 update public.annonces a set moderation = 'a_verifier', modere_le = now(),
@@ -198,11 +199,6 @@ from demo_ids d where a.auteur_id = d.id and a.titre = 'Gagne 500 euros par sema
 
 -- 5. La vie du campus : chacun agit sous son identité (les règles de la base s'appliquent à chaque action).
 set local role authenticated;
-do $$
-declare
-  ann record; aide record; v_dem uuid; v_hadri uuid; n int := 0; h int; v_cible uuid;
-  msgs text[] := array['Salut ! Toujours dispo ?', 'Oui carrément, tu es libre quand ?', 'Jeudi après les cours ça te va ?', 'Parfait, à jeudi devant la cafét.', 'Merci encore, trop bien !'];
-begin
   select id into v_hadri from demo_ids where pseudo = 'hadri';
 
   -- 5a. Sur chaque annonce « je cherche », 1 à 2 étudiants qui proposent la même chose se manifestent ;
@@ -217,7 +213,7 @@ begin
         and ((ann.type = 'cherche' and d.offre = ann.categorie) or (ann.type = 'propose' and d.demande = ann.categorie))
       order by abs(hashtext(d.pseudo || ann.id::text)) limit case when ann.type = 'cherche' then 2 else 1 end
     loop
-      n := n + 1;
+      nb := nb + 1;
       h := abs(hashtext(aide.pseudo || ann.titre)) % 100;
       perform set_config('request.jwt.claims', json_build_object('sub', aide.id, 'role', 'authenticated')::text, true);
       insert into public.demandes_contact (annonce_id, destinataire_id, message)
@@ -298,7 +294,6 @@ begin
   insert into public.signalements (annonce_id, auteur_id, motif, details)
     select a.id, (select id from demo_ids where pseudo = 'lena.rse'), 'arnaque', 'Demande d''IBAN et de carte vitale.'
     from public.annonces a where a.titre = 'Gagne 500 euros par semaine';
-end $$;
 reset role;
 
 -- 6. Les dates : l'activité s'étale sur 30 jours (un tiers des entraides cette semaine).
@@ -333,7 +328,7 @@ update public.profils p set colette_couleur = 'ciel', colette_humeur = 'fiere',
   colette_motif = case when public.objet_colette_debloque(public.stats_profil(p.id), 'quadrille') then 'quadrille' else 'uni' end
 where p.pseudo = 'hadri';
 
-commit;
+end $demo$;
 
 -- Ce qui vient d'être créé.
 select
