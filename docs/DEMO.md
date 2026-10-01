@@ -28,7 +28,7 @@
 
 ## Après la démo : expliquer nos choix (questions préparées)
 
-Support de présentation (12 slides, notes de l'orateur sous chaque slide) : https://claude.ai/artifact/8euRdaaMk6wrVysXGWzuNk
+Support de présentation (8 slides avec Colette, notes de l'orateur sous chaque slide ; la démo se fait après la slide 2) : https://claude.ai/artifact/8euRdaaMk6wrVysXGWzuNk
 
 - **Notre palier** : les 3 (ça tourne, ça discute, ça matche). Le palier 1 testé à deux comptes, les règles d'or prouvées en base par 84 vérifications SQL.
 - **Nos deux IA** : voir `docs/IA-DEFENSE.md` (besoin, humain qui valide, plan si ça rate, aucune clé).
