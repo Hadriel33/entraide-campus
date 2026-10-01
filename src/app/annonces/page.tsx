@@ -19,10 +19,10 @@ import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
-import { TitrePage } from "@/components/ui/titre-page";
+import { EnDirect } from "../mur/en-direct";
 import { EtatVide } from "@/components/colette/etat-vide";
 
-export const metadata: Metadata = { title: "Annonces" };
+export const metadata: Metadata = { title: "Le mur" };
 
 type Filtres = {
   type?: string;
@@ -227,23 +227,39 @@ export default async function PageAnnonces({
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <TitrePage accroche="Étudiants de l'ESD et de l'ESP Bordeaux. Les coordonnées s'échangent seulement après accord.">
-          Les annonces du campus
-        </TitrePage>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Le même mur, en grand écran et en direct : pour le projeter en cours ou au forum des assos. */}
-          <BoutonLien
-            href="/mur"
-            variante="contour"
-            title="Le mur en plein écran, mis à jour en direct"
-          >
-            Projeter en direct
-          </BoutonLien>
-          <BoutonLien href="/annonces/nouvelle">Publier une annonce</BoutonLien>
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
+      {/* Le look du mur : grand titre en bandeaux, « En direct », et le mode projection à côté. */}
+      <header className="flex flex-wrap items-end justify-between gap-6">
+        <div className="flex flex-col items-start gap-1.5">
+          <h1 className="flex flex-col items-start gap-1.5">
+            <span className="titre-charte couche-fixe teinte-lilas bg-bandeau px-3 pt-1 text-affiche">
+              Le mur
+            </span>
+            <span className="titre-charte couche-fixe teinte-ocre ml-6 bg-ciel px-3 pt-1 text-affiche sm:ml-14">
+              du campus
+            </span>
+          </h1>
+          <p className="mt-2 max-w-xl -rotate-1 font-main text-xl leading-snug text-encre-douce">
+            ESD et ESP Bordeaux. Les coordonnées s&apos;échangent seulement
+            après accord.
+          </p>
         </div>
-      </div>
+        <div className="flex flex-col items-end gap-3">
+          <EnDirect />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <BoutonLien
+              href="/mur"
+              variante="contour"
+              title="Le mur en plein écran, mis à jour en direct"
+            >
+              Mode projection
+            </BoutonLien>
+            <BoutonLien href="/annonces/nouvelle">
+              Publier une annonce
+            </BoutonLien>
+          </div>
+        </div>
+      </header>
 
       {etatAccueil && <ChecklistAccueil etat={etatAccueil} />}
 
@@ -610,7 +626,7 @@ export default async function PageAnnonces({
           ))}
         </ul>
       ) : annonces.length > 0 ? (
-        <div className="grid gap-x-6 gap-y-9 pt-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-x-7 gap-y-10 pt-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {annonces.map((a, i) => (
             <CarteAnnonce
               key={a.id}

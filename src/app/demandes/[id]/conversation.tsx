@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Bouton } from "@/components/ui/bouton";
 import { Colette } from "@/components/colette/colette";
 import { STICKERS, contenuSticker, stickerDe } from "@/lib/messages/stickers";
+import type { Suggestion } from "@/lib/messages/brise-glace";
 
 export type Message = {
   id: string;
@@ -29,17 +30,20 @@ export function Conversation({
   moi,
   initiaux,
   prenomAutre,
+  suggestions = [],
 }: {
   demandeId: string;
   moi: string;
   initiaux: Message[];
   prenomAutre: string;
+  suggestions?: Suggestion[];
 }) {
   const [messages, setMessages] = useState<Message[]>(initiaux);
   const [texte, setTexte] = useState("");
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [planche, setPlanche] = useState(false);
+  const [idees, setIdees] = useState(false);
   const fil = useRef<HTMLOListElement>(null);
 
   useEffect(() => {
@@ -163,6 +167,33 @@ export function Conversation({
         })}
       </ol>
 
+      {/* Colette souffle une première phrase (tant que je n'ai rien écrit, ou à la demande). */}
+      {suggestions.length > 0 &&
+        (idees || !messages.some((m) => m.auteur_id === moi)) && (
+          <div className="pop flex flex-col gap-2 rounded-carte border border-dashed border-ligne-forte bg-surface p-3">
+            <p className="flex items-center gap-2 font-main text-lg">
+              <Colette anim="reflechit" taille={36} saison={false} />
+              Colette te souffle :
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {suggestions.map((s) => (
+                <button
+                  key={s.ton}
+                  type="button"
+                  onClick={() => {
+                    setTexte(s.texte);
+                    setIdees(false);
+                    document.getElementById("message")?.focus();
+                  }}
+                  className={`presse rounded-ui px-3 py-1.5 text-left text-sm hover:-translate-y-0.5 ${s.ton === "blague" ? "bg-postit-jaune" : s.ton === "sympa" ? "bg-postit-lilas" : "bg-postit-ciel"}`}
+                >
+                  {s.texte}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
       {planche && (
         <div
           id="planche-stickers"
@@ -231,6 +262,18 @@ export function Conversation({
           placeholder={`Écris à ${prenomAutre}... (Entrée pour envoyer)`}
           className="min-h-12 flex-1 resize-none rounded-ui border border-ligne-forte bg-surface px-3 py-2 outline-none focus:border-encre"
         />
+        {suggestions.length > 0 &&
+          messages.some((m) => m.auteur_id === moi) && (
+            <button
+              type="button"
+              onClick={() => setIdees((v) => !v)}
+              aria-pressed={idees}
+              title="Une idée de phrase ?"
+              className="presse hidden min-h-12 shrink-0 rounded-ui border border-ligne-forte bg-surface px-2.5 text-sm font-semibold hover:border-encre sm:block"
+            >
+              Une idée ?
+            </button>
+          )}
         <Bouton disabled={envoi || !texte.trim()}>
           {envoi ? "..." : "Envoyer"}
         </Bouton>

@@ -14,7 +14,7 @@ type Lien = { href: string; label: string; compteur?: number };
 function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
   return [
     { href: "/bureau", label: "Mon bureau" },
-    { href: "/annonces", label: "Annonces" },
+    { href: "/annonces", label: "Le mur" },
     { href: "/carte", label: "La carte" },
     { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
     { href: "/mes-annonces", label: "Mes annonces" },
@@ -240,7 +240,7 @@ function OngletsMobile({
           className={onglet}
         >
           <Icone d={ICONES.annonces} />
-          Annonces
+          Le mur
         </Link>
         <Link
           href="/annonces/nouvelle"

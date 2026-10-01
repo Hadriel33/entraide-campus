@@ -6,7 +6,10 @@ const CLE = "postit-theme";
 
 // Le thème est posé sur <html data-theme> par un petit script avant l'affichage (layout), puis piloté ici.
 function lire() {
-  return typeof document !== "undefined" && document.documentElement.dataset.theme === "noir" ? "noir" : "clair";
+  return typeof document !== "undefined" &&
+    document.documentElement.dataset.theme === "noir"
+    ? "noir"
+    : "clair";
 }
 function abonner(rappel: () => void) {
   window.addEventListener(CLE, rappel);
@@ -30,8 +33,22 @@ export function BoutonTheme({ className = "" }: { className?: string }) {
   }
 
   return (
-    <button type="button" onClick={basculer} aria-pressed={noir} className={`presse flex items-center gap-2 rounded-ui text-sm hover:bg-papier-fonce ${className}`}>
-      <svg viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <button
+      type="button"
+      onClick={basculer}
+      aria-pressed={noir}
+      className={`presse flex items-center gap-2 rounded-ui text-sm hover:bg-papier-fonce ${className}`}
+    >
+      <svg
+        viewBox="0 0 24 24"
+        className="size-4 shrink-0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden
+      >
         {noir ? (
           <path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0" />
         ) : (

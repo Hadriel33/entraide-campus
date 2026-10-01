@@ -9,6 +9,8 @@ import {
   type Coordonnees,
 } from "@/components/demandes/coordonnees";
 import { Colette } from "@/components/colette/colette";
+import type { Categorie } from "@/lib/annonces/validation";
+import { graineDe, phrasesColette } from "@/lib/messages/brise-glace";
 import { Conversation, type Message } from "./conversation";
 
 export const metadata: Metadata = { title: "Conversation" };
@@ -36,14 +38,20 @@ export default async function PageConversation({
   const { data } = await supabase
     .from("demandes_contact")
     .select(
-      `id, statut, annonce:annonces(id, titre), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`,
+      `id, statut, annonce:annonces(id, titre, type, categorie, auteur_id), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`,
     )
     .eq("id", id)
     .maybeSingle();
   const demande = data as unknown as {
     id: string;
     statut: string;
-    annonce: { id: string; titre: string } | null;
+    annonce: {
+      id: string;
+      titre: string;
+      type: string;
+      categorie: Categorie;
+      auteur_id: string;
+    } | null;
     demandeur: Personne;
     destinataire: Personne;
   } | null;
@@ -123,6 +131,19 @@ export default async function PageConversation({
         moi={user.id}
         initiaux={(messages ?? []) as Message[]}
         prenomAutre={autre.prenom}
+        suggestions={
+          demande.annonce
+            ? phrasesColette({
+                categorie: demande.annonce.categorie,
+                // Sur un « je propose », l'auteur aide ; sur un « je cherche », c'est l'autre.
+                jAide:
+                  (demande.annonce.type === "propose") ===
+                  (demande.annonce.auteur_id === user.id),
+                prenom: autre.prenom,
+                graine: graineDe(id),
+              })
+            : []
+        }
       />
       <p className="text-xs text-encre-douce">
         Cette conversation n&apos;est visible que par vous deux.
