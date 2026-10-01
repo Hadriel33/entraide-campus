@@ -24,7 +24,8 @@ export default async function Home() {
         <Badge variante="besoin">Je cherche : coloc, covoiturage, coup de main</Badge>
       </div>
 
-      {impact && (
+      {/* Affiché seulement quand il y a de quoi montrer : une rangée de zéros ferait fuir les premiers visiteurs. */}
+      {impact && impact.etudiants >= 5 && (
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="L'entraide en chiffres">
           {[
             { valeur: impact.etudiants, label: "étudiants inscrits" },
