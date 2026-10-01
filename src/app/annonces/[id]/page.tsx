@@ -31,7 +31,7 @@ import {
   demanderContact,
   signalerAnnonce,
 } from "@/app/demandes/actions";
-import { changerStatut, prolongerAnnonce, supprimerAnnonce } from "../actions";
+import { appliquerCorrection, changerStatut, prolongerAnnonce, supprimerAnnonce } from "../actions";
 import { Colette } from "@/components/colette/colette";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -65,6 +65,10 @@ export default async function PageAnnonce({
   const { supabase, user } = await getSession();
   const estAuteur = user?.id === annonce.auteur_id;
   const prenom = annonce.auteur?.prenom ?? "l'auteur";
+  // Résultat de la modération IA, montré à l'auteur seulement.
+  const { data: moderation } = estAuteur
+    ? await supabase.from("annonces").select("moderation, moderation_raisons, moderation_suggestion").eq("id", annonce.id).maybeSingle()
+    : { data: null };
 
   // Ma demande sur cette annonce (s'il y en a une), et ce qui en découle.
   const { data: demande } = estAuteur
@@ -223,6 +227,52 @@ export default async function PageAnnonce({
           </div>
         )}
       </dl>
+
+      {/* IA n°2 : ce que Colette a remarqué, et sa proposition de correction (l'auteur décide). */}
+      {estAuteur && moderation?.moderation_suggestion && (
+        <section className="flex flex-col gap-4 rounded-carte border border-encre bg-surface p-5 shadow-[4px_4px_0_0_var(--color-lilas)]" aria-labelledby="correction">
+          <div className="flex items-center gap-3">
+            <Colette anim="reflechit" taille={70} className="shrink-0" />
+            <div>
+              <h2 id="correction" className="font-main text-2xl leading-tight">
+                Colette te propose une version corrigée
+              </h2>
+              {moderation.moderation_raisons.length > 0 && <p className="text-sm text-encre-douce">{moderation.moderation_raisons.join(" ")}</p>}
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1 rounded-ui bg-papier-fonce p-3 text-sm">
+              <span className="text-xs font-semibold text-encre-douce">Ton texte</span>
+              <strong>{annonce.titre}</strong>
+              <p className="whitespace-pre-line text-encre-douce line-through decoration-alerte/60">{annonce.description}</p>
+            </div>
+            <div className="postit papier-jaune flex flex-col gap-1 p-3 pt-4 text-sm" style={{ "--rot": "0.8deg" } as React.CSSProperties}>
+              <span className="text-xs font-semibold">La proposition de Colette</span>
+              <strong>{moderation.moderation_suggestion.titre}</strong>
+              <p className="whitespace-pre-line">{moderation.moderation_suggestion.description}</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <form action={appliquerCorrection.bind(null, annonce.id)}>
+              <Bouton>Appliquer la correction</Bouton>
+            </form>
+            <BoutonLien href={`/annonces/${annonce.id}/modifier`} variante="contour">
+              Corriger moi-même
+            </BoutonLien>
+          </div>
+          <p className="text-xs text-encre-douce">Rien ne change sans ton accord. Un modérateur humain garde le dernier mot.</p>
+        </section>
+      )}
+
+      {estAuteur && !moderation?.moderation_suggestion && moderation?.moderation === "a_verifier" && annonce.statut !== "masquee" && (
+        <div role="status" className="flex items-center gap-4 rounded-carte bg-postit-lilas p-4 text-sm">
+          <Colette anim="reflechit" taille={70} className="shrink-0" />
+          <p>
+            <strong className="block font-main text-xl">Colette a un petit doute</strong>
+            {moderation.moderation_raisons.join(" ") || "Un modérateur va jeter un œil."} Ton annonce reste visible en attendant.
+          </p>
+        </div>
+      )}
 
       {estAuteur && annonce.statut === "masquee" && (
         <div role="status" className="flex items-center gap-4 rounded-carte bg-postit-lilas p-4 text-sm">

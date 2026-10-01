@@ -88,3 +88,17 @@ export async function prolongerAnnonce(id: string) {
   revalidatePath("/annonces");
   redirect(`/annonces/${id}?ok=prolongee`);
 }
+
+// IA n°2 : l'auteur accepte la version corrigée proposée par Colette. On relit la proposition EN BASE
+// (jamais depuis le formulaire), on l'applique, et la modération repart sur le nouveau texte.
+export async function appliquerCorrection(id: string) {
+  const supabase = await clientConnecte();
+  const { data } = await supabase.from("annonces").select("moderation_suggestion, lieu").eq("id", id).maybeSingle();
+  const s = data?.moderation_suggestion as { titre?: string; description?: string } | null | undefined;
+  if (!s?.titre || !s?.description) redirect(`/annonces/${id}`);
+  const { data: maj, error } = await supabase.from("annonces").update({ titre: s.titre, description: s.description }).eq("id", id).select("id");
+  if (error || !maj?.length) redirect(`/annonces/${id}`);
+  programmerModeration(id, { titre: s.titre, description: s.description, lieu: data?.lieu ?? null });
+  revalidatePath("/annonces");
+  redirect(`/annonces/${id}?ok=corrigee`);
+}

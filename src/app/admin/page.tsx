@@ -34,6 +34,7 @@ type AModerer = {
   statut: string;
   moderation: string;
   moderation_raisons: string[];
+  moderation_suggestion: { titre: string; description: string } | null;
   cree_le: string;
   auteur: { pseudo: string } | null;
 };
@@ -62,7 +63,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
       : Promise.resolve({ data: [] }),
     supabase
       .from("annonces")
-      .select("id, titre, description, statut, moderation, moderation_raisons, cree_le, auteur:profils!annonces_auteur_id_fkey(pseudo)")
+      .select("id, titre, description, statut, moderation, moderation_raisons, moderation_suggestion, cree_le, auteur:profils!annonces_auteur_id_fkey(pseudo)")
       .neq("moderation", "ok")
       .order("moderation", { ascending: false })
       .order("cree_le", { ascending: false })
@@ -141,6 +142,12 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
                           <li key={r}>{r}</li>
                         ))}
                       </ul>
+                    )}
+                    {a.moderation_suggestion && (
+                      <p className="rounded-ui bg-postit-jaune px-3 py-2 text-sm">
+                        <span className="font-semibold">Correction proposée à l&apos;auteur : </span>
+                        {a.moderation_suggestion.titre}. {a.moderation_suggestion.description}
+                      </p>
                     )}
                     <div className="flex flex-wrap gap-2">
                       <form action={validerModeration.bind(null, a.id)}>

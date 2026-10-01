@@ -28,6 +28,7 @@ const MESSAGES: Record<string, string> = {
   classe_proposee: "Classe proposée : elle compte au classement dès qu'un admin la valide.",
   classe_validee: "Classe validée.",
   fil: "Préférence du fil du campus enregistrée.",
+  corrigee: "Correction appliquée : Colette relit ton annonce.",
   classe_supprimee: "Classe supprimée.",
   moderation: "Décision de modération enregistrée.",
   signalement: "Merci, l'équipe de modération va regarder.",
@@ -41,6 +42,7 @@ const MESSAGES: Record<string, string> = {
 // Colette réagit aux grands moments (sinon le message s'affiche seul).
 const REACTION: Record<string, AnimColette> = {
   publiee: "accroche",
+  corrigee: "tampon",
   acceptee: "saute",
   avis: "saute",
   bienvenue: "coucou",

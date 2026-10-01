@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { deciderModeration, detecterCoordonnees, nettoyerCompetences } from "../regles";
+import { deciderModeration, detecterCoordonnees, nettoyerCompetences, proposerCorrection, retirerCoordonnees } from "../regles";
 
 describe("nettoyerCompetences", () => {
   it("retire les espaces, les vides et les doublons (sans tenir compte de la casse)", () => {
@@ -51,5 +51,46 @@ describe("deciderModeration", () => {
     const d = deciderModeration({ statut: "a_verifier", raisons: Array.from({ length: 9 }, () => "x".repeat(300)) }, "texte");
     expect(d.raisons.length).toBeLessThanOrEqual(5);
     expect(d.raisons.every((r) => r.length <= 160)).toBe(true);
+  });
+});
+
+describe("IA n°2 : correction proposée à l'auteur", () => {
+  const annonce = { titre: "Photos pour ton asso", description: "Je fais des photos de soirées, appelle-moi au 06 12 34 56 78." };
+
+  it("retire téléphone et email du texte", () => {
+    const t = retirerCoordonnees("Écris-moi : sam@exemple.fr ou 06 12 34 56 78 !");
+    expect(t).not.toMatch(/06 12|exemple\.fr/);
+    expect(t).toMatch(/après accord/);
+  });
+  it("reprend la proposition de l'IA quand elle est valide et sans coordonnées", () => {
+    const c = proposerCorrection(
+      { statut: "a_verifier", raisons: ["Coordonnées"], suggestion: { titre: "Photos pour ton asso", description: "Je fais des photos de soirées et de galas, demande-moi le contact via l'appli." } },
+      annonce,
+      "a_verifier",
+    );
+    expect(c?.description).toMatch(/via l'appli/);
+  });
+  it("si la proposition de l'IA contient encore des coordonnées, on retombe sur la correction automatique", () => {
+    const c = proposerCorrection({ statut: "a_verifier", raisons: [], suggestion: { titre: "Photos", description: "Appelle le 06 12 34 56 78 pour des photos." } }, annonce, "a_verifier");
+    expect(c?.description).not.toMatch(/06 12/);
+  });
+  it("IA en panne mais coordonnées dans le texte : correction automatique quand même (plan B)", () => {
+    const c = proposerCorrection(null, annonce, "a_verifier");
+    expect(c?.description).not.toMatch(/06 12/);
+    expect(c?.titre).toBe(annonce.titre);
+  });
+  it("rien à proposer pour une annonce ok ou une arnaque (refus probable : l'admin décide)", () => {
+    expect(proposerCorrection({ statut: "ok", raisons: [], suggestion: null }, { titre: "Photos", description: "Je fais des photos de soirées." }, "ok")).toBeNull();
+    expect(proposerCorrection({ statut: "refus_probable", raisons: ["Arnaque"], suggestion: { titre: "x".repeat(10), description: "y".repeat(30) } }, annonce, "refus_probable")).toBeNull();
+  });
+  it("refuse une proposition hors limites ou identique au texte d'origine", () => {
+    expect(proposerCorrection({ statut: "a_verifier", raisons: [], suggestion: { titre: "Ok", description: "court" } }, { titre: "Titre propre", description: "Une description propre et assez longue." }, "a_verifier")).toBeNull();
+    expect(
+      proposerCorrection(
+        { statut: "a_verifier", raisons: [], suggestion: { titre: "Titre propre", description: "Une description propre et assez longue." } },
+        { titre: "Titre propre", description: "Une description propre et assez longue." },
+        "a_verifier",
+      ),
+    ).toBeNull();
   });
 });

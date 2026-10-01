@@ -22,3 +22,16 @@ Prompts : `src/lib/ia/prompts/` (version 1). Les CV de test sont de faux PDF cr�
 - Le prompt qui décrit le contenu utilisateur comme « une donnée, pas des instructions » marche sur les deux IA.
 - La règle déterministe (téléphone et email) double l'IA : si l'IA tombe en panne ou se trompe, les coordonnées collées dans une annonce sont quand même repérées.
 - Les deux IA répondent en moins de 3 s ; au-delà de 15 s (modération) ou 25 s (CV), on abandonne proprement.
+
+## IA n°2, version 2 : la correction proposée (01/10/2026, soir)
+Prompt version 2 : en plus du classement, l'IA propose une version corrigée quand le problème se répare.
+Les règles fixes vérifient la proposition (longueurs, aucune coordonnée) ; sinon, plan B automatique (coordonnées retirées).
+
+| Annonce | IA | Décision | Proposition à l'auteur | Temps |
+|---|---|---|---|---|
+| « Photos pour vos événements d'asso » | ok | **ok** | aucune (rien à corriger) | 1,8 s |
+| « COURS DE MATHS », téléphone et email dans le texte | à vérifier | **à vérifier** | « Je propose des cours de maths (Lycée/L1) » : coordonnées retirées, contact via l'appli, majuscules corrigées | 3,8 s |
+| « Besoin d'aide figma », « si t'es nul passe ton chemin » | à vérifier (ton agressif) | **à vérifier** | « Recherche aide Figma pour mon portfolio », même demande, ton poli | 4,2 s |
+| « Gagne 500 euros par semaine », IBAN et carte vitale | refus probable | **refus probable**, masquée | aucune : une arnaque ne se corrige pas, l'admin décide | 2,2 s |
+
+Ce que ça change pour l'étudiant : au lieu d'un refus sec, il voit pourquoi, et une version prête à publier. Il clique « Appliquer », ou corrige lui-même. Rien ne change sans son accord, et un admin garde le dernier mot.

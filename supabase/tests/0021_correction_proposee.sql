@@ -1,0 +1,5 @@
+-- IA n°2 v2 : correction proposée (01/10/2026). Transaction annulée. Attendu : « 4 tests correction proposée OK ».
+-- 1 l'auteur voit la proposition écrite par le serveur · 2 il ne peut pas l'écrire lui-même (42501)
+-- 3 appliquer la correction (modifier le texte) relance la modération et efface la proposition
+-- 4 une proposition hors limites est refusée par la base
+-- Script exécuté via le MCP Supabase (le serveur est simulé par request.jwt.claims role = service_role).

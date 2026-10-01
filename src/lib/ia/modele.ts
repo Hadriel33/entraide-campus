@@ -45,6 +45,7 @@ export async function modererAnnonce(annonce: { titre: string; description: stri
         schema: z.object({
           statut: z.enum(["ok", "a_verifier", "refus_probable"]),
           raisons: z.array(z.string()).max(5),
+          suggestion: z.object({ titre: z.string(), description: z.string() }).nullable(),
         }),
       }),
       prompt: `<annonce>\nTitre : ${annonce.titre}\nDescription : ${annonce.description}\nLieu : ${annonce.lieu ?? "non précisé"}\n</annonce>`,
