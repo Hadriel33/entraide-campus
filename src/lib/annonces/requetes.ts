@@ -1,8 +1,9 @@
 import type { Categorie, Contrepartie, Quartier, Tram, TypeAnnonce } from "./validation";
 
 // Colonnes lues pour afficher une annonce, avec le prénom et l'école de l'auteur (jamais ses coordonnées).
+// Le lien vers l'auteur est nommé : les favoris créent un 2e chemin annonces ↔ profils, et Supabase refuse une jointure ambiguë.
 export const SELECT_ANNONCE =
-  "id, type, categorie, titre, description, contrepartie, lieu, quartier, tram, expire_le, statut, cree_le, auteur_id, auteur:profils(prenom, pseudo, ecole, avatar_chemin, colette_couleur, colette_humeur, colette_accessoire, colette_motif)";
+  "id, type, categorie, titre, description, contrepartie, lieu, quartier, tram, expire_le, statut, cree_le, auteur_id, auteur:profils!annonces_auteur_id_fkey(prenom, pseudo, ecole, avatar_chemin, colette_couleur, colette_humeur, colette_accessoire, colette_motif)";
 
 export type Annonce = {
   id: string;

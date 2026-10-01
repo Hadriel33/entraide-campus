@@ -104,7 +104,7 @@ export default async function PageAnnonces({
   const maintenant = new Date().toISOString();
   // Filtre par école : jointure obligatoire (!inner) sur le profil de l'auteur.
   const select = filtres.ecole
-    ? SELECT_ANNONCE.replace("auteur:profils(", "auteur:profils!inner(")
+    ? SELECT_ANNONCE.replace("annonces_auteur_id_fkey(", "annonces_auteur_id_fkey!inner(")
     : SELECT_ANNONCE;
   let requete = supabase
     .from("annonces")
