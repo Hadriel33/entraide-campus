@@ -50,10 +50,11 @@ export default async function Home() {
               J&apos;ai déjà un compte
             </BoutonLien>
           </div>
-          <p className="flex -rotate-2 items-center gap-2 font-main text-xl text-alerte">
-            <svg viewBox="0 0 44 28" className="h-7 w-11 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden>
-              <path d="M42 4C30 2 12 6 6 22" />
-              <path d="M3 15l3 8 8-3" />
+          <p className="flex -rotate-2 items-end gap-2 font-main text-xl text-alerte">
+            {/* Flèche griffonnée qui remonte vers « Créer mon compte » */}
+            <svg viewBox="0 0 44 40" className="-mt-6 h-10 w-11 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M42 34C26 35 12 28 9 6" />
+              <path d="M3 12l6-7 6 6" />
             </svg>
             réservé aux mails @mail-esd.com et @mail-esp.com
           </p>
