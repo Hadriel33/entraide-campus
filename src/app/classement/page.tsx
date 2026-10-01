@@ -35,8 +35,8 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
 
   const [{ data }, { data: profils }, { data: classes }] = await Promise.all([
     supabase.rpc("stats_classement", semaine ? { depuis: debutSemaine() } : {}),
-    supabase.from("profils").select("id, classe_id, colette_couleur, colette_humeur, colette_accessoire"),
-    supabase.from("classes").select("id, nom, ecole"),
+    supabase.from("profils").select("id, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif"),
+    supabase.from("classes").select("id, nom, ecole").eq("validee", true),
   ]);
   const infos = new Map((profils ?? []).map((p) => [p.id, p]));
   const toutes = ((data ?? []) as Ligne[]).map((l) => {

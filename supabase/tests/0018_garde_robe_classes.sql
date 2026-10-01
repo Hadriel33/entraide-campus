@@ -1,0 +1,6 @@
+-- Garde-robe de Colette et propositions de classes (01/10/2026). Transaction annulée. Attendu : « 10 tests garde-robe et classes OK ».
+-- 1 cape refusée sans avoir aidé · 2 objets libres acceptés · 3 motif doré refusé sans 10 aides · 4 nœud débloqué après une annonce
+-- 5 un étudiant propose une classe de son école · 6 pas pour l'autre école · 7 il ne peut pas l'auto-valider
+-- 8 au-delà de 3 propositions par jour : refus (P0429) · 9 un autre étudiant ne voit pas une classe non validée
+-- 10 la liste officielle (36 classes) est en place
+-- Script exécuté via le MCP Supabase (même structure que 0017_classes_colette.sql).

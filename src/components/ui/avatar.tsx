@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Colette, coletteParDefaut, type Accessoire, type CouleurColette, type Humeur } from "@/components/colette/colette";
+import { Colette, coletteParDefaut, type Accessoire, type CouleurColette, type Humeur, type Motif } from "@/components/colette/colette";
 
 const TAILLES = { sm: 24, md: 32, lg: 44, xl: 96 } as const;
 
@@ -8,7 +8,7 @@ export function urlAvatar(chemin: string | null | undefined) {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${chemin}`;
 }
 
-export type PrefsColette = { colette_couleur?: string | null; colette_humeur?: string | null; colette_accessoire?: string | null };
+export type PrefsColette = { colette_couleur?: string | null; colette_humeur?: string | null; colette_accessoire?: string | null; colette_motif?: string | null };
 
 // Photo de profil, ou sa Colette (choisie dans le profil, sinon une couleur tirée du pseudo).
 export function Avatar({
@@ -37,6 +37,7 @@ export function Avatar({
         couleur={couleur}
         humeur={(colette?.colette_humeur as Humeur) || "contente"}
         accessoire={px >= 40 ? ((colette?.colette_accessoire as Accessoire) || "aucun") : "aucun"}
+        motif={(colette?.colette_motif as Motif) || "uni"}
       />
     </span>
   );

@@ -61,7 +61,7 @@ export default async function PageBureau() {
       supabase.from("annonces").select(SELECT_ANNONCE).eq("statut", "publiee").gt("expire_le", maintenant).neq("auteur_id", user.id).order("cree_le", { ascending: false }).limit(60),
       supabase.rpc("stats_classement", { depuis: debutSemaine() }),
       supabase.from("profils").select("id, classe_id"),
-      supabase.from("classes").select("id, nom, ecole"),
+      supabase.from("classes").select("id, nom, ecole").eq("validee", true),
       lireEtatAccueil(supabase, profil),
     ]);
 

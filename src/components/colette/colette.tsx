@@ -4,7 +4,24 @@
 
 export type CouleurColette = "jaune" | "lilas" | "ciel" | "ocre";
 export type Humeur = "contente" | "surprise" | "fiere" | "decue" | "fachee" | "concentree" | "dort";
-export type Accessoire = "aucun" | "photo" | "design" | "dev" | "data" | "coloc" | "covoit" | "diplome" | "bde" | "noel";
+export type Accessoire =
+  | "aucun"
+  | "photo"
+  | "design"
+  | "dev"
+  | "data"
+  | "coloc"
+  | "covoit"
+  | "diplome"
+  | "bde"
+  | "noel"
+  | "casque"
+  | "noeud"
+  | "echarpe"
+  | "cape"
+  | "etoile"
+  | "couronne";
+export type Motif = "uni" | "ligne" | "pois" | "quadrille" | "dore";
 export type AnimColette = "flotte" | "coucou" | "lit" | "tampon" | "accroche" | "saute" | "dort" | "cherche" | "reflechit" | "debordee";
 
 const PAPIER: Record<CouleurColette, [string, string]> = {
@@ -227,6 +244,47 @@ function AccessoireDevant({ a }: { a: Accessoire }) {
           <path d="M80 74 h6" stroke={K} strokeWidth="3" />
         </g>
       );
+    case "casque":
+      return (
+        <g>
+          <path d="M34 66 Q34 22 83 22 Q132 22 132 66" stroke={K} strokeWidth="6" fill="none" strokeLinecap="round" />
+          <rect x="22" y="60" width="18" height="30" rx="7" fill={K} />
+          <rect x="126" y="60" width="18" height="30" rx="7" fill={K} />
+          <rect x="25" y="64" width="9" height="22" rx="4" fill="var(--color-accent)" />
+          <rect x="132" y="64" width="9" height="22" rx="4" fill="var(--color-accent)" />
+        </g>
+      );
+    case "noeud":
+      return (
+        <g stroke={K} strokeWidth="2" strokeLinejoin="round">
+          <path d="M83 120 L64 110 L64 132 Z" fill={ROUGE} />
+          <path d="M83 120 L102 110 L102 132 Z" fill={ROUGE} />
+          <circle cx="83" cy="121" r="5" fill={ROUGE} />
+        </g>
+      );
+    case "echarpe":
+      return (
+        <g stroke={K} strokeWidth="2" strokeLinejoin="round">
+          <path d="M28 112 Q83 126 138 112 L138 126 Q83 140 28 126 Z" fill="var(--color-lilas)" />
+          <path d="M104 124 L112 158 L98 160 L94 128 Z" fill="var(--color-lilas)" />
+          <path d="M40 118 v10 M56 121 v10 M72 123 v10 M88 123 v10 M120 120 v10" stroke="var(--color-coin-lilas)" strokeWidth="3" />
+        </g>
+      );
+    case "etoile":
+      return (
+        <g>
+          <path d="M108 104 l4.5 9 10 1.4 -7.2 7 1.7 10 -9 -4.7 -9 4.7 1.7 -10 -7.2 -7 10 -1.4 z" fill="var(--color-bandeau)" stroke={K} strokeWidth="2" strokeLinejoin="round" />
+          <circle cx="108" cy="118" r="2.5" fill={K} />
+        </g>
+      );
+    case "couronne":
+      return (
+        <g>
+          <path d="M46 34 L50 8 L66 24 L83 4 L100 24 L116 8 L120 34 Z" fill="var(--color-bandeau)" stroke={K} strokeWidth="2.5" strokeLinejoin="round" />
+          <circle cx="66" cy="27" r="3" fill={ROUGE} />
+          <circle cx="100" cy="27" r="3" fill="var(--color-ciel)" />
+        </g>
+      );
     case "noel":
       return (
         <g>
@@ -238,6 +296,49 @@ function AccessoireDevant({ a }: { a: Accessoire }) {
     default:
       return null;
   }
+}
+
+// Pièces portées derrière le corps (la cape).
+function AccessoireDerriere({ a }: { a: Accessoire }) {
+  if (a !== "cape") return null;
+  return <path d="M34 40 Q8 110 22 170 L144 170 Q158 110 132 40 Z" fill={ROUGE} stroke={K} strokeWidth="2.5" strokeLinejoin="round" />;
+}
+
+// Motif imprimé sur le papier (débloqué en s'entraidant). Un id par motif : définitions identiques, donc sans conflit.
+function MotifPapier({ m }: { m: Motif }) {
+  if (m === "uni") return null;
+  if (m === "dore")
+    return (
+      <g>
+        <path d="M30 30 H136 V122 Q130 142 110 142 H30 Z" fill="var(--color-or)" />
+        <path d="M44 30 L30 50 V64 L58 30 Z M78 30 L30 98 V108 L86 30 Z" fill={BLANC} opacity="0.35" />
+      </g>
+    );
+  const id = `colette-motif-${m}`;
+  return (
+    <g>
+      <defs>
+        {m === "ligne" && (
+          <pattern id={id} width="10" height="12" patternUnits="userSpaceOnUse">
+            <path d="M0 11.5 H10" stroke="var(--color-ciel)" strokeWidth="1.2" />
+          </pattern>
+        )}
+        {m === "pois" && (
+          <pattern id={id} width="16" height="16" patternUnits="userSpaceOnUse">
+            <circle cx="4" cy="4" r="2.4" fill={BLANC} opacity="0.8" />
+            <circle cx="12" cy="12" r="2.4" fill={BLANC} opacity="0.8" />
+          </pattern>
+        )}
+        {m === "quadrille" && (
+          <pattern id={id} width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M10 0 V10 M0 10 H10" stroke="var(--color-encre)" strokeOpacity="0.14" strokeWidth="1" />
+          </pattern>
+        )}
+      </defs>
+      <path d="M30 30 H136 V122 Q130 142 110 142 H30 Z" fill={`url(#${id})`} />
+      {m === "ligne" && <path d="M44 32 V140" stroke={ROUGE} strokeOpacity="0.55" strokeWidth="1.5" />}
+    </g>
+  );
 }
 
 // Décor propre à chaque animation (CV, tampon, mur, bulles de pensée, post-it qui volent...).
@@ -344,6 +445,7 @@ export function Colette({
   couleur = "jaune",
   humeur = "contente",
   accessoire = "aucun",
+  motif = "uni",
   anim,
   taille = 120,
   titre,
@@ -353,6 +455,7 @@ export function Colette({
   couleur?: CouleurColette;
   humeur?: Humeur;
   accessoire?: Accessoire;
+  motif?: Motif;
   anim?: AnimColette;
   taille?: number;
   titre?: string;
@@ -363,7 +466,7 @@ export function Colette({
   const h = (anim && HUMEUR_ANIM[anim]) ?? humeur;
   const [fond, coin] = PAPIER[couleur];
   const joue = couleur === "lilas" ? "var(--color-ocre)" : "var(--color-lilas)";
-  const cachePunaise = accessoire === "diplome" || accessoire === "noel";
+  const cachePunaise = accessoire === "diplome" || accessoire === "noel" || accessoire === "couronne" || accessoire === "casque";
   const corps = anim === "flotte" || anim === "coucou" ? "col-flotte" : anim === "saute" ? "col-saute" : anim === "dort" ? "col-respire" : anim === "cherche" ? "col-cherche" : anim === "debordee" ? "col-tremble" : anim === "reflechit" ? "col-penche" : "";
 
   return (
@@ -379,8 +482,10 @@ export function Colette({
       {!tete && <Decor anim={anim} devant={false} />}
       <g className={corps}>
         {!tete && anim !== "dort" && <path d="M66 140 L62 166 M100 140 L104 166" stroke={K} strokeWidth="4" strokeLinecap="round" />}
+        {!tete && <AccessoireDerriere a={accessoire} />}
         {!tete && <Bras h={h} anim={anim} />}
         <path d="M30 30 H136 V122 Q130 142 110 142 H30 Z" fill={fond} />
+        <MotifPapier m={motif} />
         <path d="M136 122 Q122 128 110 142 Q130 138 136 122 Z" fill={coin} />
         {h !== "dort" && (
           <g opacity="0.7">

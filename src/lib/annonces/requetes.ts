@@ -2,7 +2,7 @@ import type { Categorie, Contrepartie, Quartier, Tram, TypeAnnonce } from "./val
 
 // Colonnes lues pour afficher une annonce, avec le prénom et l'école de l'auteur (jamais ses coordonnées).
 export const SELECT_ANNONCE =
-  "id, type, categorie, titre, description, contrepartie, lieu, quartier, tram, expire_le, statut, cree_le, auteur_id, auteur:profils(prenom, pseudo, ecole, avatar_chemin, colette_couleur, colette_humeur, colette_accessoire)";
+  "id, type, categorie, titre, description, contrepartie, lieu, quartier, tram, expire_le, statut, cree_le, auteur_id, auteur:profils(prenom, pseudo, ecole, avatar_chemin, colette_couleur, colette_humeur, colette_accessoire, colette_motif)";
 
 export type Annonce = {
   id: string;
@@ -18,7 +18,7 @@ export type Annonce = {
   statut: "publiee" | "archivee" | "masquee";
   cree_le: string;
   auteur_id: string;
-  auteur: { prenom: string; pseudo: string; ecole: string; avatar_chemin: string | null; colette_couleur?: string; colette_humeur?: string; colette_accessoire?: string } | null;
+  auteur: { prenom: string; pseudo: string; ecole: string; avatar_chemin: string | null; colette_couleur?: string; colette_humeur?: string; colette_accessoire?: string; colette_motif?: string } | null;
 };
 
 export function dateCourte(iso: string) {

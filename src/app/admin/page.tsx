@@ -8,7 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
-import { changerRole, creerClasse, modererAnnonce, supprimerAnnonceAdmin, supprimerClasse, traiterSignalement, validerModeration } from "./actions";
+import { changerRole, creerClasse, modererAnnonce, supprimerAnnonceAdmin, supprimerClasse, traiterSignalement, validerClasse, validerModeration } from "./actions";
 
 export const metadata: Metadata = { title: "Admin" };
 
@@ -291,9 +291,30 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
 // Classes : ajout et suppression (un étudiant choisit ensuite la sienne dans son profil).
 async function ListeClasses() {
   const { supabase } = await exigerSession();
-  const { data: classes } = await supabase.from("classes").select("id, ecole, nom").order("ecole").order("nom");
+  const { data: toutes } = await supabase.from("classes").select("id, ecole, nom, validee").order("ecole").order("nom");
+  const classes = (toutes ?? []).filter((c) => c.validee);
+  const propositions = (toutes ?? []).filter((c) => !c.validee);
   return (
     <section className="flex flex-col gap-5">
+      {propositions.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-carte border border-encre bg-postit-jaune p-4">
+          <h2 className="titre-charte text-xl">Propositions des étudiants ({propositions.length})</h2>
+          {propositions.map((c) => (
+            <div key={c.id} className="flex flex-wrap items-center gap-2 rounded-ui bg-surface px-3 py-2">
+              <BadgeEcole ecole={c.ecole} />
+              <span className="flex-1 font-medium">{c.nom}</span>
+              <form action={validerClasse.bind(null, c.id)}>
+                <Bouton className="min-h-8 px-3 text-sm">Valider</Bouton>
+              </form>
+              <form action={supprimerClasse.bind(null, c.id)}>
+                <Bouton variante="contour" className="min-h-8 px-3 text-sm">
+                  Refuser
+                </Bouton>
+              </form>
+            </div>
+          ))}
+        </div>
+      )}
       <form action={creerClasse} className="flex flex-wrap items-end gap-2 rounded-carte border border-ligne bg-surface p-4">
         <label className="flex flex-col gap-1 text-sm font-semibold">
           École
@@ -304,7 +325,7 @@ async function ListeClasses() {
         </label>
         <label className="flex min-w-60 flex-1 flex-col gap-1 text-sm font-semibold">
           Nom de la classe
-          <input name="nom" required minLength={2} maxLength={40} placeholder="Ex. : M1 Data, B3 Direction artistique" className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3 font-normal" />
+          <input name="nom" required minLength={2} maxLength={60} placeholder="Ex. : M1 Data, B3 Direction artistique" className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3 font-normal" />
         </label>
         <Bouton>Ajouter</Bouton>
       </form>

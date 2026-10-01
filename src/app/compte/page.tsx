@@ -11,7 +11,7 @@ import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./fo
 import { AssistantCompetences } from "./assistant-competences";
 import { ZoneSensible } from "./zone-sensible";
 import { AtelierColette } from "./atelier-colette";
-import { choisirClasse } from "./actions";
+import { choisirClasse, proposerClasse } from "./actions";
 import { Bouton } from "@/components/ui/bouton";
 import Link from "next/link";
 
@@ -34,7 +34,7 @@ export default async function PageCompte() {
   const [{ data: stats }, { data: coordonnees }, { data: classes }] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
     supabase.from("coordonnees").select("telephone, email, reseau").eq("id", user.id).single(),
-    supabase.from("classes").select("id, nom").eq("ecole", profil.ecole).order("nom"),
+    supabase.from("classes").select("id, nom, validee").eq("ecole", profil.ecole).order("nom"),
   ]);
 
   return (
@@ -66,7 +66,13 @@ export default async function PageCompte() {
         titre="Ma Colette"
         aide={profil.avatar_chemin ? "Ton personnage dans l'appli (badges, classement). Ta photo reste ton avatar principal." : "Pas de photo ? Ta Colette te représente partout dans l'appli."}
       >
-        <AtelierColette couleur={profil.colette_couleur} humeur={profil.colette_humeur} accessoire={profil.colette_accessoire} />
+        <AtelierColette
+          couleur={profil.colette_couleur}
+          humeur={profil.colette_humeur}
+          accessoire={profil.colette_accessoire}
+          motif={profil.colette_motif}
+          stats={(stats as Stats | null) ?? null}
+        />
       </Section>
 
       <Section id="classe" titre="Ma classe" aide="Chaque coup de main que tu donnes fait monter ta classe au classement.">
@@ -79,6 +85,7 @@ export default async function PageCompte() {
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.nom}
+                    {!c.validee ? " (en attente de validation)" : ""}
                   </option>
                 ))}
               </select>
@@ -86,8 +93,21 @@ export default async function PageCompte() {
             <Bouton>Enregistrer</Bouton>
           </form>
         ) : (
-          <p className="font-main text-lg text-encre-douce">Les classes de ton école n&apos;ont pas encore été ajoutées. Demande à un admin.</p>
+          <p className="font-main text-lg text-encre-douce">Les classes de ton école n&apos;ont pas encore été ajoutées.</p>
         )}
+        <details className="group/proposer">
+          <summary className="w-fit cursor-pointer list-none text-sm font-semibold text-encre-douce hover:text-encre [&::-webkit-details-marker]:hidden">
+            Ma classe n&apos;est pas dans la liste
+          </summary>
+          <form action={proposerClasse} className="mt-3 flex flex-wrap items-end gap-2">
+            <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-semibold">
+              Nom de ta classe
+              <input name="nom" required minLength={2} maxLength={60} placeholder="Ex. : M1 Data Marketing & IA" className="min-h-11 rounded-ui border border-ligne-forte bg-surface px-3 text-base font-normal" />
+            </label>
+            <Bouton variante="contour">Proposer</Bouton>
+          </form>
+          <p className="mt-2 text-xs text-encre-douce">Tu la rejoins tout de suite ; elle compte au classement dès qu&apos;un admin l&apos;a validée.</p>
+        </details>
       </Section>
 
       <Section

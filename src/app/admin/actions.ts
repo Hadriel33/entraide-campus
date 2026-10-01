@@ -65,7 +65,7 @@ export async function creerClasse(formData: FormData) {
   const { supabase } = await exigerAdmin();
   const ecole = String(formData.get("ecole") ?? "");
   const nom = String(formData.get("nom") ?? "").trim().replace(/\s+/g, " ");
-  if (!["ESD", "ESP"].includes(ecole) || nom.length < 2 || nom.length > 40) redirect("/admin?onglet=classes&erreur=classe");
+  if (!["ESD", "ESP"].includes(ecole) || nom.length < 2 || nom.length > 60) redirect("/admin?onglet=classes&erreur=classe");
   await supabase.from("classes").insert({ ecole, nom });
   revalidatePath("/admin");
   redirect("/admin?onglet=classes&ok=classe_creee");
@@ -76,4 +76,11 @@ export async function supprimerClasse(id: string) {
   await supabase.from("classes").delete().eq("id", id);
   revalidatePath("/admin");
   redirect("/admin?onglet=classes&ok=classe_supprimee");
+}
+
+export async function validerClasse(id: string) {
+  const { supabase } = await exigerAdmin();
+  await supabase.from("classes").update({ validee: true }).eq("id", id);
+  revalidatePath("/admin");
+  redirect("/admin?onglet=classes&ok=classe_validee");
 }

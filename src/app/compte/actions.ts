@@ -6,7 +6,7 @@ import { exigerSession } from "@/lib/session";
 import { normaliserPseudo, validerAvatar, validerCoordonnees, validerPseudo } from "@/lib/profils/validation";
 import { extraireCompetences } from "@/lib/ia/modele";
 import { nettoyerCompetences } from "@/lib/ia/regles";
-import { validerClasse, validerColette } from "@/lib/profils/colette";
+import { validerClasse, validerColette, validerNomClasse } from "@/lib/profils/colette";
 
 export type EtatProfil = { erreurs?: Partial<Record<string, string>>; message?: string };
 
@@ -120,7 +120,9 @@ export async function enregistrerColette(formData: FormData) {
   const { supabase, user } = await exigerSession();
   const choix = validerColette(Object.fromEntries(formData));
   if (!choix) redirect("/compte?erreur=colette#colette");
-  await supabase.from("profils").update(choix).eq("id", user.id);
+  // La base refuse un objet pas encore débloqué (trigger verifier_garde_robe).
+  const { error } = await supabase.from("profils").update(choix).eq("id", user.id);
+  if (error) redirect("/compte?erreur=verrouille#colette");
   revalidatePath("/", "layout");
   redirect("/compte?ok=colette#colette");
 }
@@ -134,4 +136,21 @@ export async function choisirClasse(formData: FormData) {
   if (error) redirect("/compte?erreur=classe#classe");
   revalidatePath("/", "layout");
   redirect("/compte?ok=classe#classe");
+}
+
+// Ma classe n'est pas dans la liste : je la propose, un admin la valide. En attendant je peux déjà la choisir.
+export async function proposerClasse(formData: FormData) {
+  const { supabase, user, profil } = await exigerSession();
+  const nom = validerNomClasse(formData.get("nom"));
+  if (!nom) redirect("/compte?erreur=classe#classe");
+  const { data, error } = await supabase
+    .from("classes")
+    .insert({ ecole: profil.ecole, nom, validee: false, proposee_par: user.id })
+    .select("id")
+    .single();
+  if (error?.code === "P0429") redirect("/compte?ok=limite#classe");
+  if (error || !data) redirect("/compte?erreur=classe#classe");
+  await supabase.from("profils").update({ classe_id: data.id }).eq("id", user.id);
+  revalidatePath("/", "layout");
+  redirect("/compte?ok=classe_proposee#classe");
 }

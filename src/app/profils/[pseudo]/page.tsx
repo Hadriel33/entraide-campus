@@ -10,7 +10,7 @@ import { CarteProgression } from "@/components/profil/progression";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { calculerProgression } from "@/lib/gamification/progression";
 import { titrePrincipal } from "@/lib/gamification/titres";
-import { Colette, coletteParDefaut, type Accessoire, type CouleurColette, type Humeur } from "@/components/colette/colette";
+import { Colette, coletteParDefaut, type Accessoire, type CouleurColette, type Humeur, type Motif } from "@/components/colette/colette";
 import { inclinaison } from "@/lib/design/teintes";
 
 type Avis = { id: string; note: number; commentaire: string | null; cree_le: string; auteur: { pseudo: string; avatar_chemin: string | null } | null };
@@ -24,7 +24,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
   const pseudo = decodeURIComponent((await params).pseudo).toLowerCase();
 
   // Profil public : jamais de coordonnées ici (elles sont dans une autre table, protégée).
-  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, cree_le, classe_id, colette_couleur, colette_humeur, colette_accessoire, classe:classes(nom)").eq("pseudo", pseudo).maybeSingle();
+  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, cree_le, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, classe:classes(nom)").eq("pseudo", pseudo).maybeSingle();
   if (!profil) notFound();
 
   const [{ data: stats }, { data: annonces }, { data: avis }] = await Promise.all([
@@ -50,6 +50,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
               couleur={(profil.colette_couleur || coletteParDefaut(profil.pseudo).couleur) as CouleurColette}
               humeur={(profil.colette_humeur || "contente") as Humeur}
               accessoire={(profil.colette_accessoire || "aucun") as Accessoire}
+              motif={(profil.colette_motif || "uni") as Motif}
               anim="flotte"
               taille={54}
               className="absolute -right-6 -bottom-3"

@@ -81,6 +81,8 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Une mascotte, Colette, plutôt qu'une roue de chargement | Elle rend l'IA visible (« Colette lit ton CV », « Colette relit ton annonce ») et explique le code couleur dans le tuto. Déclinaisons pensées comme Duo et l'Octocat : même silhouette, expressions et costumes. |
 | 01/10 | Classement des classes à la moyenne des membres actifs | Une grosse classe ne gagne pas juste par le nombre. Points calculés par le même code anti-triche ; on ne rejoint qu'une classe de son école (vérifié par la base). |
 | 01/10 | Montrer avant de coder : planche de maquettes (accueil, dashboard, logo, mascotte) | Hadriel choisit sur pièces, l'IA code ensuite la piste retenue. Moins d'allers-retours sur le vrai site. |
+| 01/10 | Tenues de Colette à débloquer, règles écrites deux fois (TypeScript pour l'affichage, SQL pour l'interdiction) | La récompense donne envie de s'entraider ; la base refuse un objet verrouillé même via l'API, et un test vérifie que les deux listes de conditions concordent. |
+| 01/10 | Classes : liste officielle préremplie + propositions validées par un admin | On ne connaissait pas toutes les classes : la liste vient des programmes publics, les étudiants complètent, l'admin garde la main. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |

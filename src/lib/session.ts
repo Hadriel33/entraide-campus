@@ -15,6 +15,7 @@ export type ProfilSession = {
   colette_couleur: string;
   colette_humeur: string;
   colette_accessoire: string;
+  colette_motif: string;
 };
 
 // Utilisateur et profil courants, lus une seule fois par requête (cache React).
@@ -27,7 +28,7 @@ export const getSession = cache(async () => {
   if (!user) return { supabase, user: null, profil: null };
   const { data: profil } = await supabase
     .from("profils")
-    .select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, classe_id, colette_couleur, colette_humeur, colette_accessoire")
+    .select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif")
     .eq("id", user.id)
     .single<ProfilSession>();
   return { supabase, user, profil };
