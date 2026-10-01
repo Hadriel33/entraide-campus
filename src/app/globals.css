@@ -6,27 +6,56 @@
    rounded-ui, font-titre...). Jamais de couleur en dur ailleurs :
    le test src/__tests__/front-portable.test.ts le vérifie.
    Changer de référence visuelle = skill `adapter-front`.
-   Valeurs actuelles : PROVISOIRES (neutres), en attente du choix dans docs/DA.md.
+
+   DA retenue : piste E « Campus 2026 » (docs/DA.md) = structure claire
+   et nouvelle charte ESP (titres condensés en capitales, bandeau jaune,
+   rouge en touche, accroche serif).
    ============================================================ */
 @theme {
-  /* Couleurs */
-  --color-papier: #f6f3ee;       /* fond de page */
-  --color-papier-fonce: #ece6dc; /* surfaces, encadrés */
-  --color-encre: #1f1b16;        /* texte principal, boutons pleins */
-  --color-encre-douce: #6b6259;  /* texte secondaire */
-  --color-ligne: #d8d0c4;        /* bordures, filets */
-  --color-accent: #3d3833;       /* survol, mise en avant (rare) */
-  --color-alerte: #b42318;       /* erreurs */
+  /* Couleurs de base */
+  --color-papier: #fafaf8;        /* fond de page */
+  --color-surface: #ffffff;       /* cartes, champs, barre latérale */
+  --color-papier-fonce: #f1f0ec;  /* surfaces enfoncées, survol */
+  --color-encre: #111111;         /* texte principal, bouton plein */
+  --color-encre-douce: #5a5a5a;   /* texte secondaire */
+  --color-ligne: #e6e4df;         /* filets */
+  --color-ligne-forte: #cfccc4;   /* bordures de champs et boutons contour */
 
-  /* Typographie */
-  --font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-titre: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  /* Signatures de la charte (avec parcimonie) */
+  --color-accent: #d7141a;        /* rouge : compteurs, alertes, focus */
+  --color-bandeau: #f3e54a;       /* jaune : UN bandeau, le titre de page */
+
+  /* Badges (couleurs de bandeaux adoucies, texte en encre) */
+  --color-offre: #faf1a8;         /* « Je propose » */
+  --color-besoin: #e6ddf7;        /* « Je cherche » */
+  --color-esd: #dce8f6;           /* école ESD */
+
+  /* États */
+  --color-alerte: #b91217;        /* texte d'erreur (contraste AA sur papier) */
+  --color-ok: #1f7a4d;
+  --color-ok-fond: #e8f5ee;
+
+  /* Typographie : variables posées par next/font dans layout.tsx */
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-titre: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, serif;
 
   /* Forme */
-  --radius-ui: 0.375rem;
+  --radius-ui: 6px;
+  --radius-carte: 10px;
 }
 
 body {
   background: var(--color-papier);
   color: var(--color-encre);
+}
+
+/* Titres de la charte : Archivo condensé en capitales. */
+@utility titre-charte {
+  font-family: var(--font-titre);
+  font-weight: 800;
+  font-stretch: 78%;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  line-height: 1.02;
 }

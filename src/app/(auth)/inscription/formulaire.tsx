@@ -25,7 +25,7 @@ export function FormulaireInscription() {
         <legend className="mb-1.5">École</legend>
         <div className="flex gap-3">
           {ECOLES.map((ecole) => (
-            <label key={ecole} className="flex items-center gap-2 rounded-ui border border-ligne bg-white px-4 py-2.5 font-normal has-[:checked]:border-encre">
+            <label key={ecole} className="flex items-center gap-2 min-h-10 cursor-pointer rounded-ui border border-ligne-forte bg-surface px-4 py-2 font-normal has-[:checked]:border-encre has-[:checked]:bg-papier-fonce">
               <input type="radio" name="ecole" value={ecole} defaultChecked={etat.valeurs?.ecole === ecole} />
               {ecole}
             </label>

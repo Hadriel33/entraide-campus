@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getUtilisateur } from "@/lib/supabase/server";
 import { FormulaireConnexion } from "./formulaire";
+import { TitrePage } from "@/components/ui/titre-page";
 
 export const metadata: Metadata = { title: "Se connecter" };
 
@@ -15,7 +16,9 @@ export default async function PageConnexion({
 
   return (
     <section className="mx-auto w-full max-w-sm py-12">
-      <h1 className="font-titre mb-8 text-3xl font-semibold tracking-tight">Se connecter</h1>
+      <div className="mb-8">
+        <TitrePage accroche="Content de te revoir.">Se connecter</TitrePage>
+      </div>
       {lien === "invalide" && (
         <p role="alert" className="mb-6 text-sm text-alerte">
           Ce lien de confirmation est invalide ou a expiré. Connecte-toi ou recrée ton compte.
