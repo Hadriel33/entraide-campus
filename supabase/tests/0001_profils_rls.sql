@@ -6,8 +6,8 @@
 -- Attendu : 0 | 1 | 2 | 'Léa' (espaces retirés par le trigger)
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESD"}'),
- ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":" Léa ","ecole":"ESP"}');
+ ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESD","pseudo":"sam.test"}'),
+ ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":" Léa ","ecole":"ESP","pseudo":"lea.test"}');
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"00000000-0000-0000-0000-00000000000b","role":"authenticated"}';
 with a as (update public.profils set prenom = 'Pirate' where id = '00000000-0000-0000-0000-00000000000a' returning 1),
@@ -21,7 +21,7 @@ rollback;
 -- Test 2 : on ne peut pas changer son école. Attendu : ERROR 42501 permission denied.
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESP"}');
+ ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESP","pseudo":"lea.test"}');
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"00000000-0000-0000-0000-00000000000b","role":"authenticated"}';
 update public.profils set ecole = 'ESD' where id = '00000000-0000-0000-0000-00000000000b';
@@ -30,7 +30,7 @@ rollback;
 -- Test 3 : sans connexion, aucun profil n'est visible. Attendu : 0
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESP"}');
+ ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESP","pseudo":"lea.test"}');
 set local role anon;
 select count(*) as profils_visibles_anonyme from public.profils;
 rollback;

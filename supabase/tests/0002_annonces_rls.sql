@@ -5,8 +5,8 @@
 -- Attendu : 0 | 0 | 1
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP"}'),
- ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESD"}');
+ ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.test"}'),
+ ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESD","pseudo":"lea.test"}');
 insert into public.annonces (id, auteur_id, type, categorie, titre, description, contrepartie, statut) values
  ('10000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000a','propose','photo','Photos pour vos événements','Soirées, galas, tournois, retouche comprise.','gratuit','publiee'),
  ('10000000-0000-0000-0000-000000000002','00000000-0000-0000-0000-00000000000a','propose','video','Montage vidéo archivé','Une ancienne annonce que Sam a archivée.','troc','archivee');
@@ -20,7 +20,7 @@ rollback;
 -- Test 2 : A voit ses annonces archivées et peut les modifier. Attendu : 2 | 1
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP"}');
+ ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.test"}');
 insert into public.annonces (auteur_id, type, categorie, titre, description, contrepartie, statut) values
  ('00000000-0000-0000-0000-00000000000a','propose','photo','Photos pour vos événements','Soirées, galas, tournois, retouche comprise.','gratuit','archivee'),
  ('00000000-0000-0000-0000-00000000000a','cherche','coloc','Chambre près de Victor Hugo','Tram A ou B, budget 550 euros, dès novembre.','a_discuter','publiee');
@@ -33,8 +33,8 @@ rollback;
 -- Test 3 : B ne peut pas publier au nom de A. Attendu : ERROR 42501 new row violates row-level security policy
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP"}'),
- ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESD"}');
+ ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.test"}'),
+ ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESD","pseudo":"lea.test"}');
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"00000000-0000-0000-0000-00000000000b","role":"authenticated"}';
 insert into public.annonces (auteur_id, type, categorie, titre, description, contrepartie)
@@ -44,7 +44,7 @@ rollback;
 -- Test 4 : sans connexion, aucune annonce visible. Attendu : 0
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP"}');
+ ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.test"}');
 insert into public.annonces (auteur_id, type, categorie, titre, description, contrepartie) values
  ('00000000-0000-0000-0000-00000000000a','propose','photo','Photos pour vos événements','Soirées, galas, tournois, retouche comprise.','gratuit');
 set local role anon;
