@@ -54,6 +54,8 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
 |---|---|---|
-| 01/10 | Le connecteur Vercel de Claude n'a pas le droit de créer un projet (erreur 403) | Import fait depuis le dashboard Vercel. |
+| 01/10 | Le connecteur Vercel de Claude n'a pas le droit de créer un projet (erreur 403) | Hadriel a connecté une fois la CLI Vercel (`vercel login` : un lien à valider, sans mot de passe donné à l'IA). Claude pilote ensuite Vercel en ligne de commande : création du projet, variables, déploiements. |
 | 01/10 | Ni Claude in Chrome ni le navigateur intégré n'étaient connectés à Vercel et Supabase, et l'IA ne saisit jamais de mot de passe | Hadriel se connecte une fois lui-même dans le navigateur intégré (la session reste), Claude fait la suite. |
+| 01/10 | Le premier projet Vercel a été branché sur le mauvais dépôt (`m1-data`, mes cours) au lieu de `entraide-campus` : les fichiers étaient lisibles publiquement sur m1-data.vercel.app | Détecté par Claude en vérifiant les déploiements côté GitHub, puis par un test d'accès (`curl` → 200). Projet Vercel supprimé et réimporté depuis le bon dépôt. Leçon : toujours vérifier **quel dépôt** est déployé et **ce qui est public**. |
+| 01/10 | Variable `NEXT_PUBLIC_...` refusée en type « Secret » sur Vercel | Une variable `NEXT_PUBLIC_` est envoyée au navigateur, elle n'est donc pas secrète : type Config. Les vrais secrets (clé IA) n'auront jamais ce préfixe. |
 | 01/10 | La copie locale de padel-snipe n'était pas à jour (22 commits de retard) | Lecture directe de la version GitHub (`origin/main`), sans toucher à la branche locale. |
