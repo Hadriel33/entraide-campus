@@ -123,6 +123,10 @@ body {
   --color-ok-fond: #e8f5ee;
   color: var(--color-encre);
 }
+/* Carte OpenStreetMap : couleurs adoucies pour laisser parler les post-it ; inversée en mode tableau noir. */
+.fond-carte { filter: grayscale(0.55) sepia(0.12) contrast(0.95) brightness(1.04); }
+:root[data-theme="noir"] .fond-carte { filter: invert(1) hue-rotate(180deg) grayscale(0.5) brightness(0.8) contrast(0.9); }
+
 /* Colette garde son trait noir : un liseré de craie la détache du tableau. */
 :root[data-theme="noir"] .colette {
   filter: drop-shadow(0 0 1.5px color-mix(in oklab, #ffffff 70%, transparent));

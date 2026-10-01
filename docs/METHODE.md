@@ -85,6 +85,7 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Classes : liste officielle préremplie + propositions validées par un admin | On ne connaissait pas toutes les classes : la liste vient des programmes publics, les étudiants complètent, l'admin garde la main. |
 | 01/10 | Fil du campus en double consentement, désactivé par défaut | Montrer l'entraide sans exposer personne : la base ne renvoie une entraide que si les deux ont dit oui, et seulement la catégorie (ni message, ni titre). |
 | 01/10 | Tableau noir par jetons : on redéfinit les couleurs du thème, et on remet les jetons clairs dans les papiers | Aucun composant à réécrire : c'est la preuve que le front est piloté par les jetons (consigne du prof). |
+| 01/10 | Vraie carte sans librairie de carte : on calcule nous-mêmes les tuiles OpenStreetMap | Pas de dépendance à ajouter (règle du projet), pas de clé d'API, 30 lignes testées. Attribution OpenStreetMap affichée comme l'exige la licence. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
@@ -103,3 +104,4 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Lint React 19 : setState dans un effet et Date.now() pendant le rendu | Compteur de la cloche calculé (valeur serveur + notifications reçues en direct), calcul de date déplacé dans une fonction de la bibliothèque. |
 | 01/10 | La copie locale de padel-snipe n'était pas à jour (22 commits de retard) | Lecture directe de la version GitHub (`origin/main`), sans toucher à la branche locale. |
 | 01/10 | L'effet de survol des cartes ne marchait pas : l'animation d'apparition gardait `transform: none` | Animation passée sur la propriété CSS `translate`, le survol garde `transform`. Repéré en vérifiant le rendu en local. |
+| 01/10 | Les tuiles CARTO affichaient « API key required » | Passage aux tuiles OpenStreetMap officielles, gratuites avec attribution ; couleurs adoucies par un filtre CSS. |

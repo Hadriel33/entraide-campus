@@ -61,6 +61,10 @@ export default function PageConfidentialite() {
           Base de données et fichiers : Supabase (serveurs en Union européenne). Hébergement du site : Vercel. Les échanges
           sont chiffrés (HTTPS).
         </p>
+        <p>
+          La page Carte affiche un fond de carte OpenStreetMap : ton navigateur télécharge les images de la carte depuis
+          leurs serveurs. Aucune de tes données n&apos;est envoyée, seulement la demande d&apos;image.
+        </p>
       </Bloc>
 
       <Bloc titre="Tes droits">
