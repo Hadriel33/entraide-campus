@@ -37,10 +37,9 @@ export async function inscrire(_: EtatFormulaire, formData: FormData): Promise<E
     email: texte(formData, "email").trim(),
     motDePasse: texte(formData, "motDePasse"),
     prenom: texte(formData, "prenom").trim(),
-    ecole: texte(formData, "ecole"),
     pseudo: normaliserPseudo(texte(formData, "pseudo")),
   };
-  const valeurs = { email: champs.email, prenom: champs.prenom, ecole: champs.ecole, pseudo: champs.pseudo };
+  const valeurs = { email: champs.email, prenom: champs.prenom, pseudo: champs.pseudo };
 
   const validation = validerInscription(champs);
   if (!validation.ok) return { erreurs: validation.erreurs, valeurs };
@@ -54,7 +53,7 @@ export async function inscrire(_: EtatFormulaire, formData: FormData): Promise<E
     email: champs.email,
     password: champs.motDePasse,
     options: {
-      data: { prenom: champs.prenom, ecole: champs.ecole, pseudo: champs.pseudo },
+      data: { prenom: champs.prenom, pseudo: champs.pseudo }, // l'école est déduite de l'email par la base
       emailRedirectTo: `${origine}/auth/confirmer`,
     },
   });

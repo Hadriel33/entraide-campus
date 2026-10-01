@@ -5,7 +5,6 @@ import Link from "next/link";
 import { inscrire, type EtatFormulaire } from "../actions";
 import { Champ } from "@/components/ui/champ";
 import { Bouton } from "@/components/ui/bouton";
-import { ECOLES } from "@/lib/auth/validation";
 
 export function FormulaireInscription() {
   const [etat, action, enCours] = useActionState<EtatFormulaire, FormData>(inscrire, {});
@@ -21,20 +20,8 @@ export function FormulaireInscription() {
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
       <Champ label="Prénom" name="prenom" autoComplete="given-name" erreur={etat.erreurs?.prenom} defaultValue={etat.valeurs?.prenom} />
-      <fieldset className="flex flex-col gap-1.5 text-sm font-medium">
-        <legend className="mb-1.5">École</legend>
-        <div className="flex gap-3">
-          {ECOLES.map((ecole) => (
-            <label key={ecole} className="flex items-center gap-2 min-h-10 cursor-pointer rounded-ui border border-ligne-forte bg-surface px-4 py-2 font-normal has-[:checked]:border-encre has-[:checked]:bg-papier-fonce">
-              <input type="radio" name="ecole" value={ecole} defaultChecked={etat.valeurs?.ecole === ecole} />
-              {ecole}
-            </label>
-          ))}
-        </div>
-        {etat.erreurs?.ecole && <span className="font-normal text-alerte">{etat.erreurs.ecole}</span>}
-      </fieldset>
       <Champ label="Pseudo" name="pseudo" autoComplete="username" aide="Ton nom sur l'appli, par exemple sam.photo" erreur={etat.erreurs?.pseudo} defaultValue={etat.valeurs?.pseudo} />
-      <Champ label="Email" name="email" type="email" autoComplete="email" erreur={etat.erreurs?.email} defaultValue={etat.valeurs?.email} />
+      <Champ label="Email de l'école" name="email" type="email" autoComplete="email" aide="prenom.nom@mail-esd.com ou @mail-esp.com : ton école est reconnue automatiquement" erreur={etat.erreurs?.email} defaultValue={etat.valeurs?.email} />
       <Champ label="Mot de passe (8 caractères minimum)" name="motDePasse" type="password" autoComplete="new-password" erreur={etat.erreurs?.motDePasse} />
       {etat.message && <p role="alert" className="text-sm text-alerte">{etat.message}</p>}
       <Bouton disabled={enCours} className="py-3">

@@ -1,7 +1,7 @@
 -- Tests de sécurité de la modération IA. Transaction annulée. Attendu : « 4 tests IA OK ».
 begin;
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@exemple.fr','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.photo"}');
+ ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.photo"}');
 set local role authenticated;
 do $$
 declare

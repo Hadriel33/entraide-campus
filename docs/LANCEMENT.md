@@ -21,6 +21,6 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 - [ ] Test complet avec 2 comptes : annonce, demande, acceptation, discussion, avis, points
 
 ## Décisions à prendre
-- [ ] **Réserver l'appli aux emails de l'école ?** C'est ce qui nous distingue des groupes Facebook. Il faut d'abord connaître les domaines exacts des emails étudiants ESD et ESP. Je peux ensuite bloquer les autres adresses en base.
+- [x] **Appli réservée aux emails de l'école** (@mail-esd.com, @mail-esp.com), école déduite automatiquement. **Ne devient sûr qu'avec la confirmation d'email**, donc avec le SMTP branché.
 - [ ] Nom de domaine propre (ex. `entraide-campus.fr`), à brancher sur Vercel en 5 minutes.
 - [ ] Premières annonces crédibles pour l'ouverture : 2 ou 3 par catégorie, publiées par de vrais étudiants volontaires.

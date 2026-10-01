@@ -4,9 +4,9 @@
 begin;
 
 insert into auth.users (id, instance_id, aud, role, email, raw_user_meta_data) values
- ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@exemple.fr','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.photo"}'),
- ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@exemple.fr','{"prenom":"Léa","ecole":"ESD","pseudo":"lea.dev"}'),
- ('00000000-0000-0000-0000-00000000000c','00000000-0000-0000-0000-000000000000','authenticated','authenticated','tom.test@exemple.fr','{"prenom":"Tom","ecole":"ESD","pseudo":"tom_c"}');
+ ('00000000-0000-0000-0000-00000000000a','00000000-0000-0000-0000-000000000000','authenticated','authenticated','sam.test@mail-esp.com','{"prenom":"Sam","ecole":"ESP","pseudo":"sam.photo"}'),
+ ('00000000-0000-0000-0000-00000000000b','00000000-0000-0000-0000-000000000000','authenticated','authenticated','lea.test@mail-esd.com','{"prenom":"Léa","ecole":"ESD","pseudo":"lea.dev"}'),
+ ('00000000-0000-0000-0000-00000000000c','00000000-0000-0000-0000-000000000000','authenticated','authenticated','tom.test@mail-esd.com','{"prenom":"Tom","ecole":"ESD","pseudo":"tom_c"}');
 insert into public.annonces (id, auteur_id, type, categorie, titre, description, contrepartie) values
  ('20000000-0000-0000-0000-000000000001','00000000-0000-0000-0000-00000000000a','propose','photo','Photos pour vos événements','Soirées, galas, tournois, retouche comprise.','gratuit');
 update public.coordonnees set telephone = '0612345678' where id = '00000000-0000-0000-0000-00000000000a';

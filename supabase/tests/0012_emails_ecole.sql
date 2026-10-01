@@ -1,0 +1,6 @@
+-- Emails de l'école (01/10/2026). Transaction annulée. Attendu : « 5 tests emails de l'école OK ».
+-- 1. Hadriel.Die@MAIL-ESD.com avec la métadonnée "ecole": "ESP" -> profil ESD (l'école est déduite, pas déclarée)
+-- 2. lea@mail-esp.com -> ESP
+-- 3. pirate@gmail.com -> refusé (42501)
+-- 4. pirate@mail-esd.com.evil.fr -> refusé (domaine imité)
+-- 5. changer son email pour lea@yahoo.fr -> refusé
