@@ -11,7 +11,9 @@ import {
   type Coordonnees,
 } from "@/components/demandes/coordonnees";
 import { FormulaireAvis } from "@/components/demandes/formulaire-avis";
-import { repondreDemande } from "./actions";
+import { choisirDemande, repondreDemande } from "./actions";
+import { grouperParAnnonce, resumeCandidat } from "@/lib/demandes/choix";
+import type { Stats } from "@/lib/gamification/progression";
 import { inclinaison } from "@/lib/design/teintes";
 import { EtatVide } from "@/components/colette/etat-vide";
 
@@ -116,6 +118,110 @@ export default async function PageDemandes({
         .in("demande_id", acceptees)
     : { data: [] };
   const avisDonnes = new Set((mesAvis ?? []).map((a) => a.demande_id));
+
+  // Plusieurs intéressés sur une même annonce : on les regroupe pour comparer (des faits, jamais de coordonnées).
+  const { groupes, seules } = grouperParAnnonce(
+    onglet === "recues"
+      ? demandes.filter((d) => d.statut === "en_attente")
+      : [],
+  );
+  const candidats = groupes
+    .flatMap((g) => g.demandes.map((d) => d.demandeur?.id))
+    .filter(Boolean) as string[];
+  const statsCandidats = new Map(
+    await Promise.all(
+      candidats.map(async (id) => {
+        const { data: st } = await supabase.rpc("stats_profil", { cible: id });
+        return [id, resumeCandidat((st as Stats | null) ?? null)] as const;
+      }),
+    ),
+  );
+
+  function groupe(g: (typeof groupes)[number], i: number) {
+    return (
+      <article
+        key={g.annonce.id}
+        className="colle postit papier-jaune flex flex-col gap-4 p-5 pt-6"
+        style={{ "--i": i, "--rot": "-0.5deg" } as React.CSSProperties}
+      >
+        <span className="punaise" aria-hidden />
+        <div className="flex flex-col gap-1">
+          <span className="titre-charte text-sm">
+            {g.demandes.length} personnes intéressées
+          </span>
+          <Link
+            href={`/annonces/${g.annonce.id}`}
+            className="text-lg leading-snug font-bold hover:underline"
+          >
+            « {g.annonce.titre} »
+          </Link>
+          <p className="-rotate-1 font-main text-lg text-alerte">
+            à toi de choisir, pas de premier arrivé premier servi
+          </p>
+        </div>
+        <ul className="flex flex-col gap-3">
+          {g.demandes.map((d) => {
+            const p = d.demandeur;
+            if (!p) return null;
+            const r = statsCandidats.get(p.id) ?? resumeCandidat(null);
+            return (
+              <li
+                key={d.id}
+                id={`demande-${d.id}`}
+                className="flex scroll-mt-24 flex-col gap-2.5 rounded-carte bg-surface/75 p-3.5 target:outline-4 target:outline-bandeau"
+              >
+                <Link
+                  href={`/profils/${p.pseudo}`}
+                  className="flex items-center gap-2 font-bold hover:underline"
+                >
+                  <Avatar chemin={p.avatar_chemin} nom={p.pseudo} />
+                  <span className="truncate">@{p.pseudo}</span>
+                  <BadgeEcole ecole={p.ecole} />
+                </Link>
+                <p className="text-xs leading-relaxed text-encre-douce">
+                  <strong className="text-encre">{r.niveau}</strong> · {r.aides}{" "}
+                  aide{r.aides > 1 ? "s" : ""} donnée{r.aides > 1 ? "s" : ""} ·{" "}
+                  {r.avis > 0 && r.note !== null
+                    ? `note ${String(r.note).replace(".", ",")}/5 (${r.avis} avis)`
+                    : "pas encore d'avis"}{" "}
+                  · {r.badges} badge
+                  {r.badges > 1 ? "s" : ""}
+                </p>
+                {d.message && (
+                  <p className="font-main text-lg leading-snug">
+                    « {d.message} »
+                  </p>
+                )}
+                <span className="text-[11px] text-encre-douce">
+                  intéressé le {dateCourte(d.cree_le)}
+                </span>
+                <form action={choisirDemande.bind(null, d.id, true)}>
+                  <Bouton className="w-full">Je choisis @{p.pseudo}</Bouton>
+                </form>
+                <div className="flex items-center justify-between gap-2 text-sm font-semibold">
+                  <form action={choisirDemande.bind(null, d.id, false)}>
+                    <button className="text-encre-douce underline-offset-2 hover:text-encre hover:underline">
+                      Accepter aussi
+                    </button>
+                  </form>
+                  <form action={repondreDemande.bind(null, d.id, "refusee")}>
+                    <button className="text-encre-douce underline-offset-2 hover:text-encre hover:underline">
+                      Refuser
+                    </button>
+                  </form>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="text-xs text-encre-douce">
+          « Je choisis » accepte cette personne, prévient les autres et retire
+          l&apos;annonce du mur. « Accepter aussi » garde l&apos;annonce ouverte
+          (covoit ou coloc à plusieurs).
+        </p>
+      </article>
+    );
+  }
 
   function carte(d: Demande, i: number, papier: string) {
     const autre = onglet === "recues" ? d.demandeur : d.destinataire;
@@ -264,7 +370,16 @@ export default async function PageDemandes({
                     Rien pour l&apos;instant.
                   </p>
                 )}
-                {liste.map((d, i) => carte(d, i, col.papier))}
+                {onglet === "recues" && col.statut === "en_attente" ? (
+                  <>
+                    {groupes.map((g, i) => groupe(g, i))}
+                    {seules.map((d, i) =>
+                      carte(d, groupes.length + i, col.papier),
+                    )}
+                  </>
+                ) : (
+                  liste.map((d, i) => carte(d, i, col.papier))
+                )}
               </section>
             );
           })}

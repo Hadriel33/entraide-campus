@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
-import { suggerer } from "@/lib/matching/suggestions";
+import { niveauMatch, suggerer } from "@/lib/matching/suggestions";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { normaliserRecherche } from "@/lib/annonces/recherche";
 import {
@@ -93,18 +93,24 @@ export default async function PageAnnonces({
       brut.contrepartie && brut.contrepartie in CONTREPARTIES
         ? brut.contrepartie
         : undefined,
-    tri: brut.tri === "bientot" ? "bientot" : undefined,
+    tri:
+      brut.tri === "bientot" || brut.tri === "pour_moi" ? brut.tri : undefined,
     vue: brut.vue === "liste" ? "liste" : undefined,
     page: brut.page && /^[2-5]$/.test(brut.page) ? brut.page : undefined,
   };
-  const limite = PAR_PAGE * Number(filtres.page ?? 1);
+  const pourMoi = filtres.tri === "pour_moi";
+  // « Pour moi » trie par correspondance : on lit plus large, puis on classe côté serveur.
+  const limite = pourMoi ? 300 : PAR_PAGE * Number(filtres.page ?? 1);
   const recherche = filtres.q ? normaliserRecherche(filtres.q) : "";
 
   const { supabase, user, profil } = await getSession();
   const maintenant = new Date().toISOString();
   // Filtre par école : jointure obligatoire (!inner) sur le profil de l'auteur.
   const select = filtres.ecole
-    ? SELECT_ANNONCE.replace("annonces_auteur_id_fkey(", "annonces_auteur_id_fkey!inner(")
+    ? SELECT_ANNONCE.replace(
+        "annonces_auteur_id_fkey(",
+        "annonces_auteur_id_fkey!inner(",
+      )
     : SELECT_ANNONCE;
   let requete = supabase
     .from("annonces")
@@ -137,7 +143,7 @@ export default async function PageAnnonces({
       .gt("expire_le", maintenant)
       .limit(2000),
   ]);
-  const annonces = (data ?? []) as unknown as Annonce[];
+  let annonces = (data ?? []) as unknown as Annonce[];
   const parCategorie = (toutes ?? []).reduce<Record<string, number>>(
     (acc, a) => ({ ...acc, [a.categorie]: (acc[a.categorie] ?? 0) + 1 }),
     {},
@@ -164,11 +170,14 @@ export default async function PageAnnonces({
     },
   ].filter(Boolean) as { cle: keyof Filtres; label: string }[];
 
-  // Palier 3 : suggestions « Pour toi », et accueil guidé, seulement sur la vue sans filtre.
+  // Palier 3 : suggestions « Pour toi » (vue sans filtre) et tri « Pour moi » (toutes les annonces classées).
   const sansFiltre = actifs.length === 0;
   let pourToi: ReturnType<typeof suggerer<Annonce>> = [];
   let etatAccueil = null;
-  if (sansFiltre && user && profil) {
+  let matchs = new Map<string, { niveau: string; raisons: string[] }>();
+  let profilMatch: { competences: string[]; categories: string[] } | null =
+    null;
+  if ((sansFiltre || pourMoi) && user && profil) {
     const [{ data: miennes }, etat] = await Promise.all([
       supabase
         .from("annonces")
@@ -177,7 +186,7 @@ export default async function PageAnnonces({
         .eq("statut", "publiee"),
       lireEtatAccueil(supabase, profil),
     ]);
-    etatAccueil = etat;
+    if (sansFiltre && !pourMoi) etatAccueil = etat;
     const categories = (type: string) => [
       ...new Set(
         (miennes ?? [])
@@ -185,14 +194,31 @@ export default async function PageAnnonces({
           .map((m) => m.categorie as Categorie),
       ),
     ];
-    pourToi = suggerer(
-      {
-        competences: profil.competences ?? [],
-        categoriesProposees: categories("propose"),
-        categoriesCherchees: categories("cherche"),
-      },
-      annonces.filter((a) => a.auteur_id !== user.id),
-    );
+    const moi = {
+      competences: profil.competences ?? [],
+      categoriesProposees: categories("propose"),
+      categoriesCherchees: categories("cherche"),
+    };
+    const autres = annonces.filter((a) => a.auteur_id !== user.id);
+    if (pourMoi) {
+      const classees = suggerer(moi, autres, Infinity);
+      annonces = classees.map((c) => c.annonce);
+      matchs = new Map(
+        classees.map((c) => [
+          c.annonce.id,
+          { niveau: niveauMatch(c.score), raisons: c.raisons },
+        ]),
+      );
+      profilMatch = {
+        competences: moi.competences,
+        categories: [
+          ...moi.categoriesProposees,
+          ...moi.categoriesCherchees,
+        ].map((c) => CATEGORIES[c]),
+      };
+    } else {
+      pourToi = suggerer(moi, autres);
+    }
   }
 
   const onglets = [
@@ -206,7 +232,17 @@ export default async function PageAnnonces({
         <TitrePage accroche="Étudiants de l'ESD et de l'ESP Bordeaux. Les coordonnées s'échangent seulement après accord.">
           Les annonces du campus
         </TitrePage>
-        <BoutonLien href="/annonces/nouvelle">Publier une annonce</BoutonLien>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Le même mur, en grand écran et en direct : pour le projeter en cours ou au forum des assos. */}
+          <BoutonLien
+            href="/mur"
+            variante="contour"
+            title="Le mur en plein écran, mis à jour en direct"
+          >
+            Projeter en direct
+          </BoutonLien>
+          <BoutonLien href="/annonces/nouvelle">Publier une annonce</BoutonLien>
+        </div>
       </div>
 
       {etatAccueil && <ChecklistAccueil etat={etatAccueil} />}
@@ -408,6 +444,7 @@ export default async function PageAnnonces({
           >
             {[
               { tri: undefined, label: "Plus récentes" },
+              ...(user ? [{ tri: "pour_moi", label: "Pour moi" }] : []),
               { tri: "bientot", label: "Expirent bientôt" },
             ].map((o) => (
               <Link
@@ -457,16 +494,25 @@ export default async function PageAnnonces({
           )}
         </nav>
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-encre-douce">
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1" aria-label="Légende des couleurs">
+          <p
+            className="flex flex-wrap items-center gap-x-3 gap-y-1"
+            aria-label="Légende des couleurs"
+          >
             <span className="font-semibold">Les couleurs :</span>
             {Object.values(TEINTES).map((t) => (
               <span key={t.famille} className="flex items-center gap-1.5">
-                <span className={`size-3 rounded-[2px] ${t.point}`} aria-hidden />
+                <span
+                  className={`size-3 rounded-[2px] ${t.point}`}
+                  aria-hidden
+                />
                 {t.famille}
               </span>
             ))}
           </p>
-          <nav className="inline-flex rounded-ui bg-papier-fonce p-1" aria-label="Affichage">
+          <nav
+            className="inline-flex rounded-ui bg-papier-fonce p-1"
+            aria-label="Affichage"
+          >
             {[
               { vue: undefined, label: "Mur" },
               { vue: "liste", label: "Liste" },
@@ -523,6 +569,33 @@ export default async function PageAnnonces({
         </section>
       )}
 
+      {profilMatch && (
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-carte border border-ligne bg-surface px-4 py-3 text-sm">
+          <strong>Classé d&apos;après ton profil :</strong>
+          {profilMatch.competences.length > 0 ? (
+            <span>
+              tes compétences ({profilMatch.competences.slice(0, 6).join(", ")})
+            </span>
+          ) : (
+            <span className="text-encre-douce">pas encore de compétences</span>
+          )}
+          {profilMatch.categories.length > 0 && (
+            <span>
+              et ce que tu publies (
+              {[...new Set(profilMatch.categories)].join(", ")})
+            </span>
+          )}
+          <Link
+            href="/compte#competences"
+            className="ml-auto -rotate-1 font-main text-lg text-alerte hover:underline"
+          >
+            {profilMatch.competences.length
+              ? "affiner avec mon CV"
+              : "ajouter mon CV"}
+          </Link>
+        </p>
+      )}
+
       {recherche && (
         <p className="text-sm text-encre-douce">
           {annonces.length} résultat{annonces.length > 1 ? "s" : ""} pour «{" "}
@@ -539,22 +612,35 @@ export default async function PageAnnonces({
       ) : annonces.length > 0 ? (
         <div className="grid gap-x-6 gap-y-9 pt-3 sm:grid-cols-2 lg:grid-cols-3">
           {annonces.map((a, i) => (
-            <CarteAnnonce key={a.id} annonce={a} index={i % PAR_PAGE} />
+            <CarteAnnonce
+              key={a.id}
+              annonce={a}
+              index={i % PAR_PAGE}
+              match={matchs.get(a.id)}
+            />
           ))}
         </div>
       ) : (
         <EtatVide
           anim={sansFiltre ? "accroche" : "cherche"}
-          titre={sansFiltre ? "Le mur est encore vide" : "Colette n'a rien trouvé"}
+          titre={
+            pourMoi
+              ? "Rien qui te corresponde pour l'instant"
+              : sansFiltre
+                ? "Le mur est encore vide"
+                : "Colette n'a rien trouvé"
+          }
           action={
             <BoutonLien href="/annonces/nouvelle" variante="contour">
               Publier une annonce
             </BoutonLien>
           }
         >
-          {sansFiltre
-            ? "Lance-toi : la première annonce, c'est la tienne."
-            : "Essaie d'autres mots ou retire un filtre. Ou publie ce que tu cherches : quelqu'un te répondra."}
+          {pourMoi
+            ? "Ajoute tes compétences (dépose ton CV dans ton profil) et publie ce que tu proposes ou cherches : Colette classera le mur pour toi."
+            : sansFiltre
+              ? "Lance-toi : la première annonce, c'est la tienne."
+              : "Essaie d'autres mots ou retire un filtre. Ou publie ce que tu cherches : quelqu'un te répondra."}
         </EtatVide>
       )}
 
