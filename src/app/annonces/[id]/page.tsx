@@ -32,6 +32,7 @@ import {
   signalerAnnonce,
 } from "@/app/demandes/actions";
 import { changerStatut, prolongerAnnonce, supprimerAnnonce } from "../actions";
+import { Colette } from "@/components/colette/colette";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -224,11 +225,13 @@ export default async function PageAnnonce({
       </dl>
 
       {estAuteur && annonce.statut === "masquee" && (
-        <p role="status" className="rounded-carte bg-besoin p-4 text-sm">
-          <strong className="block">Annonce en attente de vérification</strong>
-          Elle n&apos;est pas visible des autres étudiants pour le moment. Un
-          modérateur va la relire rapidement.
-        </p>
+        <div role="status" className="flex items-center gap-4 rounded-carte bg-postit-lilas p-4 text-sm">
+          <Colette anim="tampon" taille={80} className="shrink-0" />
+          <p>
+            <strong className="block font-main text-xl">Colette relit ton annonce</strong>
+            Elle n&apos;est pas visible des autres étudiants pour le moment. Un modérateur va la relire rapidement.
+          </p>
+        </div>
       )}
 
       {estAuteur ? (

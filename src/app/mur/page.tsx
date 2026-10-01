@@ -3,6 +3,7 @@ import { exigerSession } from "@/lib/session";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { BoutonProjection, EnDirect } from "./en-direct";
+import { EtatVide } from "@/components/colette/etat-vide";
 
 export const metadata: Metadata = { title: "Le mur en direct" };
 
@@ -53,7 +54,9 @@ export default async function PageMur() {
           ))}
         </div>
       ) : (
-        <p className="font-main text-2xl text-encre-douce">Le mur attend sa première annonce. À toi de jouer.</p>
+        <EtatVide anim="accroche" titre="Le mur attend sa première annonce">
+          À toi de jouer : publie depuis ton téléphone et regarde-la arriver ici.
+        </EtatVide>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 @AGENTS.md
 
-# Fiche d'identité — L'entraide du campus
+# Fiche d'identité — Post-it campus (ex « L'entraide du campus »)
 
 > Relis ce fichier avant chaque demande. Si une demande le contredit, demande-moi avant d'agir.
 

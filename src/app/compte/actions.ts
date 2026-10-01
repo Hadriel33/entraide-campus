@@ -6,6 +6,7 @@ import { exigerSession } from "@/lib/session";
 import { normaliserPseudo, validerAvatar, validerCoordonnees, validerPseudo } from "@/lib/profils/validation";
 import { extraireCompetences } from "@/lib/ia/modele";
 import { nettoyerCompetences } from "@/lib/ia/regles";
+import { validerClasse, validerColette } from "@/lib/profils/colette";
 
 export type EtatProfil = { erreurs?: Partial<Record<string, string>>; message?: string };
 
@@ -111,4 +112,26 @@ export async function supprimerMonCompte() {
   }
   await supabase.auth.signOut();
   redirect("/?ok=compte_supprime");
+}
+
+// ---------- Ma Colette et ma classe ----------
+
+export async function enregistrerColette(formData: FormData) {
+  const { supabase, user } = await exigerSession();
+  const choix = validerColette(Object.fromEntries(formData));
+  if (!choix) redirect("/compte?erreur=colette#colette");
+  await supabase.from("profils").update(choix).eq("id", user.id);
+  revalidatePath("/", "layout");
+  redirect("/compte?ok=colette#colette");
+}
+
+export async function choisirClasse(formData: FormData) {
+  const { supabase, user } = await exigerSession();
+  const classe = validerClasse(formData.get("classe"));
+  if (classe === false) redirect("/compte?erreur=classe#classe");
+  // La base refuse une classe d'une autre école (trigger verifier_classe).
+  const { error } = await supabase.from("profils").update({ classe_id: classe }).eq("id", user.id);
+  if (error) redirect("/compte?erreur=classe#classe");
+  revalidatePath("/", "layout");
+  redirect("/compte?ok=classe#classe");
 }

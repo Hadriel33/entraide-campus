@@ -10,15 +10,18 @@ import { CarteDefi } from "@/components/profil/carte-defi";
 import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
 import { ZoneSensible } from "./zone-sensible";
+import { AtelierColette } from "./atelier-colette";
+import { choisirClasse } from "./actions";
+import { Bouton } from "@/components/ui/bouton";
 import Link from "next/link";
 
 export const metadata: Metadata = { title: "Mon profil" };
 
 function Section({ id, titre, aide, children }: { id?: string; titre: string; aide?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="apparition flex scroll-mt-6 flex-col gap-4 rounded-carte border border-ligne bg-surface p-5 target:border-encre">
-      <div>
-        <h2 className="text-lg font-semibold">{titre}</h2>
+    <section id={id} className="apparition flex scroll-mt-6 flex-col gap-4 rounded-carte border border-ligne bg-surface p-5 target:border-encre target:shadow-[4px_4px_0_0_var(--color-bandeau)] sm:p-6">
+      <div className="flex flex-col gap-1">
+        <h2 className="titre-charte text-section">{titre}</h2>
         {aide && <p className="text-sm text-encre-douce">{aide}</p>}
       </div>
       {children}
@@ -28,13 +31,14 @@ function Section({ id, titre, aide, children }: { id?: string; titre: string; ai
 
 export default async function PageCompte() {
   const { supabase, user, profil } = await exigerSession();
-  const [{ data: stats }, { data: coordonnees }] = await Promise.all([
+  const [{ data: stats }, { data: coordonnees }, { data: classes }] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
     supabase.from("coordonnees").select("telephone, email, reseau").eq("id", user.id).single(),
+    supabase.from("classes").select("id, nom").eq("ecole", profil.ecole).order("nom"),
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <TitrePage
           accroche={
@@ -54,7 +58,36 @@ export default async function PageCompte() {
       <CarteDefi supabase={supabase} />
 
       <Section id="photo" titre="Photo de profil">
-        <FormulairePhoto apercu={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" />} />
+        <FormulairePhoto apercu={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" colette={profil} />} />
+      </Section>
+
+      <Section
+        id="colette"
+        titre="Ma Colette"
+        aide={profil.avatar_chemin ? "Ton personnage dans l'appli (badges, classement). Ta photo reste ton avatar principal." : "Pas de photo ? Ta Colette te représente partout dans l'appli."}
+      >
+        <AtelierColette couleur={profil.colette_couleur} humeur={profil.colette_humeur} accessoire={profil.colette_accessoire} />
+      </Section>
+
+      <Section id="classe" titre="Ma classe" aide="Chaque coup de main que tu donnes fait monter ta classe au classement.">
+        {classes && classes.length > 0 ? (
+          <form action={choisirClasse} className="flex flex-wrap items-end gap-2">
+            <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-semibold">
+              Classe ({profil.ecole})
+              <select name="classe" defaultValue={profil.classe_id ?? ""} className="min-h-11 rounded-ui border border-ligne-forte bg-surface px-3 text-base font-normal">
+                <option value="">Pas de classe</option>
+                {classes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nom}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <Bouton>Enregistrer</Bouton>
+          </form>
+        ) : (
+          <p className="font-main text-lg text-encre-douce">Les classes de ton école n&apos;ont pas encore été ajoutées. Demande à un admin.</p>
+        )}
       </Section>
 
       <Section

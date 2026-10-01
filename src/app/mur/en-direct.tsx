@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Colette } from "@/components/colette/colette";
 
 // Écoute les annonces en temps réel (la RLS filtre ce que chacun reçoit) et relance
 // la lecture côté serveur : le contenu de l'événement n'est jamais affiché tel quel.
@@ -32,8 +33,8 @@ export function EnDirect() {
       </span>
       En direct
       {arrivees > 0 && (
-        <span key={arrivees} className="pop -rotate-2 font-main text-lg text-alerte">
-          +{arrivees} depuis que tu regardes
+        <span key={arrivees} className="pop flex items-center gap-2 -rotate-2 font-main text-lg text-alerte">
+          <Colette anim="accroche" taille={56} />+{arrivees} depuis que tu regardes
         </span>
       )}
     </p>

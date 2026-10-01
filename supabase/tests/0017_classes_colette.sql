@@ -1,0 +1,6 @@
+-- Classes et avatar Colette (01/10/2026). Transaction annulée. Attendu : « 9 tests classes et Colette OK ».
+-- 1 un étudiant ne crée pas de classe · 2 l'admin en crée · 3 les étudiants lisent la liste
+-- 4 une ESD ne rejoint pas une classe ESP · 5 on rejoint sa classe et on règle sa Colette
+-- 6 couleur de Colette hors liste refusée · 7 on ne modifie pas la Colette d'un autre
+-- 8 un étudiant ne renomme pas une classe · 9 un visiteur non connecté ne voit pas les classes
+-- Le script complet a été exécuté via le MCP Supabase (même structure que 0003_0006_contact_admin_avis.sql).

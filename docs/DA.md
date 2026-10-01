@@ -18,6 +18,17 @@ La même interface est déclinée en 3 pistes : **seuls les jetons changent**, c
 
 ---
 
+## V5 (01/10, nuit) : Post-it campus et Colette
+
+- **Nouveau nom : Post-it campus** (usage interne à l'école). Logo : un post-it jaune penché avec un « P », la punaise rouge à la place du tiret, « campus » écrit à la main. Favicon et image de partage refaits.
+- **Colette, la mascotte** : un post-it avec une punaise sur la tête. Inspirations : Duo (Duolingo) pour une silhouette fixe et des expressions qui changent, l'Octocat (GitHub) pour les costumes et l'outil « crée le tien ». Elle incarne les fonctions IA et les états de l'appli :
+  - lit le CV avec une loupe (IA n°1), tamponne l'annonce pendant la modération (IA n°2), accroche le post-it à la publication ;
+  - réfléchit pendant les chargements (bulles de pensée), est débordée sur la page d'erreur et quand trop de choses attendent, cherche aux jumelles (404, recherche vide), fait la sieste (pages vides), saute de joie (demande acceptée, avis, Colette créée) ;
+  - guide le tuto de premier passage (4 bulles, « Passer » toujours visible) ;
+  - sert d'**avatar par défaut** : chacun crée sa Colette (couleur, humeur, accessoire) dans son profil.
+- Pur SVG + CSS, couleurs en jetons, animations coupées si « réduire les animations ».
+- **Pistes de la planche de maquettes retenues** : accueil A « L'affiche », dashboard A « Mon bureau ». Ajouts : légende des couleurs et vue « Liste » sur les annonces, classement des classes en podium de post-it.
+
 ## V4 (01/10, soir) : « le mur du campus », on s'amuse
 
 Demande de Hadriel : travailler l'identité, les espacements, la taille des textes, la hiérarchie, des demandes « en post-it », un effet wow pour la démo.

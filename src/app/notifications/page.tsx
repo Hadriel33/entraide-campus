@@ -3,6 +3,7 @@ import Link from "next/link";
 import { exigerSession } from "@/lib/session";
 import { TitrePage } from "@/components/ui/titre-page";
 import { MarqueurLu } from "./marqueur";
+import { EtatVide } from "@/components/colette/etat-vide";
 
 export const metadata: Metadata = { title: "Notifications" };
 
@@ -48,9 +49,7 @@ export default async function PageNotifications() {
           ))}
         </ol>
       ) : (
-        <p className="rounded-carte border border-dashed border-ligne-forte p-6 text-sm text-encre-douce">
-          Rien pour l&apos;instant. Tu seras prévenu ici dès qu&apos;on te répond.
-        </p>
+        <EtatVide titre="Rien pour l'instant">Tu seras prévenu ici dès qu&apos;on te répond.</EtatVide>
       )}
     </div>
   );

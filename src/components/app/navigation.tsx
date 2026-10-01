@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Logo } from "./logo";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { deconnecter } from "@/app/(auth)/actions";
@@ -11,6 +12,7 @@ type Lien = { href: string; label: string; compteur?: number };
 
 function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
   return [
+    { href: "/bureau", label: "Mon bureau" },
     { href: "/annonces", label: "Annonces" },
     { href: "/mur", label: "Le mur en direct" },
     { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
@@ -22,15 +24,6 @@ function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
   ];
 }
 
-function Monogramme() {
-  return (
-    <span className="relative flex size-8 shrink-0" aria-hidden>
-      <span className="absolute inset-0 translate-x-[3px] translate-y-[3px] rounded-ui bg-lilas" />
-      <span className="absolute inset-0 translate-x-[1.5px] translate-y-[1.5px] rounded-ui bg-bandeau" />
-      <span className="relative flex size-full items-center justify-center rounded-ui bg-encre text-[13px] font-bold text-surface">ec</span>
-    </span>
-  );
-}
 
 function Compteur({ n }: { n?: number }) {
   if (!n) return null;
@@ -68,9 +61,8 @@ export function BarreLaterale({
       {/* Bureau : barre latérale */}
       <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 border-r border-ligne bg-surface px-3.5 py-5 md:flex">
         <div className="flex items-center justify-between gap-1">
-          <Link href="/annonces" className="flex items-center gap-2.5 px-2 font-semibold">
-            <Monogramme />
-            L&apos;entraide du campus
+          <Link href="/bureau" className="flex items-center gap-2.5 px-2 font-semibold">
+            <Logo />
           </Link>
           <Cloche moi={moi} nonLues={notificationsNonLues} />
         </div>
@@ -108,9 +100,8 @@ export function BarreLaterale({
 
       {/* Mobile : barre du haut (logo, cloche) + barre d'onglets en bas, à portée de pouce */}
       <header className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-ligne bg-surface px-4 py-2 md:hidden">
-        <Link href="/annonces" className="flex items-center gap-2 font-semibold">
-          <Monogramme />
-          <span className="text-sm">L&apos;entraide du campus</span>
+        <Link href="/bureau" className="flex items-center gap-2 font-semibold">
+          <Logo />
         </Link>
         <Cloche moi={moi} nonLues={notificationsNonLues} />
       </header>
@@ -124,8 +115,7 @@ export function EnTetePublic() {
     <header className="border-b border-ligne bg-surface">
       <nav className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3" aria-label="Navigation">
         <Link href="/" className="flex items-center gap-2.5 font-semibold">
-          <Monogramme />
-          <span className="hidden sm:inline">L&apos;entraide du campus</span>
+          <Logo compact />
         </Link>
         <div className="flex items-center gap-2 text-sm">
           <Link href="/connexion" className="presse rounded-ui px-3 py-2 font-medium hover:bg-papier-fonce">
@@ -151,6 +141,7 @@ function Icone({ d, className = "size-6" }: { d: string; className?: string }) {
 }
 
 const ICONES = {
+  bureau: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
   annonces: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
   demandes: "M22 12h-6l-2 3h-4l-2-3H2M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1Z",
   plus: "M12 5v14M5 12h14",
@@ -174,6 +165,7 @@ function OngletsMobile({
   const [ouvert, setOuvert] = useState(false);
   const onglet = "presse flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium text-encre-douce aria-[current=page]:text-encre";
   const plus = [
+    { href: "/classement", label: "Classement" },
     { href: "/mur", label: "Le mur en direct" },
     { href: "/mes-annonces", label: "Mes annonces" },
     { href: "/favoris", label: "Favoris" },
@@ -188,9 +180,18 @@ function OngletsMobile({
         className="fixed inset-x-0 bottom-0 z-40 flex items-stretch border-t border-ligne bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
         aria-label="Navigation principale"
       >
+        <Link href="/bureau" aria-current={actif("/bureau") ? "page" : undefined} className={onglet}>
+          <Icone d={ICONES.bureau} />
+          Bureau
+        </Link>
         <Link href="/annonces" aria-current={actif("/annonces") ? "page" : undefined} className={onglet}>
           <Icone d={ICONES.annonces} />
           Annonces
+        </Link>
+        <Link href="/annonces/nouvelle" aria-label="Publier une annonce" className="presse flex flex-1 items-center justify-center">
+          <span className="-mt-5 flex size-13 items-center justify-center rounded-full bg-encre text-surface shadow-lg ring-4 ring-papier">
+            <Icone d={ICONES.plus} className="size-7" />
+          </span>
         </Link>
         <Link href="/demandes" aria-current={actif("/demandes") ? "page" : undefined} className={`${onglet} relative`}>
           <Icone d={ICONES.demandes} />
@@ -201,15 +202,7 @@ function OngletsMobile({
             </span>
           )}
         </Link>
-        <Link href="/annonces/nouvelle" aria-label="Publier une annonce" className="presse flex flex-1 items-center justify-center">
-          <span className="-mt-5 flex size-13 items-center justify-center rounded-full bg-encre text-surface shadow-lg ring-4 ring-papier">
-            <Icone d={ICONES.plus} className="size-7" />
-          </span>
-        </Link>
-        <Link href="/classement" aria-current={actif("/classement") ? "page" : undefined} className={onglet}>
-          <Icone d={ICONES.classement} />
-          Classement
-        </Link>
+
         <button type="button" onClick={() => setOuvert(true)} aria-expanded={ouvert} className={onglet}>
           <Icone d={ICONES.menu} />
           Plus

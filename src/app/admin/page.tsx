@@ -8,7 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge, BadgeEcole } from "@/components/ui/badge";
 import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
-import { changerRole, modererAnnonce, supprimerAnnonceAdmin, traiterSignalement, validerModeration } from "./actions";
+import { changerRole, creerClasse, modererAnnonce, supprimerAnnonceAdmin, supprimerClasse, traiterSignalement, validerModeration } from "./actions";
 
 export const metadata: Metadata = { title: "Admin" };
 
@@ -42,7 +42,8 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
   const { supabase, user, profil } = await exigerSession();
   // Un non-admin reçoit une 404 : on ne révèle même pas que la page existe.
   if (profil.role !== "admin") notFound();
-  const onglet = (await searchParams).onglet === "etudiants" ? "etudiants" : "moderation";
+  const brutOnglet = (await searchParams).onglet;
+  const onglet = brutOnglet === "etudiants" || brutOnglet === "classes" ? brutOnglet : "moderation";
 
   const [{ data: stats }, { data: signalements }, { data: annonces }, { data: etudiants }, { data: aModerer }] = await Promise.all([
     supabase.rpc("stats_admin"),
@@ -97,6 +98,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
         {[
           { valeur: "moderation", label: "Modération", href: "/admin" },
           { valeur: "etudiants", label: "Étudiants et rôles", href: "/admin?onglet=etudiants" },
+          { valeur: "classes", label: "Classes", href: "/admin?onglet=classes" },
         ].map((o) => (
           <Link
             key={o.valeur}
@@ -256,6 +258,8 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
             </div>
           </section>
         </>
+      ) : onglet === "classes" ? (
+        <ListeClasses />
       ) : (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-semibold">Étudiants et rôles</h2>
@@ -281,5 +285,47 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
         </section>
       )}
     </div>
+  );
+}
+
+// Classes : ajout et suppression (un étudiant choisit ensuite la sienne dans son profil).
+async function ListeClasses() {
+  const { supabase } = await exigerSession();
+  const { data: classes } = await supabase.from("classes").select("id, ecole, nom").order("ecole").order("nom");
+  return (
+    <section className="flex flex-col gap-5">
+      <form action={creerClasse} className="flex flex-wrap items-end gap-2 rounded-carte border border-ligne bg-surface p-4">
+        <label className="flex flex-col gap-1 text-sm font-semibold">
+          École
+          <select name="ecole" className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3">
+            <option value="ESD">ESD</option>
+            <option value="ESP">ESP</option>
+          </select>
+        </label>
+        <label className="flex min-w-60 flex-1 flex-col gap-1 text-sm font-semibold">
+          Nom de la classe
+          <input name="nom" required minLength={2} maxLength={40} placeholder="Ex. : M1 Data, B3 Direction artistique" className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3 font-normal" />
+        </label>
+        <Bouton>Ajouter</Bouton>
+      </form>
+      <div className="grid gap-6 sm:grid-cols-2">
+        {["ESD", "ESP"].map((e) => (
+          <div key={e} className="flex flex-col gap-2">
+            <h2 className="titre-charte text-xl">{e}</h2>
+            {(classes ?? []).filter((c) => c.ecole === e).map((c) => (
+              <div key={c.id} className="flex items-center justify-between gap-2 rounded-ui border border-ligne bg-surface px-3 py-2">
+                <span className="font-medium">{c.nom}</span>
+                <form action={supprimerClasse.bind(null, c.id)}>
+                  <Bouton variante="discret" className="min-h-8 px-2 text-sm">
+                    Supprimer
+                  </Bouton>
+                </form>
+              </div>
+            ))}
+            {!(classes ?? []).some((c) => c.ecole === e) && <p className="text-sm text-encre-douce">Aucune classe pour l&apos;instant.</p>}
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

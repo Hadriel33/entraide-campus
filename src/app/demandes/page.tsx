@@ -13,6 +13,7 @@ import {
 import { FormulaireAvis } from "@/components/demandes/formulaire-avis";
 import { repondreDemande } from "./actions";
 import { inclinaison } from "@/lib/design/teintes";
+import { EtatVide } from "@/components/colette/etat-vide";
 
 export const metadata: Metadata = { title: "Demandes" };
 
@@ -222,22 +223,14 @@ export default async function PageDemandes({
       </nav>
 
       {demandes.length === 0 && (
-        <div
-          className="postit papier-gris flex max-w-md flex-col gap-2 self-center p-6 pt-7"
-          style={{ "--rot": "1.5deg" } as React.CSSProperties}
+        <EtatVide
+          anim={onglet === "recues" ? "dort" : "cherche"}
+          titre={onglet === "recues" ? "Aucune demande reçue pour l'instant" : "Tu n'as envoyé aucune demande"}
         >
-          <span className="punaise" aria-hidden />
-          <strong className="font-main text-2xl">
-            {onglet === "recues"
-              ? "Aucune demande reçue pour l'instant"
-              : "Tu n'as envoyé aucune demande"}
-          </strong>
-          <p className="text-sm text-encre/75">
-            {onglet === "recues"
-              ? "Quand quelqu'un voudra te contacter pour une de tes annonces, sa demande sera punaisée ici."
-              : "Trouve une annonce qui t'intéresse et clique sur « Demander le contact »."}
-          </p>
-        </div>
+          {onglet === "recues"
+            ? "Quand quelqu'un voudra te contacter pour une de tes annonces, sa demande sera punaisée ici."
+            : "Trouve une annonce qui t'intéresse et clique sur « Demander le contact »."}
+        </EtatVide>
       )}
 
       {demandes.length > 0 && (

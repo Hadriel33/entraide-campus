@@ -10,7 +10,7 @@ export function BoutonPartager({ titre }: { titre: string }) {
     const url = window.location.href.split("?")[0];
     if (navigator.share) {
       try {
-        await navigator.share({ title: titre, text: `${titre} · L'entraide du campus`, url });
+        await navigator.share({ title: titre, text: `${titre} · Post-it campus`, url });
         return;
       } catch {
         // partage annulé : on ne fait rien

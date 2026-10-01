@@ -58,3 +58,22 @@ export async function validerModeration(id: string) {
   revalidatePath("/annonces");
   redirect("/admin?ok=moderation");
 }
+
+// ---------- Classes (liste gérée par les admins, RLS : écriture admin uniquement) ----------
+
+export async function creerClasse(formData: FormData) {
+  const { supabase } = await exigerAdmin();
+  const ecole = String(formData.get("ecole") ?? "");
+  const nom = String(formData.get("nom") ?? "").trim().replace(/\s+/g, " ");
+  if (!["ESD", "ESP"].includes(ecole) || nom.length < 2 || nom.length > 40) redirect("/admin?onglet=classes&erreur=classe");
+  await supabase.from("classes").insert({ ecole, nom });
+  revalidatePath("/admin");
+  redirect("/admin?onglet=classes&ok=classe_creee");
+}
+
+export async function supprimerClasse(id: string) {
+  const { supabase } = await exigerAdmin();
+  await supabase.from("classes").delete().eq("id", id);
+  revalidatePath("/admin");
+  redirect("/admin?onglet=classes&ok=classe_supprimee");
+}

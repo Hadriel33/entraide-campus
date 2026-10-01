@@ -19,7 +19,7 @@ export default function PageConfidentialite() {
 
       <Bloc titre="Qui sommes-nous ?">
         <p>
-          L&apos;entraide du campus est un <strong>projet étudiant non officiel</strong>, réalisé dans le cadre du module Vibe
+          Post-it campus est un <strong>projet étudiant non officiel</strong>, réalisé dans le cadre du module Vibe
           Coding (M2 Data) à l&apos;ESD Bordeaux. Il n&apos;est pas édité par l&apos;ESD, l&apos;ESP ni leur groupe. Responsable
           du traitement : l&apos;étudiant auteur du projet, joignable via l&apos;espace de modération de l&apos;appli.
         </p>

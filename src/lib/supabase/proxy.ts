@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PAGES_PROTEGEES = ["/compte", "/annonces", "/mes-annonces", "/demandes", "/classement", "/profils", "/admin", "/notifications", "/favoris", "/bienvenue", "/mur"];
+const PAGES_PROTEGEES = ["/compte", "/annonces", "/mes-annonces", "/demandes", "/classement", "/profils", "/admin", "/notifications", "/favoris", "/bienvenue", "/mur", "/bureau"];
 
 // Rafraîchit la session Supabase à chaque requête et redirige vers /connexion
 // si une page protégée est demandée sans être connecté (vérification optimiste :

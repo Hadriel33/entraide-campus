@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Colette, coletteParDefaut, type Accessoire, type CouleurColette, type Humeur } from "@/components/colette/colette";
 
 const TAILLES = { sm: 24, md: 32, lg: 44, xl: 96 } as const;
 
@@ -7,22 +8,36 @@ export function urlAvatar(chemin: string | null | undefined) {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${chemin}`;
 }
 
-// Photo de profil, ou initiales du pseudo sur fond doux si aucune photo.
-export function Avatar({ chemin, nom, taille = "md" }: { chemin?: string | null; nom: string; taille?: keyof typeof TAILLES }) {
+export type PrefsColette = { colette_couleur?: string | null; colette_humeur?: string | null; colette_accessoire?: string | null };
+
+// Photo de profil, ou sa Colette (choisie dans le profil, sinon une couleur tirée du pseudo).
+export function Avatar({
+  chemin,
+  nom,
+  taille = "md",
+  colette,
+}: {
+  chemin?: string | null;
+  nom: string;
+  taille?: keyof typeof TAILLES;
+  colette?: PrefsColette | null;
+}) {
   const px = TAILLES[taille];
   const url = urlAvatar(chemin);
-  const initiales = nom.replace(/[^a-zA-Z0-9]/g, "").slice(0, 2).toUpperCase() || "?";
 
   if (url) {
     return <Image src={url} alt="" width={px} height={px} className="shrink-0 rounded-full object-cover" style={{ width: px, height: px }} />;
   }
+  const couleur = (colette?.colette_couleur || coletteParDefaut(nom).couleur) as CouleurColette;
   return (
-    <span
-      aria-hidden
-      className="flex shrink-0 items-center justify-center rounded-full bg-papier-fonce font-semibold text-encre"
-      style={{ width: px, height: px, fontSize: Math.round(px * 0.38) }}
-    >
-      {initiales}
+    <span aria-hidden className="flex shrink-0 items-end justify-center overflow-hidden rounded-full bg-papier-fonce" style={{ width: px, height: px }}>
+      <Colette
+        tete
+        taille={Math.round(px * 0.92)}
+        couleur={couleur}
+        humeur={(colette?.colette_humeur as Humeur) || "contente"}
+        accessoire={px >= 40 ? ((colette?.colette_accessoire as Accessoire) || "aucun") : "aucun"}
+      />
     </span>
   );
 }

@@ -3,6 +3,7 @@
 import { useActionState, useState, useTransition } from "react";
 import { Bouton } from "@/components/ui/bouton";
 import { analyserCV, enregistrerCompetences, type EtatCV } from "./actions";
+import { Colette } from "@/components/colette/colette";
 
 // IA n°1 : l'IA propose, l'étudiant relit, corrige et valide. Rien n'est enregistré sans son clic.
 export function AssistantCompetences({ actuelles }: { actuelles: string[] }) {
@@ -37,13 +38,18 @@ export function AssistantCompetences({ actuelles }: { actuelles: string[] }) {
         <span className="text-xs text-encre-douce">
           L&apos;IA lit ton CV et propose tes compétences. Ton CV n&apos;est pas conservé.
         </span>
-        {analyseEnCours && (
-          <span role="status" className="flex items-center gap-2 text-sm font-medium">
-            <span className="size-3 animate-ping rounded-full bg-bandeau" aria-hidden />
-            L&apos;IA lit ton CV...
-          </span>
-        )}
       </form>
+      {analyseEnCours && (
+        <div role="status" className="pop flex items-center gap-5 rounded-carte bg-papier-fonce p-4">
+          <Colette anim="lit" taille={110} className="shrink-0" />
+          <div className="flex flex-col gap-1 font-main text-xl">
+            <strong>Colette lit ton CV...</strong>
+            <span className="apparition text-encre-douce" style={{ "--i": 6 } as React.CSSProperties}>je repère tes compétences</span>
+            <span className="apparition text-encre-douce" style={{ "--i": 12 } as React.CSSProperties}>je les range par post-it</span>
+            <span className="text-sm font-sans text-encre-douce">Ton CV n&apos;est pas conservé.</span>
+          </div>
+        </div>
+      )}
 
       {etat.erreur && (
         <p role="alert" className="text-sm text-alerte">

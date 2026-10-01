@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <g transform="rotate(-7 32 32)">
+    <path d="M10 10 H54 V46 Q52 54 44 54 H10 Z" fill="#111111" transform="translate(2 3)"/>
+    <path d="M10 10 H54 V46 Q52 54 44 54 H10 Z" fill="#fcf08f"/>
+    <path d="M54 46 Q49 48 44 54 Q52 52 54 46 Z" fill="#e3d35a"/>
+    <text x="31" y="48" text-anchor="middle" font-family="Arial Narrow, Arial, sans-serif" font-weight="900" font-size="38" fill="#111111">P</text>
+    <circle cx="32" cy="11" r="5" fill="#d7141a"/>
+  </g>
+</svg>

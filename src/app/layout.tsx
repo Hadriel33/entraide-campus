@@ -8,6 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Toast } from "@/components/ui/toast";
 import { Palette } from "@/components/app/palette";
 import { Confettis } from "@/components/ui/confettis";
+import { TutoColette } from "@/components/colette/tuto";
 import "./globals.css";
 
 // Polices de la DA « Campus 2026 » : Archivo (axe de largeur pour les titres condensés),
@@ -19,10 +20,10 @@ const sourceSerif = Source_Serif_4({ subsets: ["latin"], variable: "--font-sourc
 const kalam = Kalam({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-kalam" });
 
 export const metadata: Metadata = {
-  title: { default: "L'entraide du campus", template: "%s · L'entraide du campus" },
+  title: { default: "Post-it campus", template: "%s · Post-it campus" },
   description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants ESD et ESP Bordeaux.",
   metadataBase: new URL("https://entraide-campus.vercel.app"),
-  openGraph: { siteName: "L'entraide du campus", locale: "fr_FR", type: "website" },
+  openGraph: { siteName: "Post-it campus", locale: "fr_FR", type: "website" },
 };
 
 function PiedDePage() {
@@ -59,10 +60,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         {user && profil ? (
           <div className="flex min-h-dvh flex-col md:flex-row">
             <Palette />
+            <TutoColette />
             <BarreLaterale
               pseudo={profil.pseudo}
               ecole={profil.ecole}
-              avatar={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} />}
+              avatar={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} colette={profil} />}
               demandesEnAttente={enAttente ?? 0}
               estAdmin={profil.role === "admin"}
               moi={user.id}

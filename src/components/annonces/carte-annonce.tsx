@@ -68,7 +68,7 @@ export function CarteAnnonce({ annonce, index = 0, afficherExpiration = false }:
 
       <div className="mt-auto flex items-end justify-between gap-2 pt-1">
         <span className="flex min-w-0 items-center gap-2 text-sm font-semibold">
-          <Avatar chemin={annonce.auteur?.avatar_chemin} nom={annonce.auteur?.pseudo ?? "?"} taille="sm" />
+          <Avatar chemin={annonce.auteur?.avatar_chemin} nom={annonce.auteur?.pseudo ?? "?"} taille="sm" colette={annonce.auteur} />
           <span className="truncate">@{annonce.auteur?.pseudo}</span>
           {annonce.auteur?.ecole && <BadgeEcole ecole={annonce.auteur.ecole} />}
         </span>

@@ -84,7 +84,7 @@ export async function connecter(_: EtatFormulaire, formData: FormData): Promise<
   });
   if (error) return { message: messageErreur(error.code, error.message), valeurs };
 
-  redirect("/annonces");
+  redirect("/bureau");
 }
 
 export async function deconnecter() {

@@ -13,12 +13,14 @@ import {
   type Categorie,
 } from "@/lib/annonces/validation";
 import { ECOLES } from "@/lib/auth/validation";
-import { inclinaison, teinte } from "@/lib/design/teintes";
+import { TEINTES, inclinaison, teinte } from "@/lib/design/teintes";
+import { LigneAnnonce } from "@/components/annonces/ligne-annonce";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
+import { EtatVide } from "@/components/colette/etat-vide";
 
 export const metadata: Metadata = { title: "Annonces" };
 
@@ -32,6 +34,7 @@ type Filtres = {
   contrepartie?: string;
   tri?: string;
   page?: string;
+  vue?: string;
 };
 
 const PAR_PAGE = 30;
@@ -49,6 +52,7 @@ function lienFiltre(actuels: Filtres, change: Filtres) {
     "contrepartie",
     "tri",
     "page",
+    "vue",
   ] as const)
     if (f[cle]) p.set(cle, f[cle]!);
   const q = p.toString();
@@ -90,6 +94,7 @@ export default async function PageAnnonces({
         ? brut.contrepartie
         : undefined,
     tri: brut.tri === "bientot" ? "bientot" : undefined,
+    vue: brut.vue === "liste" ? "liste" : undefined,
     page: brut.page && /^[2-5]$/.test(brut.page) ? brut.page : undefined,
   };
   const limite = PAR_PAGE * Number(filtres.page ?? 1);
@@ -451,6 +456,33 @@ export default async function PageAnnonces({
             },
           )}
         </nav>
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-encre-douce">
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1" aria-label="Légende des couleurs">
+            <span className="font-semibold">Les couleurs :</span>
+            {Object.values(TEINTES).map((t) => (
+              <span key={t.famille} className="flex items-center gap-1.5">
+                <span className={`size-3 rounded-[2px] ${t.point}`} aria-hidden />
+                {t.famille}
+              </span>
+            ))}
+          </p>
+          <nav className="inline-flex rounded-ui bg-papier-fonce p-1" aria-label="Affichage">
+            {[
+              { vue: undefined, label: "Mur" },
+              { vue: "liste", label: "Liste" },
+            ].map((o) => (
+              <Link
+                key={o.label}
+                href={lienFiltre(filtres, { vue: o.vue })}
+                aria-current={filtres.vue === o.vue ? "page" : undefined}
+                scroll={false}
+                className="rounded-[4px] px-3 py-1 text-sm font-semibold aria-[current=page]:bg-surface aria-[current=page]:text-encre aria-[current=page]:shadow-sm"
+              >
+                {o.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </div>
 
       {pourToi.length > 0 && (
@@ -498,30 +530,32 @@ export default async function PageAnnonces({
         </p>
       )}
 
-      {annonces.length > 0 ? (
+      {annonces.length > 0 && filtres.vue === "liste" ? (
+        <ul className="flex flex-col gap-1.5">
+          {annonces.map((a) => (
+            <LigneAnnonce key={a.id} annonce={a} />
+          ))}
+        </ul>
+      ) : annonces.length > 0 ? (
         <div className="grid gap-x-6 gap-y-9 pt-3 sm:grid-cols-2 lg:grid-cols-3">
           {annonces.map((a, i) => (
             <CarteAnnonce key={a.id} annonce={a} index={i % PAR_PAGE} />
           ))}
         </div>
       ) : (
-        <div
-          className="postit papier-gris flex max-w-md flex-col items-start gap-3 self-center p-6 pt-7"
-          style={{ "--rot": "-1.5deg" } as React.CSSProperties}
+        <EtatVide
+          anim={sansFiltre ? "accroche" : "cherche"}
+          titre={sansFiltre ? "Le mur est encore vide" : "Colette n'a rien trouvé"}
+          action={
+            <BoutonLien href="/annonces/nouvelle" variante="contour">
+              Publier une annonce
+            </BoutonLien>
+          }
         >
-          <span className="scotch" aria-hidden />
-          <strong className="font-main text-2xl">
-            {sansFiltre ? "Le mur est encore vide" : "Rien sur le mur pour ça"}
-          </strong>
-          <p className="text-sm text-encre-douce">
-            {sansFiltre
-              ? "Lance-toi : la première annonce, c'est la tienne."
-              : "Essaie d'autres mots ou retire un filtre. Ou publie ce que tu cherches : quelqu'un te répondra."}
-          </p>
-          <BoutonLien href="/annonces/nouvelle" variante="contour">
-            Publier une annonce
-          </BoutonLien>
-        </div>
+          {sansFiltre
+            ? "Lance-toi : la première annonce, c'est la tienne."
+            : "Essaie d'autres mots ou retire un filtre. Ou publie ce que tu cherches : quelqu'un te répondra."}
+        </EtatVide>
       )}
 
       {annonces.length === limite && limite < PAR_PAGE * 5 && (

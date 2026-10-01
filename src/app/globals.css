@@ -37,6 +37,12 @@
   --color-postit-ciel: #d4e6f8;
   --color-postit-ocre: #f6dfb4;
   --color-postit-gris: #ecebe6;
+  --color-coin-jaune: #e3d35a;    /* coin qui rebique des post-it (et de Colette) */
+  --color-coin-lilas: #c9b6ec;
+  --color-coin-ciel: #a9c9ea;
+  --color-coin-ocre: #e2bf7c;
+  --color-encre-bleue: #1f5f8b;   /* stylo bleu (gribouillis, code) */
+  --color-bois: #8a5a2b;          /* manche de pinceau, cartable */
 
   /* Badges (couleurs de bandeaux adoucies, texte en encre) */
   --color-offre: #faf1a8;         /* « Je propose » */
@@ -55,7 +61,7 @@
   --font-main: var(--font-kalam), ui-serif, cursive; /* annotations écrites à la main */
 
   /* Échelle des textes : fluide pour les grands titres, fixe pour le reste */
-  --text-affiche: clamp(2.75rem, 1.4rem + 5.6vw, 5.5rem);
+  --text-affiche: clamp(2.6rem, 1.2rem + 4.4vw, 4.6rem);
   --text-affiche--line-height: 0.95;
   --text-titre: clamp(2.1rem, 1.5rem + 2.4vw, 3.25rem);
   --text-titre--line-height: 1;
@@ -133,6 +139,14 @@ body {
 @utility colle {
   animation: colle 420ms cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
   animation-delay: calc(min(var(--i, 0), 12) * 45ms);
+}
+
+/* Bande qui défile (contenu doublé, on glisse de la moitié). */
+@keyframes defile {
+  to { translate: -50% 0; }
+}
+@utility defile {
+  animation: defile 38s linear infinite;
 }
 
 /* Confettis (demande acceptée, annonce publiée). */
@@ -222,6 +236,63 @@ body {
   animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* ============ Colette, la mascotte ============
+   Chaque animation communique un état : bonjour, l'IA lit, l'IA vérifie, c'est publié, succès, vide, recherche,
+   réflexion, débordée. Tout s'arrête si l'utilisateur a demandé à réduire les animations. */
+.colette .col-flotte { animation: col-flotte 2.4s ease-in-out infinite; }
+@keyframes col-flotte { 50% { translate: 0 -6px; } }
+.colette .col-yeux { animation: col-clin 3.4s infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes col-clin { 0%, 92%, 100% { scale: 1 1; } 95% { scale: 1 0.1; } }
+.colette .col-coucou { animation: col-coucou 1.1s ease-in-out infinite; transform-box: fill-box; transform-origin: 0% 100%; }
+@keyframes col-coucou { 25% { rotate: -28deg; } 75% { rotate: 14deg; } }
+.colette .col-loupe { animation: col-loupe 2.6s ease-in-out infinite; }
+@keyframes col-loupe { 25% { translate: 18px 8px; } 50% { translate: 4px 22px; } 75% { translate: 22px 28px; } }
+.colette .col-ligne { animation: col-ligne 1.3s infinite; }
+.colette .col-ligne-2 { animation-delay: 0.3s; }
+.colette .col-ligne-3 { animation-delay: 0.6s; }
+@keyframes col-ligne { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+.colette .col-tampon { animation: col-tampon 1.8s cubic-bezier(0.5, 0, 0.3, 1.4) infinite; }
+@keyframes col-tampon { 0%, 40%, 70%, 100% { translate: 0 -24px; rotate: -6deg; } 55% { translate: 0 0; rotate: 0deg; } }
+.colette .col-ok { animation: col-ok 1.8s infinite; }
+@keyframes col-ok { 0%, 50% { opacity: 0; } 58%, 90% { opacity: 1; } 100% { opacity: 0; } }
+.colette .col-colle { animation: col-colle 2.4s ease-in-out infinite; }
+@keyframes col-colle { 0% { translate: 0 0; rotate: 0deg; } 35%, 100% { translate: 34px -30px; rotate: 6deg; } }
+.colette .col-punaise-tombe { animation: col-punaise 2.4s cubic-bezier(0.5, 0, 0.3, 1.5) infinite; }
+@keyframes col-punaise { 0%, 45% { translate: 0 -40px; opacity: 0; } 58% { translate: 0 2px; opacity: 1; } 66%, 100% { translate: 0 0; opacity: 1; } }
+.colette .col-saute { animation: col-saute 1s cubic-bezier(0.3, 0.7, 0.4, 1) infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes col-saute { 0%, 100% { translate: 0 0; scale: 1 1; } 15% { scale: 1.08 0.9; } 40%, 55% { translate: 0 -22px; scale: 0.96 1.05; } 80% { scale: 1.04 0.96; } }
+.colette .col-respire { animation: col-respire 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes col-respire { 50% { scale: 1 0.96; } }
+.colette .col-z { animation: col-z 2.4s infinite; opacity: 0; }
+.colette .col-z-2 { animation-delay: 0.8s; }
+.colette .col-z-3 { animation-delay: 1.6s; }
+@keyframes col-z { 0% { translate: 0 0; opacity: 0; } 30% { opacity: 1; } 100% { translate: 22px -40px; opacity: 0; } }
+.colette .col-cherche { animation: col-cherche 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes col-cherche { 0%, 100% { rotate: -9deg; } 50% { rotate: 9deg; } }
+/* Réflexion : tête penchée, bulles de pensée qui montent, points de suspension. */
+.colette .col-penche { animation: col-penche 3s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes col-penche { 0%, 100% { rotate: 0deg; } 50% { rotate: 4deg; } }
+.colette .col-pensee { animation: col-pensee 3s ease-in-out infinite; opacity: 0; }
+.colette .col-pensee-2 { animation-delay: 0.25s; }
+.colette .col-pensee-3 { animation-delay: 0.5s; }
+@keyframes col-pensee { 0% { opacity: 0; translate: 0 6px; } 20%, 85% { opacity: 1; translate: 0 0; } 100% { opacity: 0; } }
+.colette .col-point { animation: col-point 1s ease-in-out infinite; }
+.colette .col-point-2 { animation-delay: 0.15s; }
+.colette .col-point-3 { animation-delay: 0.3s; }
+@keyframes col-point { 0%, 100% { translate: 0 0; } 40% { translate: 0 -4px; } }
+/* Débordée : elle tremble, agite les bras, les post-it lui tournent autour, une goutte de sueur glisse. */
+.colette .col-tremble { animation: col-tremble 0.35s linear infinite; }
+@keyframes col-tremble { 25% { translate: -1.5px 0; } 75% { translate: 1.5px 0; } }
+.colette .col-agite { animation: col-agite 0.45s ease-in-out infinite; transform-box: fill-box; transform-origin: 100% 100%; }
+.colette .col-agite-2 { animation-delay: 0.22s; transform-origin: 0% 100%; }
+@keyframes col-agite { 50% { rotate: -22deg; } }
+.colette .col-pupille { animation: col-pupille 0.6s linear infinite; }
+@keyframes col-pupille { 25% { translate: 2.5px 0; } 50% { translate: 0 2.5px; } 75% { translate: -2.5px 0; } }
+.colette .col-orbite { animation: col-orbite 3.2s linear infinite; transform-box: view-box; transform-origin: 83px 86px; }
+@keyframes col-orbite { to { rotate: 360deg; } }
+.colette .col-goutte { animation: col-goutte 1.2s ease-in infinite; }
+@keyframes col-goutte { 0% { translate: 0 0; opacity: 1; } 100% { translate: 2px 22px; opacity: 0; } }
+
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
     animation: none !important;
@@ -231,6 +302,9 @@ body {
     animation-delay: 0ms !important;
     transition-duration: 1ms !important;
   }
+  /* Colette s'immobilise (ses animations sont en boucle : 1 ms ferait clignoter). */
+  .colette, .colette * { animation: none !important; }
+  .colette .col-pensee, .colette .col-z { opacity: 1; }
 }
 
 /* Titres de la charte : Archivo condensé en capitales. */
