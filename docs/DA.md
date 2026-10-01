@@ -12,6 +12,8 @@ La même interface est déclinée en 3 pistes : **seuls les jetons changent**, c
 | **C · Éditorial** | Marine du groupe, titres serif (écho du Minion Pro de l'ESP), rouge en touche | fond `#F6F5F1`, marine `#0A2240`, rouge `#E84545` | Newsreader + DM Sans | 4 px |
 | **D · ESP 2026** | La **nouvelle DA de l'ESP** (Instagram @esp_ecole, sept. 2026) : affiches avec un verbe géant (EXISTER, SIGNER, PENSER) posé sur un bandeau de couleur, « ESP. » noir sur rouge, une ligne en serif | fond `#FAF9F6`, encre `#111111`, rouge `#D7141A` (action), bandeaux jaune `#F3E54A`, lilas `#CDBDEB`, ocre `#C98A1F`, ciel `#BCD3EC` | Archivo condensé 900 en capitales + Source Serif 4 + DM Sans | 0 px |
 
+| **E · Campus 2026** (retenue en finale) | Choix de Hadriel : « entre A et D, clean, moderne, qui respecte la nouvelle charte ». La structure de A (sidebar claire, arrondis doux, beaucoup d'air) et les signatures de D, dosées : titres Archivo condensé en capitales, **un seul** bandeau jaune (le titre de page), rouge réservé aux compteurs et alertes, accroche en serif, badges aux couleurs des bandeaux adoucies | fond `#FAFAF8`, encre `#111111`, boutons noirs, rouge `#D7141A` en touche, jaune `#F3E54A`, lilas `#E6DDF7`, ciel `#DCE8F6` | Archivo condensé 800 + Source Serif 4 + DM Sans | 6 / 10 px |
+
 Écartés : la proposition violette et Fira du skill `ui-ux-pro-max` (le violet est le signal n°4 de la checklist anti-IA), le mode sombre imposé (signal n°5), et les logos officiels (projet non officiel).
 
 ---

@@ -54,6 +54,7 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Étape 3 : test d'abord, puis base, puis code | 9 tests de validation écrits et vus en échec avant le code. Table `profils` + RLS + trigger, testée en SQL avec 2 comptes fictifs (transaction annulée). Fiche de l'étape : `docs/etapes/03-comptes.md`. |
 | 01/10 | DA V2 « dashboard SaaS inspiré ESD/ESP » : maquettes avant le code | Codes couleurs et polices relevés **dans le CSS réel** des deux sites (pas devinés). Une planche de maquettes (kit UI, tableau de bord, mobile) où les 3 pistes partagent la même interface et ne diffèrent que par les jetons. On choisit sur pièce, puis `adapter-front` applique la piste au vrai code. |
 | 01/10 | Piste D ajoutée : la nouvelle DA de l'ESP repérée sur Instagram | Hadriel a signalé la refonte. Relevé visuel du compte @esp_ecole (cookies optionnels refusés, sans connexion). Le rouge est foncé à `#D7141A` pour passer le contraste AA sous du texte blanc. Même interface, nouveaux jetons : la planche le démontre sans réécrire un seul écran. |
+| 01/10 | Piste E = synthèse A + D | Choix itératif sur maquettes : 3 pistes, puis D (nouvelle charte), puis E (synthèse demandée). Le même écran est rejoué avec d'autres jetons : chaque itération coûte quelques lignes, pas une refonte. |
 | 01/10 | Gamification repoussée après le palier 1 | Anti-guide du cours : ne pas viser le palier 3 sur une appli sans comptes. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
