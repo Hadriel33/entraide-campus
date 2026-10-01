@@ -55,4 +55,5 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | Date | Problème | Solution |
 |---|---|---|
 | 01/10 | Le connecteur Vercel de Claude n'a pas le droit de créer un projet (erreur 403) | Import fait depuis le dashboard Vercel. |
+| 01/10 | Ni Claude in Chrome ni le navigateur intégré n'étaient connectés à Vercel et Supabase, et l'IA ne saisit jamais de mot de passe | Hadriel se connecte une fois lui-même dans le navigateur intégré (la session reste), Claude fait la suite. |
 | 01/10 | La copie locale de padel-snipe n'était pas à jour (22 commits de retard) | Lecture directe de la version GitHub (`origin/main`), sans toucher à la branche locale. |
