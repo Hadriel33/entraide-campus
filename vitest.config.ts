@@ -7,7 +7,8 @@ export default defineConfig({
     alias: { "@": path.resolve(__dirname, "src") },
   },
   test: {
-    // Les modèles des skills sont de la documentation, pas des tests du projet.
-    exclude: ["**/node_modules/**", ".claude/**"],
+    // Les modèles des skills sont de la documentation, pas des tests du projet ;
+    // e2e/ contient les parcours Playwright (npm run e2e), lancés à part.
+    exclude: ["**/node_modules/**", ".claude/**", "e2e/**"],
   },
 });

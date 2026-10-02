@@ -1,0 +1,44 @@
+# Parcours de bout en bout : un vrai navigateur sur l'appli en ligne, après chaque déploiement réussi,
+# chaque matin, et à la demande (onglet Actions › Parcours › Run workflow).
+# Le parcours connecté utilise le compte robot : E2E_EMAIL et E2E_PASSWORD sont des SECRETS GitHub
+# (Settings › Secrets and variables › Actions). Sans eux, seules les pages publiques sont testées.
+name: Parcours
+
+on:
+  deployment_status:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  parcours:
+    # Après un déploiement : seulement s'il a réussi.
+    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      E2E_URL: ${{ github.event.deployment_status.environment_url || 'https://entraide-campus.vercel.app' }}
+      E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+      E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Installer les dépendances
+        run: npm ci
+      - name: Installer le navigateur
+        run: npx playwright install --with-deps chromium
+      - name: Parcours (public, puis étudiant connecté)
+        run: npm run e2e
+      - name: Rapport en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-parcours
+          path: playwright-report/
+          retention-days: 7

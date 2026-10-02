@@ -42,7 +42,7 @@ Next.js 16 · Supabase (Postgres, Auth, Storage, Realtime, pg_cron) · Vercel (+
 - Recette à deux comptes : [docs/RECETTE.md](docs/RECETTE.md) · Démo de 3 minutes : [docs/DEMO.md](docs/DEMO.md)
 
 ## En chiffres
-22 migrations SQL · 87 vérifications de sécurité en base · une simulation de campus (25 contrôles) · 112 tests Vitest · CI à chaque push (lint, tests, build, typage, recherche de clés).
+22 migrations SQL · 87 vérifications de sécurité en base · une simulation de campus (25 contrôles) · 112 tests Vitest · CI à chaque push (lint, tests, build, typage, recherche de clés) · parcours Playwright après chaque déploiement (public, téléphone, étudiant connecté).
 
 ## Lancer en local
 ```bash
@@ -50,4 +50,5 @@ npm install
 npx vercel env pull .env.local   # variables publiques + jeton OIDC pour l'IA (aucune clé dans le code)
 npm run dev
 npm test
+npm run e2e                       # parcours dans un vrai navigateur sur l'appli en ligne (Playwright)
 ```

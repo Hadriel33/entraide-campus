@@ -21,6 +21,9 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 - [ ] **Brevo en SMTP** (Supabase › Authentication › Emails › SMTP Settings, avec la clé SMTP Brevo) : sans ça, Supabase n'envoie d'emails qu'aux membres de l'équipe, donc le « mot de passe oublié » ne marche pas pour les autres étudiants. Une fois branché : réactiver « Confirm email ».
 - [ ] Test complet avec 2 comptes : suivre `docs/RECETTE.md` (toutes les cases)
 
+- [ ] **Clé serveur** : ajouter `SUPABASE_SECRET_KEY` sur Vercel (Production et Preview, « Sensitive »), redéployer, puis Admin › Impact › « Tester maintenant » : les 4 lignes doivent être OK. Sans elle, l'IA n°2 ne relit aucune annonce en ligne.
+- [ ] **Compte robot des parcours** : lancer `supabase/demo/compte-robot.sql` avec un mot de passe à soi, puis créer les secrets GitHub `E2E_EMAIL` et `E2E_PASSWORD`. Le parcours connecté tournera après chaque déploiement et chaque matin (onglet Actions › Parcours).
+
 ## Décisions à prendre
 - [x] **Appli réservée aux emails de l'école** (@mail-esd.com, @mail-esp.com), école déduite automatiquement. **Ne devient sûr qu'avec la confirmation d'email**, donc avec le SMTP branché.
 - [ ] Nom de domaine propre (ex. `entraide-campus.fr`), à brancher sur Vercel en 5 minutes.
