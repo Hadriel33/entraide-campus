@@ -216,7 +216,7 @@ export default async function PageDemandes({
         </ul>
         <p className="text-xs text-encre-douce">
           « Je choisis » accepte cette personne, prévient les autres et retire
-          l&apos;annonce du mur. « Accepter aussi » garde l&apos;annonce ouverte
+          l&apos;annonce du tableau. « Accepter aussi » garde l&apos;annonce ouverte
           (covoit ou coloc à plusieurs).
         </p>
       </article>

@@ -24,7 +24,7 @@ import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { EnDirect } from "../mur/en-direct";
 import { EtatVide } from "@/components/colette/etat-vide";
 
-export const metadata: Metadata = { title: "Le mur" };
+export const metadata: Metadata = { title: "Le tableau" };
 
 type Filtres = {
   type?: string;
@@ -277,12 +277,12 @@ export default async function PageAnnonces({
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
-      {/* Le look du mur : grand titre en bandeaux, « En direct », et le mode projection à côté. */}
+      {/* Le look du tableau : grand titre en bandeaux, « En direct », et le mode projection à côté. */}
       <header className="flex flex-wrap items-end justify-between gap-6">
         <div className="flex flex-col items-start gap-1.5">
           <h1 className="flex flex-col items-start gap-1.5">
             <span className="titre-charte couche-fixe teinte-lilas bg-bandeau px-3 pt-1 text-affiche">
-              Le mur
+              Le tableau
             </span>
             <span className="titre-charte couche-fixe teinte-ocre ml-6 bg-ciel px-3 pt-1 text-affiche sm:ml-14">
               du campus
@@ -299,7 +299,7 @@ export default async function PageAnnonces({
             <BoutonLien
               href="/mur"
               variante="contour"
-              title="Le mur en plein écran, mis à jour en direct"
+              title="Le tableau en plein écran, mis à jour en direct"
             >
               Mode projection
             </BoutonLien>
@@ -579,7 +579,7 @@ export default async function PageAnnonces({
             aria-label="Affichage"
           >
             {[
-              { vue: undefined, label: "Mur" },
+              { vue: undefined, label: "Tableau" },
               { vue: "liste", label: "Liste" },
             ].map((o) => (
               <Link
@@ -726,7 +726,7 @@ export default async function PageAnnonces({
             pourMoi
               ? "Rien qui te corresponde pour l'instant"
               : sansFiltre
-                ? "Le mur est encore vide"
+                ? "Le tableau est encore vide"
                 : "Colette n'a rien trouvé"
           }
           action={
@@ -736,7 +736,7 @@ export default async function PageAnnonces({
           }
         >
           {pourMoi
-            ? "Ajoute tes compétences (dépose ton CV dans ton profil) et publie ce que tu proposes ou cherches : Colette classera le mur pour toi."
+            ? "Ajoute tes compétences (dépose ton CV dans ton profil) et publie ce que tu proposes ou cherches : Colette classera le tableau pour toi."
             : sansFiltre
               ? "Lance-toi : la première annonce, c'est la tienne."
               : "Essaie d'autres mots ou retire un filtre. Ou publie ce que tu cherches : quelqu'un te répondra."}

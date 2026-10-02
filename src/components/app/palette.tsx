@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 type Commande = { label: string; aide: string; href: string };
 
 const PAGES: Commande[] = [
-  { label: "Le mur", aide: "Toutes les annonces du campus", href: "/annonces" },
+  { label: "Le tableau", aide: "Toutes les annonces du campus", href: "/annonces" },
   {
     label: "La carte",
     aide: "Les annonces par quartier et ligne de tram",
@@ -14,7 +14,7 @@ const PAGES: Commande[] = [
   },
   {
     label: "Mode projection",
-    aide: "Le mur en plein écran, en direct (pour projeter)",
+    aide: "Le tableau en plein écran, en direct (pour projeter)",
     href: "/mur",
   },
   {

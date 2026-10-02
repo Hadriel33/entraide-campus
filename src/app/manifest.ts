@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Post-it campus",
     short_name: "Post-it",
-    description: "Le mur d'entraide des étudiants de l'ESD et de l'ESP Bordeaux.",
+    description: "Le tableau d'entraide des étudiants de l'ESD et de l'ESP Bordeaux.",
     start_url: "/bureau",
     scope: "/",
     display: "standalone",
@@ -22,7 +22,7 @@ export default function manifest(): MetadataRoute.Manifest {
     shortcuts: [
       { name: "Publier une annonce", url: "/annonces/nouvelle" },
       { name: "Mes demandes", url: "/demandes" },
-      { name: "Le mur en direct", url: "/mur" },
+      { name: "Le tableau en direct", url: "/mur" },
     ],
   };
 }

@@ -142,7 +142,7 @@ export default async function Home() {
         <div className="flex flex-col gap-5">
           <h2 className="titre-charte text-titre">Entre étudiants de l&apos;école, point</h2>
           <p className="font-serif text-xl leading-relaxed text-encre/80">
-            Pour entrer, il faut un mail de l&apos;ESD ou de l&apos;ESP. Pas d&apos;inconnus, pas de faux profils : tout le monde sur le mur est sur le campus.
+            Pour entrer, il faut un mail de l&apos;ESD ou de l&apos;ESP. Pas d&apos;inconnus, pas de faux profils : tout le monde sur le tableau est sur le campus.
           </p>
         </div>
         <div className="postit papier-gris flex flex-col gap-3 p-7 pt-9" style={{ "--rot": "1.5deg" } as React.CSSProperties}>
@@ -170,7 +170,7 @@ export default async function Home() {
           <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {[
               { valeur: impact.etudiants, label: "étudiants inscrits", teinte: "teinte-bandeau" },
-              { valeur: impact.annonces_actives, label: "post-it sur le mur", teinte: "teinte-lilas" },
+              { valeur: impact.annonces_actives, label: "post-it sur le tableau", teinte: "teinte-lilas" },
               { valeur: impact.entraides, label: "entraides réalisées", teinte: "teinte-ciel" },
               { valeur: impact.croisements, label: "entre ESD et ESP", teinte: "teinte-ocre" },
             ].map((c) => (

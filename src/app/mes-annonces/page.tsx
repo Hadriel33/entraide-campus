@@ -41,7 +41,7 @@ export default async function PageMesAnnonces() {
             </BoutonLien>
           }
         >
-          Propose une compétence ou demande un coup de main au campus. Colette le colle sur le mur.
+          Propose une compétence ou demande un coup de main au campus. Colette le punaise sur le tableau.
         </EtatVide>
       )}
     </div>

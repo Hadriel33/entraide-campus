@@ -5,8 +5,8 @@
 ## Avant de commencer (la veille au plus tard, sans toucher au code)
 - [ ] Deux comptes de démo ouverts dans **deux navigateurs** (pas deux onglets du même : sinon, même session) :
   - **Sam** (ESP, photographe) : son CV PDF prêt sur le bureau, son annonce déjà publiée « Photos pour vos événements d'asso ».
-  - **Léa** (ESD, organise le gala de son asso) : connectée, sur le mur.
-- [ ] Une vingtaine de vraies annonces sur le mur (voir `docs/CONTENU-DEMO.md`), les deux comptes dans le fil du campus.
+  - **Léa** (ESD, organise le gala de son asso) : connectée, sur le tableau.
+- [ ] Une vingtaine de vraies annonces sur le tableau (voir `docs/CONTENU-DEMO.md`), les deux comptes dans le fil du campus.
 - [ ] Le **mur en direct** ouvert en mode projection sur un troisième onglet.
 - [ ] Le téléphone en partage de connexion, au cas où le wifi lâche.
 - [ ] Répété 3 fois, chronométré, depuis un autre ordinateur.
@@ -22,7 +22,7 @@
 | 1:15 | Les deux | Un message envoyé dans la discussion, reçu en direct de l'autre côté | « Cette conversation n'est lisible que par eux deux, règle d'or n°3. » |
 | 1:35 | Sam | Mon profil, dépose son CV | « IA n°1 : Colette lit le CV et propose ses compétences. Sam garde ce qui est juste. Le CV n'est jamais stocké. » |
 | 2:00 | Léa | Publie « RECHERCHE PHOTOGRAPHE, appelle le 06... » | « IA n°2, celle qu'on a inventée. » Ouvrir l'annonce : Colette propose une version corrigée, sans le numéro. « Elle ne refuse pas sèchement : elle aide. Léa clique Appliquer. » |
-| 2:30 | | Le mur en direct (projection) | Le post-it de Léa tombe sur le mur. « Et le campus le voit en direct. » |
+| 2:30 | | Le tableau en direct (projection) | Le post-it de Léa tombe sur le tableau. « Et le campus le voit en direct. » |
 | 2:45 | | Classement des classes | « Chaque entraide fait monter sa classe. Sam vient de rapporter un bonus croisement ESD × ESP. » |
 | 3:00 | | | Fin. |
 

@@ -14,7 +14,7 @@ const ASTUCES = [
   "Astuce : dépose ton CV dans ton profil, je te propose tes compétences en 10 secondes.",
   "Astuce : Ctrl + K pour aller n'importe où sans la souris.",
   "Astuce : aider quelqu'un de l'autre école rapporte un bonus croisement.",
-  "Astuce : passe le mur en mode projection pour l'afficher en grand.",
+  "Astuce : passe le tableau en mode projection pour l'afficher en grand.",
   "Astuce : les tenues rares de ma garde-robe se gagnent en s'entraidant.",
   "Astuce : une annonce expire toute seule, pense à la prolonger.",
 ];

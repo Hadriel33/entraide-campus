@@ -93,7 +93,7 @@ export default async function PageConversation({
             className="shrink-0"
           />
           C&apos;est fait : les autres intéressés sont prévenus, et ton annonce
-          a quitté le mur. Dis bonjour à {autre.prenom} !
+          a quitté le tableau. Dis bonjour à {autre.prenom} !
         </p>
       )}
       <header className="apparition flex flex-wrap items-center gap-3">
