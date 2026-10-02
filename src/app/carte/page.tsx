@@ -108,7 +108,7 @@ export default async function PageCarte() {
             return (
               <div
                 key={q}
-                className="group absolute z-10 -translate-x-1/2 -translate-y-full hover:z-20 focus-within:z-20"
+                className={`group absolute -translate-x-1/2 -translate-y-full hover:z-20 focus-within:z-20 ${q === "victor_hugo" ? "z-[15]" : "z-10"}`}
                 style={{ left: `${gauche}%`, top: `${haut}%` }}
               >
                 {/* Clic : le post-it du quartier s'ouvre sur la carte (popover natif), avec ses annonces. */}
@@ -129,11 +129,10 @@ export default async function PageCarte() {
                     }
                   >
                     <span className="punaise" aria-hidden />
+                    {/* Seulement le nombre : les quartiers du centre sont proches, des noms se chevaucheraient
+                        (trouvé par le parcours Playwright). Le nom est dans l'aperçu au survol et dans le post-it. */}
                     <span className="titre-charte text-base">
                       {liste.length}
-                    </span>
-                    <span className="hidden max-w-24 truncate font-semibold md:inline">
-                      {QUARTIERS[q].split(" (")[0].split(",")[0]}
                     </span>
                   </span>
                 </button>

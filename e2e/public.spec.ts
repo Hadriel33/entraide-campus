@@ -7,7 +7,9 @@ test("l'accueil s'affiche, sans erreur ni débordement", async ({ page }) => {
   const erreurs = surveillerErreurs(page);
   await page.goto("/");
   await expect(page).toHaveTitle(/Post-it campus/);
-  await expect(page.getByRole("link", { name: /Créer mon compte/i }).first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Créer mon compte/i }).first(),
+  ).toBeVisible();
   await pasDeDebordement(page);
   expect(erreurs).toEqual([]);
 });
@@ -20,9 +22,17 @@ test("la connexion propose email et mot de passe", async ({ page }) => {
 });
 
 test("les pages réservées renvoient vers la connexion", async ({ page }) => {
-  for (const chemin of ["/annonces", "/bureau", "/demandes", "/admin", "/mur"]) {
+  for (const chemin of [
+    "/annonces",
+    "/bureau",
+    "/demandes",
+    "/admin",
+    "/mur",
+  ]) {
     await page.goto(chemin);
-    await expect(page, `${chemin} doit exiger une connexion`).toHaveURL(/\/connexion/);
+    await expect(page, `${chemin} doit exiger une connexion`).toHaveURL(
+      /\/connexion/,
+    );
   }
 });
 

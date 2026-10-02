@@ -8,5 +8,7 @@ setup("connexion du compte robot", async ({ page }) => {
   await page.getByLabel("Mot de passe").fill(process.env.E2E_PASSWORD!);
   await page.getByRole("button", { name: /connecter/i }).click();
   await expect(page).toHaveURL(/\/(bureau|bienvenue)/, { timeout: 20_000 });
+  // La visite guidée de Colette s'ouvre pour un nouveau compte : le robot l'a déjà vue.
+  await page.evaluate(() => localStorage.setItem("postit-tuto", "vu"));
   await page.context().storageState({ path: "e2e/.auth/etudiant.json" });
 });
