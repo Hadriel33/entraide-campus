@@ -1,39 +1,66 @@
 // Crée le compte robot des parcours Playwright, en UNE commande lancée par Hadriel : npm run robot
-// 1. demande un mot de passe (rien ne s'affiche à l'écran, rien n'est écrit sur le disque) ;
+// 1. demande un mot de passe (affiché en étoiles, jamais écrit sur le disque) ;
 // 2. inscrit le robot sur l'appli, comme un étudiant (e2e-robot@mail-esd.com, pseudo robot.tests) ;
 // 3. range l'email et le mot de passe dans les secrets GitHub du dépôt (gh secret set) ;
 // 4. lance le parcours sur GitHub.
 // Seules les valeurs PUBLIQUES de Supabase sont utilisées (les mêmes que dans le navigateur).
 import { createClient } from "@supabase/supabase-js";
 import { execFileSync } from "node:child_process";
-import readline from "node:readline";
 
 const URL_SUPABASE = "https://oobnrocwpyyeaadbhweu.supabase.co";
 const CLE_PUBLIQUE = "sb_publishable_pBc7zqK42NB4V8obmVevtQ_YAbmensn";
 const EMAIL = "e2e-robot@mail-esd.com";
 
+const ENTREE = ["\r", "\n"];
+const CTRL_C = "\u0003";
+const EFFACER = ["\u0008", "\u007f"];
+
+// Saisie masquée : une étoile par caractère, Retour arrière pour corriger, Ctrl+C pour quitter.
 function demanderEnSilence(question) {
   return new Promise((resolve) => {
-    const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-    rl._writeToOutput = (s) => {
-      if (s.includes(question)) process.stdout.write(s);
+    process.stdout.write(question);
+    const entree = process.stdin;
+    let saisie = "";
+    entree.setRawMode(true);
+    entree.resume();
+    entree.setEncoding("utf8");
+    const surTouche = (touches) => {
+      for (const c of touches) {
+        if (ENTREE.includes(c)) {
+          entree.setRawMode(false);
+          entree.pause();
+          entree.off("data", surTouche);
+          process.stdout.write("\n");
+          resolve(saisie);
+          return;
+        }
+        if (c === CTRL_C) {
+          process.stdout.write("\n");
+          process.exit(130);
+        }
+        if (EFFACER.includes(c)) {
+          if (saisie.length) {
+            saisie = saisie.slice(0, -1);
+            process.stdout.write("\b \b");
+          }
+        } else {
+          saisie += c;
+          process.stdout.write("*");
+        }
+      }
     };
-    rl.question(question, (reponse) => {
-      rl.close();
-      process.stdout.write("\n");
-      resolve(reponse.trim());
-    });
+    entree.on("data", surTouche);
   });
 }
 
-const mdp = await demanderEnSilence("Mot de passe du robot (12 caractères minimum, invisible) : ");
+const mdp = await demanderEnSilence("Mot de passe du robot (12 caractères minimum) : ");
 if (mdp.length < 12) {
-  console.error("Trop court : 12 caractères minimum.");
+  console.error("Trop court : 12 caractères minimum. Relance : npm run robot");
   process.exit(1);
 }
 const confirmation = await demanderEnSilence("Retape-le : ");
 if (confirmation !== mdp) {
-  console.error("Les deux saisies ne correspondent pas.");
+  console.error("Les deux saisies ne correspondent pas. Relance : npm run robot");
   process.exit(1);
 }
 
