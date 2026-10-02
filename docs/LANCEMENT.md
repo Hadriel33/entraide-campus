@@ -17,7 +17,6 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 
 ## À faire par Hadriel (je ne manipule ni mots de passe ni clés secrètes)
 - [x] Créer son compte (@hadri) : nommé **admin** le 01/10
-- [ ] Ajouter `SUPABASE_SECRET_KEY` sur Vercel : active l'écriture de la modération IA
 - [ ] **Brevo en SMTP** (Supabase › Authentication › Emails › SMTP Settings, avec la clé SMTP Brevo) : sans ça, Supabase n'envoie d'emails qu'aux membres de l'équipe, donc le « mot de passe oublié » ne marche pas pour les autres étudiants. Une fois branché : réactiver « Confirm email ».
 - [ ] Test complet avec 2 comptes : suivre `docs/RECETTE.md` (toutes les cases)
 
