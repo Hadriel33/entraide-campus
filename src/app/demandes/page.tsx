@@ -195,9 +195,49 @@ export default async function PageDemandes({
                 <span className="text-[11px] text-encre-douce">
                   intéressé le {dateCourte(d.cree_le)}
                 </span>
-                <form action={choisirDemande.bind(null, d.id, true)}>
-                  <Bouton className="w-full">Je choisis @{p.pseudo}</Bouton>
-                </form>
+                {/* Geste irréversible (les autres sont refusés) : on confirme dans un post-it (popover natif). */}
+                <Bouton
+                  type="button"
+                  popoverTarget={`choisir-${d.id}`}
+                  className="w-full"
+                >
+                  Je choisis @{p.pseudo}
+                </Bouton>
+                <div
+                  id={`choisir-${d.id}`}
+                  popover="auto"
+                  className="m-auto w-[min(24rem,calc(100vw-2rem))] overflow-visible border-0 bg-transparent p-3 text-encre backdrop:bg-encre/30"
+                >
+                  <div
+                    className="postit papier-jaune pop flex flex-col gap-3 p-6 pt-8"
+                    style={{ "--rot": "-1deg" } as React.CSSProperties}
+                  >
+                    <span className="punaise" aria-hidden />
+                    <strong className="text-xl leading-tight">
+                      Tu choisis @{p.pseudo} ?
+                    </strong>
+                    <p className="text-sm leading-snug">
+                      {g.demandes.length - 1 === 1
+                        ? "L'autre personne intéressée sera prévenue"
+                        : `Les ${g.demandes.length - 1} autres personnes intéressées seront prévenues`}{" "}
+                      que c&apos;est pris, et ton annonce quittera le tableau.
+                      Ce n&apos;est pas annulable.
+                    </p>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <form action={choisirDemande.bind(null, d.id, true)}>
+                        <Bouton>Oui, je choisis @{p.pseudo}</Bouton>
+                      </form>
+                      <button
+                        type="button"
+                        popoverTarget={`choisir-${d.id}`}
+                        popoverTargetAction="hide"
+                        className="text-sm font-semibold text-encre-douce hover:text-encre"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex items-center justify-between gap-2 text-sm font-semibold">
                   <form action={choisirDemande.bind(null, d.id, false)}>
                     <button className="text-encre-douce underline-offset-2 hover:text-encre hover:underline">
@@ -216,8 +256,8 @@ export default async function PageDemandes({
         </ul>
         <p className="text-xs text-encre-douce">
           « Je choisis » accepte cette personne, prévient les autres et retire
-          l&apos;annonce du tableau. « Accepter aussi » garde l&apos;annonce ouverte
-          (covoit ou coloc à plusieurs).
+          l&apos;annonce du tableau. « Accepter aussi » garde l&apos;annonce
+          ouverte (covoit ou coloc à plusieurs).
         </p>
       </article>
     );
