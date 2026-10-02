@@ -90,6 +90,10 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | Gel des fonctionnalités, priorité à ce qui est noté | Le brief note la méthode (30 %), l'IA (25 %) et un parcours qui tourne en direct : on prépare la recette, la démo et la défense plutôt qu'une 15e fonctionnalité. |
 | 01/10 | Mesurer l'IA sur un jeu annoté à la main avant de la défendre | Tout le monde utilisera l'IA : la différence, c'est de prouver qu'elle marche. 40 annonces écrites et annotées AVANT de lancer la mesure, pour ne pas ajuster les réponses au résultat. |
 | 01/10 | Comptes de démo créés par Hadriel via un script SQL, pas par l'IA | Créer des comptes n'est pas le rôle de l'IA ; le script est vérifié à blanc, effaçable en une requête, et ses comptes n'ont pas de mot de passe. |
+| 02/10 | IA n°3 : le « Pour moi » intelligent, appelée à la demande | Le palier 3 (« ça matche ») méritait mieux que des mots exacts. Mesurée avant d'être défendue : 97 % contre 73 % pour les règles. Elle classe des annonces, jamais des personnes (équité). |
+| 02/10 | Choisir parmi les intéressés, avec confirmation | Ce n'est pas « premier arrivé, premier servi » : l'auteur compare des faits (niveau, aides, note) et décide. Refuser les autres est irréversible, donc on confirme. |
+| 02/10 | « Le mur » devient « Le tableau » | Choix de Hadriel : des post-its punaisés, c'est un tableau d'affichage (et le soir, un tableau noir). |
+| 02/10 | Playwright (nouvelle dépendance, accordée par Hadriel) | Nos tests vérifiaient les règles et la base, jamais une vraie page : le bug des annonces vides est passé. Parcours dans un vrai navigateur après chaque déploiement, avec un compte robot dont l'IA ne voit jamais le mot de passe. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
@@ -110,3 +114,9 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 01/10 | L'effet de survol des cartes ne marchait pas : l'animation d'apparition gardait `transform: none` | Animation passée sur la propriété CSS `translate`, le survol garde `transform`. Repéré en vérifiant le rendu en local. |
 | 01/10 | Les tuiles CARTO affichaient « API key required » | Passage aux tuiles OpenStreetMap officielles, gratuites avec attribution ; couleurs adoucies par un filtre CSS. |
 | 01/10 | La mesure de l'IA donnait 35 % au premier essai | 26 pannes (limite de 5 appels simultanés de l'offre gratuite) comptées comme des erreurs. Pannes comptées à part, appels espacés et délai maximal : 94 %. La limite elle-même est notée comme un risque pour le lancement. |
+| 02/10 | Tableau, liste et détail des annonces vides depuis les favoris (migration 0013), sans erreur visible | Jointure « auteur:profils » devenue ambiguë (deux chemins annonces/profils). Lien nommé, test de régression, garde-fou qui refuse toute jointure vers profils sans nom, et parcours Playwright. Trouvé grâce au campus de démo. |
+| 02/10 | Une annonce « à vérifier » affichait un numéro à tout le campus | Migration 0023 : visible seulement de l'auteur et de l'admin, 6 tests SQL (faille n°6). |
+| 02/10 | Le script du campus de démo échouait dans l'éditeur SQL de Supabase (« demo_eleves does not exist ») | L'éditeur n'exécute pas le script en une seule transaction : tout dans un seul bloc `do $$`. |
+| 02/10 | Le connecteur Supabase de l'assistant pointait sur un autre compte | Scripts relus contre chaque contrainte des migrations, collés par Hadriel ; les tests finissent par une erreur volontaire pour ne rien garder. |
+| 02/10 | La clé serveur n'était pas sur Vercel : l'IA n°2 n'a jamais tourné en ligne | Vu en listant les variables (noms seulement). Bouton admin « Tester maintenant » pour le vérifier en un clic. |
+| 02/10 | Premier parcours Playwright sur GitHub en échec | Il visait l'adresse unique du déploiement, protégée par Vercel : on teste toujours le domaine public. |
