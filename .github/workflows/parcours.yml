@@ -15,12 +15,13 @@ permissions:
 
 jobs:
   parcours:
-    # Après un déploiement : seulement s'il a réussi.
-    if: github.event_name != 'deployment_status' || github.event.deployment_status.state == 'success'
+    # Après un déploiement : seulement un déploiement de PRODUCTION réussi. On teste le domaine public :
+    # l'adresse unique de chaque déploiement est protégée par Vercel (connexion exigée).
+    if: github.event_name != 'deployment_status' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      E2E_URL: ${{ github.event.deployment_status.environment_url || 'https://entraide-campus.vercel.app' }}
+      E2E_URL: https://entraide-campus.vercel.app
       E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
       E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
     steps:
