@@ -15,22 +15,41 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: { baseURL: URL, trace: "retain-on-failure", locale: "fr-FR" },
   projects: [
-    { name: "public", testMatch: /public\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
-    { name: "public-telephone", testMatch: /public\.spec\.ts/, use: { ...devices["Pixel 7"] } },
+    {
+      name: "public",
+      testMatch: /public\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "public-telephone",
+      testMatch: /public\.spec\.ts/,
+      use: { ...devices["Pixel 7"] },
+    },
     ...(connecte
       ? [
-          { name: "connexion", testMatch: /connexion\.setup\.ts/, use: { ...devices["Desktop Chrome"] } },
           {
+            name: "connexion",
+            testMatch: /connexion\.setup\.ts/,
+            use: { ...devices["Desktop Chrome"] },
+          },
+          {
+            // Le parcours d'écriture (publier puis supprimer) ne tourne qu'ici, une fois par passage.
             name: "etudiant",
-            testMatch: /etudiant\.spec\.ts/,
+            testMatch: /(etudiant|ecriture)\.spec\.ts/,
             dependencies: ["connexion"],
-            use: { ...devices["Desktop Chrome"], storageState: "e2e/.auth/etudiant.json" },
+            use: {
+              ...devices["Desktop Chrome"],
+              storageState: "e2e/.auth/etudiant.json",
+            },
           },
           {
             name: "etudiant-telephone",
             testMatch: /etudiant\.spec\.ts/,
             dependencies: ["connexion"],
-            use: { ...devices["Pixel 7"], storageState: "e2e/.auth/etudiant.json" },
+            use: {
+              ...devices["Pixel 7"],
+              storageState: "e2e/.auth/etudiant.json",
+            },
           },
         ]
       : []),
