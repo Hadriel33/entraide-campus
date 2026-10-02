@@ -8,11 +8,11 @@ const PREFIXE = "Test automatique du robot";
 
 async function supprimer(page: Page, url: string) {
   await page.goto(url);
+  // On attend que la page soit affichée (elle arrive par morceaux) avant de chercher le bouton.
   const bouton = page.getByRole("button", { name: "Supprimer" });
-  if (await bouton.isVisible().catch(() => false)) {
-    await bouton.click();
-    await expect(page).toHaveURL(/\/mes-annonces/);
-  }
+  await bouton.waitFor({ state: "visible", timeout: 15_000 });
+  await bouton.click();
+  await expect(page).toHaveURL(/\/mes-annonces/, { timeout: 15_000 });
 }
 
 test("publier une annonce, la voir sur le tableau, puis la supprimer", async ({
@@ -59,10 +59,12 @@ test("publier une annonce, la voir sur le tableau, puis la supprimer", async ({
     // 3. La supprimer : elle disparaît partout
     await supprimer(page, adresse);
     await expect(page.getByText(titre)).toHaveCount(0);
-    const reponse = await page.goto(adresse);
-    expect(reponse?.status(), "l'annonce supprimée est encore accessible").toBe(
-      404,
-    );
+    // La page de l'annonce affiche « Introuvable » (le code HTTP reste 200 : la page arrive en streaming).
+    await page.goto(adresse);
+    await expect(
+      page.getByRole("heading", { name: "Introuvable" }),
+      "l'annonce supprimée est encore accessible",
+    ).toBeVisible();
     adresse = null;
 
     expect(erreurs).toEqual([]);

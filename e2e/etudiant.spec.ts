@@ -24,7 +24,10 @@ test("le tableau affiche des post-its, avec leur auteur", async ({ page }) => {
 test("un post-it s'ouvre sur sa page", async ({ page }) => {
   await page.goto("/annonces");
   const titre = (await page.locator("article h3").first().innerText()).trim();
-  await page.locator("article h3 a").first().click();
+  // Centré dans l'écran : sur téléphone, la barre du haut (fixe) peut recouvrir le post-it.
+  const lien = page.locator("article h3 a").first();
+  await lien.evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await lien.click();
   await expect(page).toHaveURL(/\/annonces\/[0-9a-f-]{36}/);
   await expect(page.getByText(titre).first()).toBeVisible();
 });

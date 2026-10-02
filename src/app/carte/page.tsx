@@ -240,30 +240,36 @@ export default async function PageCarte() {
             );
           })}
 
-          <div className="absolute right-3 bottom-8 z-10 flex items-end gap-2">
-            <Colette anim="cherche" taille={64} className="hidden sm:block" />
-            {ailleurs > 0 && (
-              <Link
-                href="/annonces?quartier=hors_bordeaux"
-                className="postit papier-gris p-2.5 pt-4 text-xs"
-                style={{ "--rot": "2deg" } as React.CSSProperties}
-              >
-                <span className="punaise" aria-hidden />
-                Ailleurs ou sans lieu : <strong>{ailleurs}</strong>
-              </Link>
-            )}
-          </div>
+          {/* Colette décore seulement : elle ne doit jamais bloquer le clic sur une punaise. */}
+          <Colette
+            anim="cherche"
+            taille={64}
+            className="pointer-events-none absolute right-3 bottom-8 z-0 hidden sm:block"
+          />
         </div>
-        <figcaption className="text-right text-[11px] text-encre-douce">
-          ©{" "}
-          <a
-            href="https://www.openstreetmap.org/copyright"
-            className="underline"
-            target="_blank"
-            rel="noreferrer"
-          >
-            les contributeurs OpenStreetMap
-          </a>{" "}
+        {/* Sous la carte (et plus dessus) : sur téléphone, ce post-it cachait la punaise de Bègles. */}
+        <figcaption className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-encre-douce">
+          {ailleurs > 0 ? (
+            <Link
+              href="/annonces?quartier=hors_bordeaux"
+              className="rounded-ui bg-postit-gris px-2.5 py-1 text-xs font-semibold text-encre hover:underline"
+            >
+              Ailleurs ou sans lieu : {ailleurs}
+            </Link>
+          ) : (
+            <span />
+          )}
+          <span>
+            ©{" "}
+            <a
+              href="https://www.openstreetmap.org/copyright"
+              className="underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              les contributeurs OpenStreetMap
+            </a>{" "}
+          </span>
         </figcaption>
       </figure>
 
