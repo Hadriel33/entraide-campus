@@ -120,3 +120,4 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 02/10 | Le connecteur Supabase de l'assistant pointait sur un autre compte | Scripts relus contre chaque contrainte des migrations, collés par Hadriel ; les tests finissent par une erreur volontaire pour ne rien garder. |
 | 02/10 | La clé serveur n'était pas sur Vercel : l'IA n°2 n'a jamais tourné en ligne | Vu en listant les variables (noms seulement). Bouton admin « Tester maintenant » pour le vérifier en un clic. |
 | 02/10 | Premier parcours Playwright sur GitHub en échec | Il visait l'adresse unique du déploiement, protégée par Vercel : on teste toujours le domaine public. |
+| 22/10 | Clic sur « Moi » (bas de la barre latérale) : page Introuvable | Même famille que les annonces vides du 02/10 : deux liens entre profils et classes, la jointure `classes(nom)` est refusée. Le garde-fou Vitest couvre maintenant aussi `classes`, et la jointure nomme sa clé. |

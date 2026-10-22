@@ -24,7 +24,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
   const pseudo = decodeURIComponent((await params).pseudo).toLowerCase();
 
   // Profil public : jamais de coordonnées ici (elles sont dans une autre table, protégée).
-  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, cree_le, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, classe:classes(nom)").eq("pseudo", pseudo).maybeSingle();
+  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, cree_le, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, classe:classes!profils_classe_id_fkey(nom)").eq("pseudo", pseudo).maybeSingle();
   if (!profil) notFound();
 
   const [{ data: stats }, { data: annonces }, { data: avis }] = await Promise.all([

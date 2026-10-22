@@ -28,4 +28,18 @@ describe("jointures Supabase", () => {
     }
     expect(fautes).toEqual([]);
   });
+
+  // Même famille, trouvée le 22/10 : « Moi » menait à Introuvable. Entre profils et classes il y a deux liens
+  // (la classe de l'étudiant, et l'étudiant qui a proposé la classe) : « classes(...) » est refusé.
+  it("nomment toujours le lien vers classes", () => {
+    const fautes: string[] = [];
+    for (const f of fichiers(path.resolve(__dirname, ".."))) {
+      readFileSync(f, "utf8")
+        .split("\n")
+        .forEach((ligne, i) => {
+          if (/[:\s,(`"]classes(!inner)?\(/.test(ligne)) fautes.push(`${path.relative(process.cwd(), f)}:${i + 1}`);
+        });
+    }
+    expect(fautes).toEqual([]);
+  });
 });
