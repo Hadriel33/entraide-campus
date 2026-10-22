@@ -52,4 +52,4 @@
 ## Liens
 - Plan de travail : `docs/PLAN.md`
 - Idées et bonus : `docs/IDEES.md`
-- Cours : `../COURS VIBE CODING — M2 DATA.pdf`
+- Cours : `docs/COURS.md` (résumé séance par séance ; le PDF original reste hors du dépôt, sur le PC de Hadriel : `../COURS VIBE CODING — M2 DATA.pdf`)
