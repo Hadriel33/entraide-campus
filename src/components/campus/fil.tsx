@@ -64,7 +64,7 @@ export async function FilCampus({ supabase, limite = 5, moiDansLeFil }: { supaba
         </ul>
       )}
       {!moiDansLeFil && (
-        <Link href="/compte#fil" className="-rotate-1 self-start font-main text-base text-alerte">
+        <Link href="/reglages#fil" className="-rotate-1 self-start font-main text-base text-alerte">
           et toi, tu veux apparaître dans le fil ?
         </Link>
       )}

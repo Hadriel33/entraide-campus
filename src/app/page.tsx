@@ -3,7 +3,7 @@ import { getSession } from "@/lib/session";
 import { BoutonLien } from "@/components/ui/bouton";
 import { Colette } from "@/components/colette/colette";
 
-type Impact = { etudiants: number; annonces_actives: number; entraides: number; croisements: number };
+type Impact = { etudiants: number; annonces_actives: number; entraides: number; croisements: number; campus?: number };
 
 // Exemples d'affichage pour la page publique (les vraies annonces sont réservées aux étudiants connectés).
 const EXEMPLES = [
@@ -176,7 +176,7 @@ export default async function Home() {
               { valeur: impact.etudiants, label: "étudiants inscrits", teinte: "teinte-bandeau" },
               { valeur: impact.annonces_actives, label: "post-it sur le tableau", teinte: "teinte-lilas" },
               { valeur: impact.entraides, label: "entraides réalisées", teinte: "teinte-ciel" },
-              { valeur: impact.croisements, label: "entre deux formations", teinte: "teinte-ocre" },
+              { valeur: `${impact.campus ?? 1} / 6`, label: "campus déjà lancés", teinte: "teinte-ocre" },
             ].map((c) => (
               <div key={c.label} className={`couche-fixe ${c.teinte} flex flex-col-reverse rounded-carte border border-ligne bg-surface p-5`}>
                 <dt className="text-sm text-encre-douce">{c.label}</dt>

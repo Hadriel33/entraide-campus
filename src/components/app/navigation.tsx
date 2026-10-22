@@ -6,22 +6,31 @@ import { BoutonTheme } from "./theme";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { deconnecter } from "@/app/(auth)/actions";
-import { BadgeCampus } from "@/components/ui/badge";
 import { Cloche } from "./cloche";
 
 type Lien = { href: string; label: string; compteur?: number };
 
-function liens(demandesEnAttente: number, estAdmin: boolean): Lien[] {
+// La navigation rangée en deux groupes : ce qui se passe sur le campus, et mes affaires.
+function groupes(demandesEnAttente: number, estAdmin: boolean): { titre: string; liens: Lien[] }[] {
   return [
-    { href: "/bureau", label: "Mon bureau" },
-    { href: "/annonces", label: "Le tableau" },
-    { href: "/carte", label: "La carte" },
-    { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
-    { href: "/mes-annonces", label: "Mes annonces" },
-    { href: "/favoris", label: "Favoris" },
-    { href: "/classement", label: "Classement" },
-    { href: "/compte", label: "Mon profil" },
-    ...(estAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+    {
+      titre: "Le campus",
+      liens: [
+        { href: "/bureau", label: "Mon bureau" },
+        { href: "/annonces", label: "Le tableau" },
+        { href: "/carte", label: "La carte" },
+        { href: "/classement", label: "Classement" },
+      ],
+    },
+    {
+      titre: "Mes affaires",
+      liens: [
+        { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
+        { href: "/mes-annonces", label: "Mes annonces" },
+        { href: "/favoris", label: "Favoris" },
+        ...(estAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+      ],
+    },
   ];
 }
 
@@ -32,6 +41,59 @@ function Compteur({ n }: { n?: number }) {
       {n}
       <span className="sr-only"> en attente</span>
     </span>
+  );
+}
+
+// « Moi » : un seul endroit pour mon profil, mes réglages, le thème et la déconnexion.
+function MenuMoi({ pseudo, campus, avatar }: { pseudo: string; campus: string; avatar: React.ReactNode }) {
+  const [ouvert, setOuvert] = useState(false);
+  const lien = "presse flex items-center rounded-ui px-3 py-2 text-sm font-medium hover:bg-papier-fonce";
+  return (
+    <div
+      className="relative"
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setOuvert(false);
+      }}
+    >
+      {ouvert && (
+        <>
+          <button type="button" aria-label="Fermer le menu" className="fixed inset-0 z-40 cursor-default" onClick={() => setOuvert(false)} />
+          <div className="monte absolute inset-x-0 bottom-full z-50 mb-2 flex flex-col gap-0.5 rounded-carte border border-ligne-forte bg-surface p-1.5 shadow-lg" role="menu">
+            <Link href={`/profils/${pseudo}`} className={lien} onClick={() => setOuvert(false)} role="menuitem">
+              Mon profil public
+            </Link>
+            <Link href="/compte" className={lien} onClick={() => setOuvert(false)} role="menuitem">
+              Modifier mon profil
+            </Link>
+            <Link href="/reglages" className={lien} onClick={() => setOuvert(false)} role="menuitem">
+              Réglages
+            </Link>
+            <BoutonTheme className="px-3 py-2 font-medium" />
+            <form action={deconnecter} className="border-t border-ligne pt-0.5">
+              <button className="presse w-full rounded-ui px-3 py-2 text-left text-sm text-encre-douce hover:bg-papier-fonce hover:text-encre" role="menuitem">
+                Se déconnecter
+              </button>
+            </form>
+          </div>
+        </>
+      )}
+      <button
+        type="button"
+        onClick={() => setOuvert((o) => !o)}
+        aria-expanded={ouvert}
+        aria-haspopup="menu"
+        className="presse flex w-full items-center gap-2.5 rounded-ui border border-ligne p-2.5 text-left hover:bg-papier-fonce aria-expanded:border-encre"
+      >
+        {avatar}
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate font-semibold">@{pseudo}</span>
+          <span className="truncate text-xs text-encre-douce">Campus de {campus}</span>
+        </span>
+        <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-encre-douce" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
+          <path d="m7 14 5-5 5 5" />
+        </svg>
+      </button>
+    </div>
   );
 }
 
@@ -53,14 +115,14 @@ export function BarreLaterale({
   estAdmin: boolean;
 }) {
   const chemin = usePathname();
-  const menu = liens(demandesEnAttente, estAdmin);
+  const menu = groupes(demandesEnAttente, estAdmin);
   const actif = (href: string) =>
     chemin === href || chemin.startsWith(`${href}/`);
 
   return (
     <>
       {/* Bureau : barre latérale */}
-      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 border-r border-ligne bg-surface px-3.5 py-5 md:flex">
+      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-5 border-r border-ligne bg-surface px-3.5 py-5 md:flex">
         <div className="flex items-center justify-between gap-1">
           <Link
             href="/bureau"
@@ -70,49 +132,33 @@ export function BarreLaterale({
           </Link>
           <Cloche moi={moi} nonLues={notificationsNonLues} />
         </div>
-        <nav
-          className="flex flex-col gap-0.5"
-          aria-label="Navigation principale"
+        <Link
+          href="/annonces/nouvelle"
+          className="presse flex items-center justify-center gap-2 rounded-ui bg-encre px-3 py-2.5 font-semibold text-surface hover:bg-encre/85"
         >
-          {menu.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              aria-current={actif(l.href) ? "page" : undefined}
-              className="presse flex items-center rounded-ui px-2.5 py-2 font-medium text-encre-douce hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-papier-fonce aria-[current=page]:text-encre aria-[current=page]:shadow-[inset_3px_0_0_var(--color-accent)]"
-            >
-              {l.label}
-              <Compteur n={l.compteur} />
-            </Link>
+          <Icone d={ICONES.plus} className="size-5" />
+          Publier un post-it
+        </Link>
+        <nav className="flex flex-col gap-4" aria-label="Navigation principale">
+          {menu.map((g) => (
+            <div key={g.titre} className="flex flex-col gap-0.5">
+              <p className="px-2.5 pb-1 text-[11px] font-semibold tracking-wider text-encre-douce uppercase">{g.titre}</p>
+              {g.liens.map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  aria-current={actif(l.href) ? "page" : undefined}
+                  className="presse flex items-center rounded-ui px-2.5 py-2 font-medium text-encre-douce hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-papier-fonce aria-[current=page]:text-encre aria-[current=page]:shadow-[inset_3px_0_0_var(--color-accent)]"
+                >
+                  {l.label}
+                  <Compteur n={l.compteur} />
+                </Link>
+              ))}
+            </div>
           ))}
         </nav>
-        <div className="mt-auto flex flex-col gap-2">
-          <Link
-            href={`/profils/${pseudo}`}
-            className="presse flex items-center gap-2.5 rounded-ui border border-ligne p-2.5 hover:bg-papier-fonce"
-          >
-            {avatar}
-            <span className="flex min-w-0 flex-1 items-center justify-between gap-2 font-semibold">
-              <span className="truncate">@{pseudo}</span>
-              <BadgeCampus campus={campus} />
-            </span>
-          </Link>
-          <BoutonTheme className="px-2.5 py-2 text-encre-douce hover:text-encre" />
-          <p className="px-2.5 text-xs text-encre-douce">
-            <kbd className="rounded border border-ligne-forte px-1 font-sans">
-              Ctrl
-            </kbd>{" "}
-            +{" "}
-            <kbd className="rounded border border-ligne-forte px-1 font-sans">
-              K
-            </kbd>{" "}
-            pour aller n&apos;importe où
-          </p>
-          <form action={deconnecter}>
-            <button className="presse w-full rounded-ui px-2.5 py-2 text-left text-sm text-encre-douce hover:bg-papier-fonce hover:text-encre">
-              Se déconnecter
-            </button>
-          </form>
+        <div className="mt-auto">
+          <MenuMoi pseudo={pseudo} campus={campus} avatar={avatar} />
         </div>
       </aside>
 
@@ -128,6 +174,7 @@ export function BarreLaterale({
         demandesEnAttente={demandesEnAttente}
         estAdmin={estAdmin}
         pseudo={pseudo}
+        campus={campus}
         avatar={avatar}
       />
     </>
@@ -199,25 +246,43 @@ function OngletsMobile({
   demandesEnAttente,
   estAdmin,
   pseudo,
+  campus,
   avatar,
 }: {
   actif: (href: string) => boolean;
   demandesEnAttente: number;
   estAdmin: boolean;
   pseudo: string;
+  campus: string;
   avatar: React.ReactNode;
 }) {
   const [ouvert, setOuvert] = useState(false);
   const onglet =
     "presse flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium text-encre-douce aria-[current=page]:text-encre";
   const plus = [
-    { href: "/classement", label: "Classement" },
-    { href: "/carte", label: "La carte" },
-    { href: "/mes-annonces", label: "Mes annonces" },
-    { href: "/favoris", label: "Favoris" },
-    { href: "/compte", label: "Mon profil" },
-    { href: `/profils/${pseudo}`, label: "Mon profil public" },
-    ...(estAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+    {
+      titre: "Le campus",
+      liens: [
+        { href: "/classement", label: "Classement" },
+        { href: "/carte", label: "La carte" },
+      ],
+    },
+    {
+      titre: "Mes affaires",
+      liens: [
+        { href: "/mes-annonces", label: "Mes annonces" },
+        { href: "/favoris", label: "Favoris" },
+        ...(estAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+      ],
+    },
+    {
+      titre: "Moi",
+      liens: [
+        { href: `/profils/${pseudo}`, label: "Mon profil public" },
+        { href: "/compte", label: "Modifier mon profil" },
+        { href: "/reglages", label: "Réglages" },
+      ],
+    },
   ];
 
   return (
@@ -289,20 +354,28 @@ function OngletsMobile({
             onClick={() => setOuvert(false)}
             className="fondu absolute inset-0 bg-encre/40"
           />
-          <div className="monte absolute inset-x-0 bottom-0 flex flex-col gap-1 rounded-t-carte bg-surface p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
+          <div className="monte absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col gap-1 overflow-y-auto rounded-t-carte bg-surface p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
             <div className="mb-2 flex items-center gap-3 px-2">
               {avatar}
-              <span className="font-semibold">@{pseudo}</span>
+              <span className="flex flex-col">
+                <span className="font-semibold">@{pseudo}</span>
+                <span className="text-xs text-encre-douce">Campus de {campus}</span>
+              </span>
             </div>
-            {plus.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOuvert(false)}
-                className="presse rounded-ui px-3 py-3 font-medium hover:bg-papier-fonce"
-              >
-                {l.label}
-              </Link>
+            {plus.map((g) => (
+              <div key={g.titre} className="flex flex-col">
+                <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-encre-douce uppercase">{g.titre}</p>
+                {g.liens.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    onClick={() => setOuvert(false)}
+                    className="presse rounded-ui px-3 py-2.5 font-medium hover:bg-papier-fonce"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
             ))}
             <BoutonTheme className="px-3 py-3 font-medium" />
             <form action={deconnecter}>

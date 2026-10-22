@@ -29,7 +29,7 @@ export function FormulaireInscription() {
           {CAMPUS.map((c) => (
             <label key={c} className="presse cursor-pointer">
               <input type="radio" name="campus" value={c} defaultChecked={etat.valeurs?.campus === c} className="peer sr-only" />
-              <span className="flex min-h-10 items-center justify-center rounded-ui border border-ligne-forte bg-surface px-2 py-2 font-medium peer-checked:border-encre peer-checked:bg-bandeau peer-focus-visible:ring-3 peer-focus-visible:ring-accent/40">
+              <span className="flex min-h-10 items-center justify-center rounded-ui border border-ligne-forte bg-surface px-2 py-2 font-medium peer-checked:border-encre peer-checked:bg-encre peer-checked:text-surface peer-focus-visible:ring-3 peer-focus-visible:ring-accent/40">
                 {c}
               </span>
             </label>

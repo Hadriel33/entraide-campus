@@ -114,5 +114,5 @@ export async function changerMotDePasse(_: EtatFormulaire, formData: FormData): 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password: motDePasse });
   if (error) return { message: messageErreur(error.code, error.message) };
-  redirect("/compte?ok=mot_de_passe");
+  redirect("/reglages?ok=mot_de_passe");
 }
