@@ -17,9 +17,7 @@ import {
 import { CAMPUS, estCampus } from "@/lib/auth/validation";
 import { TEINTES, inclinaison, teinte } from "@/lib/design/teintes";
 import { LigneAnnonce } from "@/components/annonces/ligne-annonce";
-import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
-import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { EnDirect } from "../mur/en-direct";
 import { EtatVide } from "@/components/colette/etat-vide";
@@ -180,21 +178,16 @@ export default async function PageAnnonces({
   // Palier 3 : suggestions « Pour toi » (vue sans filtre) et tri « Pour moi » (toutes les annonces classées).
   const sansFiltre = actifs.length === 0;
   let pourToi: ReturnType<typeof suggerer<Annonce>> = [];
-  let etatAccueil = null;
   let matchs = new Map<string, { niveau: string; raisons: string[] }>();
   let coletteOk: boolean | null = null; // null : pas demandé ; false : IA indisponible
   let profilMatch: { competences: string[]; categories: string[] } | null =
     null;
   if ((sansFiltre || pourMoi) && user && profil) {
-    const [{ data: miennes }, etat] = await Promise.all([
-      supabase
-        .from("annonces")
-        .select("type, categorie")
-        .eq("auteur_id", user.id)
-        .eq("statut", "publiee"),
-      lireEtatAccueil(supabase, profil),
-    ]);
-    if (sansFiltre && !pourMoi) etatAccueil = etat;
+    const { data: miennes } = await supabase
+      .from("annonces")
+      .select("type, categorie")
+      .eq("auteur_id", user.id)
+      .eq("statut", "publiee");
     const categories = (type: string) => [
       ...new Set(
         (miennes ?? [])
@@ -311,8 +304,6 @@ export default async function PageAnnonces({
           </div>
         </div>
       </header>
-
-      {etatAccueil && <ChecklistAccueil etat={etatAccueil} />}
 
       {/* Recherche et filtres de lieu : un simple formulaire GET (fonctionne sans JavaScript, URL partageable). */}
       <form

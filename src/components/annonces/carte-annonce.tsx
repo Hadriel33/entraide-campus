@@ -156,8 +156,8 @@ export function CarteAnnonce({
         </p>
       )}
 
-      <div className="mt-auto flex items-end justify-between gap-2 pt-1">
-        <span className="flex min-w-0 items-center gap-2 text-sm font-semibold">
+      <div className="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-1 pt-1">
+        <span className="flex min-w-[7rem] flex-1 items-center gap-2 text-sm font-semibold">
           <Avatar
             chemin={annonce.auteur?.avatar_chemin}
             nom={annonce.auteur?.pseudo ?? "?"}

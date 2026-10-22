@@ -9,6 +9,7 @@ import { Toast } from "@/components/ui/toast";
 import { Palette } from "@/components/app/palette";
 import { Confettis } from "@/components/ui/confettis";
 import { TutoColette } from "@/components/colette/tuto";
+import { BulleColette } from "@/components/social/bulle-colette";
 import { SCRIPT_THEME } from "@/components/app/theme";
 import "./globals.css";
 
@@ -50,6 +51,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { count: nonLues } = user
     ? await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("lu", false)
     : { count: 0 };
+  // La bulle de Colette : messages privés non lus, et le nom de ma classe pour son salon.
+  const [{ count: messagesNonLus }, { data: classe }] = user && profil
+    ? await Promise.all([
+        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("lu", false).eq("type", "message"),
+        profil.classe_id ? supabase.from("classes").select("id, nom").eq("id", profil.classe_id).maybeSingle() : Promise.resolve({ data: null }),
+      ])
+    : [{ count: 0 }, { data: null }];
 
   return (
     <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} ${kalam.variable} h-full antialiased`} suppressHydrationWarning>
@@ -75,6 +83,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               moi={user.id}
               notificationsNonLues={nonLues ?? 0}
             />
+            <BulleColette moi={user.id} campus={profil.campus} classe={classe} nonLus={messagesNonLus ?? 0} />
             <div className="flex min-w-0 flex-1 flex-col">
               <main className="flex-1 px-4 pt-6 pb-28 sm:px-8 md:py-10">{children}</main>
               <PiedDePage />

@@ -17,6 +17,7 @@ function groupes(demandesEnAttente: number, estAdmin: boolean): { titre: string;
       titre: "Le campus",
       liens: [
         { href: "/bureau", label: "Mon bureau" },
+        { href: "/fil", label: "Le fil" },
         { href: "/annonces", label: "Le tableau" },
         { href: "/carte", label: "La carte" },
         { href: "/classement", label: "Classement" },
@@ -232,6 +233,7 @@ function Icone({ d, className = "size-6" }: { d: string; className?: string }) {
 
 const ICONES = {
   bureau: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
+  fil: "M4 5h16M4 5v14h16V5M8 9h8M8 13h8M8 17h5",
   annonces: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
   demandes:
     "M22 12h-6l-2 3h-4l-2-3H2M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1Z",
@@ -263,6 +265,7 @@ function OngletsMobile({
     {
       titre: "Le campus",
       liens: [
+        { href: "/bureau", label: "Mon bureau" },
         { href: "/classement", label: "Classement" },
         { href: "/carte", label: "La carte" },
       ],
@@ -292,12 +295,12 @@ function OngletsMobile({
         aria-label="Navigation principale"
       >
         <Link
-          href="/bureau"
-          aria-current={actif("/bureau") ? "page" : undefined}
+          href="/fil"
+          aria-current={actif("/fil") ? "page" : undefined}
           className={onglet}
         >
-          <Icone d={ICONES.bureau} />
-          Bureau
+          <Icone d={ICONES.fil} />
+          Le fil
         </Link>
         <Link
           href="/annonces"

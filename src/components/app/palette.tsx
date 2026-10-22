@@ -45,6 +45,11 @@ const PAGES: Commande[] = [
     href: "/compte",
   },
   {
+    label: "Le fil",
+    aide: "Entraides réussies, nouveaux post-it, commentaires",
+    href: "/fil",
+  },
+  {
     label: "Réglages",
     aide: "Coordonnées, confidentialité, apparence, compte",
     href: "/reglages",

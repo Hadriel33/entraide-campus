@@ -6,6 +6,8 @@ import { BadgeCampus } from "@/components/ui/badge";
 import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { Section, Sommaire } from "@/components/ui/section";
+import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
+import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
 import { AtelierColette } from "./atelier-colette";
@@ -18,9 +20,10 @@ export const metadata: Metadata = { title: "Mon profil" };
 // Coordonnées, confidentialité, apparence et compte sont dans Réglages.
 export default async function PageCompte() {
   const { supabase, user, profil } = await exigerSession();
-  const [{ data: stats }, { data: classes }] = await Promise.all([
+  const [{ data: stats }, { data: classes }, etatAccueil] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
     supabase.from("classes").select("id, nom, validee").eq("campus", profil.campus).order("nom"),
+    lireEtatAccueil(supabase, profil),
   ]);
 
   return (
@@ -44,6 +47,8 @@ export default async function PageCompte() {
           </BoutonLien>
         </div>
       </div>
+      {/* « Bien démarrer » : les étapes du profil, ici et plus sur le tableau. Disparaît quand tout est fait. */}
+      <ChecklistAccueil etat={etatAccueil} />
       <Sommaire
         liens={[
           { href: "#photo", label: "Qui je suis" },

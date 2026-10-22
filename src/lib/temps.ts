@@ -5,3 +5,8 @@ export function ilYa(iso: string, maintenant = new Date()) {
   if (min < 1440) return `il y a ${Math.round(min / 60)} h`;
   return `il y a ${Math.round(min / 1440)} j`;
 }
+
+// Date ISO d'il y a n jours (bornes des requêtes : fil, statistiques).
+export function ilYaJours(n: number, maintenant = new Date()) {
+  return new Date(maintenant.getTime() - n * 86400000).toISOString();
+}

@@ -19,6 +19,9 @@ import { BoutonFavori } from "@/components/annonces/bouton-favori";
 import { BoutonPartager } from "@/components/annonces/bouton-partager";
 import { inclinaison, teinte } from "@/lib/design/teintes";
 import { Avatar } from "@/components/ui/avatar";
+import { chargerSocial } from "@/lib/social/requetes";
+import { Reactions } from "@/components/social/reactions";
+import { Commentaires } from "@/components/social/commentaires";
 import { Badge, BadgeCampus } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import {
@@ -106,6 +109,10 @@ export default async function PageAnnonce({
           .eq("auteur_id", user!.id)
           .maybeSingle()
       : { data: null };
+
+  // Le côté réseau social : réactions et commentaires sous l'annonce (jamais de coordonnées, la base y veille).
+  const social = user ? await chargerSocial(supabase, "annonce", [annonce.id], user.id) : null;
+  const { data: moi } = user ? await supabase.from("profils").select("role").eq("id", user.id).maybeSingle() : { data: null };
 
   return (
     <article className="apparition flex w-full max-w-2xl flex-col gap-8">
@@ -424,6 +431,20 @@ export default async function PageAnnonce({
             </Bouton>
           </form>
         </details>
+      )}
+      {social && user && (
+        <section id="commentaires" className="flex scroll-mt-6 flex-col gap-3 border-t border-ligne pt-6">
+          <h2 className="titre-charte text-section">Réactions et commentaires</h2>
+          <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estAuteur} />
+          <Commentaires
+            cible="annonce"
+            id={annonce.id}
+            liste={social.commentaires.get(annonce.id) ?? []}
+            moi={user.id}
+            estAdmin={moi?.role === "admin"}
+            ouvert
+          />
+        </section>
       )}
     </article>
   );
