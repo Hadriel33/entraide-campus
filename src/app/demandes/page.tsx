@@ -3,7 +3,7 @@ import Link from "next/link";
 import { exigerSession } from "@/lib/session";
 import { dateCourte } from "@/lib/annonces/requetes";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge, BadgeEcole } from "@/components/ui/badge";
+import { Badge, BadgeCampus } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import {
@@ -23,7 +23,7 @@ type Personne = {
   id: string;
   prenom: string;
   pseudo: string;
-  ecole: string;
+  campus: string;
   avatar_chemin: string | null;
 };
 type Demande = {
@@ -36,7 +36,7 @@ type Demande = {
   destinataire: Personne | null;
 };
 
-const PERSONNE = "id, prenom, pseudo, ecole, avatar_chemin";
+const PERSONNE = "id, prenom, pseudo, campus, avatar_chemin";
 const SELECT = `id, statut, message, cree_le, annonce:annonces(id, titre), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`;
 
 const STATUTS = {
@@ -176,7 +176,7 @@ export default async function PageDemandes({
                 >
                   <Avatar chemin={p.avatar_chemin} nom={p.pseudo} />
                   <span className="truncate">@{p.pseudo}</span>
-                  <BadgeEcole ecole={p.ecole} />
+                  <BadgeCampus campus={p.campus} />
                 </Link>
                 <p className="text-xs leading-relaxed text-encre-douce">
                   <strong className="text-encre">{r.niveau}</strong> · {r.aides}{" "}
@@ -286,7 +286,7 @@ export default async function PageDemandes({
           >
             <Avatar chemin={autre.avatar_chemin} nom={autre.pseudo} />@
             {autre.pseudo}
-            <BadgeEcole ecole={autre.ecole} />
+            <BadgeCampus campus={autre.campus} />
           </Link>
           <span className="flex items-center gap-2 text-xs text-encre/60">
             {dateCourte(d.cree_le)} {d.statut === "refusee" && STATUTS.refusee}

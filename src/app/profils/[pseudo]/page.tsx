@@ -4,7 +4,7 @@ import { exigerSession } from "@/lib/session";
 import type { Stats } from "@/lib/gamification/progression";
 import { SELECT_ANNONCE, dateCourte, type Annonce } from "@/lib/annonces/requetes";
 import { Avatar } from "@/components/ui/avatar";
-import { BadgeEcole } from "@/components/ui/badge";
+import { BadgeCampus } from "@/components/ui/badge";
 import { NoteEtoiles } from "@/components/ui/etoiles";
 import { CarteProgression } from "@/components/profil/progression";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
@@ -24,7 +24,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
   const pseudo = decodeURIComponent((await params).pseudo).toLowerCase();
 
   // Profil public : jamais de coordonnées ici (elles sont dans une autre table, protégée).
-  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, cree_le, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, classe:classes!profils_classe_id_fkey(nom)").eq("pseudo", pseudo).maybeSingle();
+  const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, campus, avatar_chemin, bio, competences, role, cree_le, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, classe:classes!profils_classe_id_fkey(nom)").eq("pseudo", pseudo).maybeSingle();
   if (!profil) notFound();
 
   const [{ data: stats }, { data: annonces }, { data: avis }] = await Promise.all([
@@ -62,7 +62,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
           <h1 className="titre-charte couche-fixe self-start bg-bandeau px-2.5 pt-0.5 text-3xl">@{profil.pseudo}</h1>
           {s && <p className="pop self-start rounded-ui bg-encre px-2.5 py-1 text-xs font-semibold text-surface">{titrePrincipal(s.aides_par_categorie ?? {}, calculerProgression(s).niveau.nom)}</p>}
           <p className="flex flex-wrap items-center gap-2 text-encre-douce">
-            {profil.prenom} <BadgeEcole ecole={profil.ecole} />
+            {profil.prenom} <BadgeCampus campus={profil.campus} />
             {profil.role === "admin" && <span className="text-xs font-semibold text-accent">Modération</span>}
             {(profil.classe as unknown as { nom: string } | null)?.nom && (
               <span className="rounded-full bg-papier-fonce px-2 py-0.5 text-xs font-semibold text-encre">{(profil.classe as unknown as { nom: string }).nom}</span>
@@ -94,7 +94,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
             { label: "personnes aidées", valeur: s.aides_donnees, teinte: "teinte-bandeau" },
             { label: "coups de main reçus", valeur: s.aides_recues, teinte: "teinte-lilas" },
             { label: "annonces publiées", valeur: s.annonces, teinte: "teinte-ciel" },
-            { label: "entraides ESD × ESP", valeur: s.croisements, teinte: "teinte-ocre" },
+            { label: "entraides avec une autre formation", valeur: s.croisements, teinte: "teinte-ocre" },
           ].map((t, i) => (
             <div key={t.label} className={`apparition couche-fixe ${t.teinte} flex flex-col-reverse rounded-carte border border-ligne bg-surface p-4`} style={{ "--i": i } as React.CSSProperties}>
               <dt className="text-sm text-encre-douce">{t.label}</dt>

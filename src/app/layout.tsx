@@ -22,7 +22,7 @@ const kalam = Kalam({ subsets: ["latin"], weight: ["400", "700"], variable: "--f
 
 export const metadata: Metadata = {
   title: { default: "Post-it campus", template: "%s · Post-it campus" },
-  description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants ESD et ESP Bordeaux.",
+  description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants de ton campus ESP.",
   metadataBase: new URL("https://entraide-campus.vercel.app"),
   openGraph: { siteName: "Post-it campus", locale: "fr_FR", type: "website" },
 };
@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             <TutoColette />
             <BarreLaterale
               pseudo={profil.pseudo}
-              ecole={profil.ecole}
+              campus={profil.campus}
               avatar={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} colette={profil} />}
               demandesEnAttente={enAttente ?? 0}
               estAdmin={profil.role === "admin"}

@@ -6,7 +6,7 @@ import { BoutonTheme } from "./theme";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { deconnecter } from "@/app/(auth)/actions";
-import { BadgeEcole } from "@/components/ui/badge";
+import { BadgeCampus } from "@/components/ui/badge";
 import { Cloche } from "./cloche";
 
 type Lien = { href: string; label: string; compteur?: number };
@@ -37,7 +37,7 @@ function Compteur({ n }: { n?: number }) {
 
 export function BarreLaterale({
   pseudo,
-  ecole,
+  campus,
   avatar,
   demandesEnAttente,
   estAdmin,
@@ -47,7 +47,7 @@ export function BarreLaterale({
   moi: string;
   notificationsNonLues: number;
   pseudo: string;
-  ecole: string;
+  campus: string;
   avatar: React.ReactNode;
   demandesEnAttente: number;
   estAdmin: boolean;
@@ -94,7 +94,7 @@ export function BarreLaterale({
             {avatar}
             <span className="flex min-w-0 flex-1 items-center justify-between gap-2 font-semibold">
               <span className="truncate">@{pseudo}</span>
-              <BadgeEcole ecole={ecole} />
+              <BadgeCampus campus={campus} />
             </span>
           </Link>
           <BoutonTheme className="px-2.5 py-2 text-encre-douce hover:text-encre" />

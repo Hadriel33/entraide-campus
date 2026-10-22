@@ -94,6 +94,8 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 02/10 | Choisir parmi les intéressés, avec confirmation | Ce n'est pas « premier arrivé, premier servi » : l'auteur compare des faits (niveau, aides, note) et décide. Refuser les autres est irréversible, donc on confirme. |
 | 02/10 | « Le mur » devient « Le tableau » | Choix de Hadriel : des post-its punaisés, c'est un tableau d'affichage (et le soir, un tableau noir). |
 | 02/10 | Playwright (nouvelle dépendance, accordée par Hadriel) | Nos tests vérifiaient les règles et la base, jamais une vraie page : le bug des annonces vides est passé. Parcours dans un vrai navigateur après chaque déploiement, avec un compte robot dont l'IA ne voit jamais le mot de passe. |
+| 22/10 | Retours du prof : ranger plutôt qu'ajouter, gamification façon réseau social, formes de post-it par type, plus d'ESD/ESP | Plan en 6 lots (`docs/etapes/08-retours-du-prof.md`), chacun vérifié avant le suivant. |
+| 22/10 | L'ESD rejoint l'ESP : la compétition se joue entre les 6 campus ESP | Campus choisi à l'inscription, modifiable seulement par un admin (anti-triche). Score de campus = moyenne des membres actifs, saison d'un mois. Le bonus « croisement » compte désormais deux formations différentes. |
 
 ## 6. Ce qui n'a pas marché (et comment on l'a contourné)
 | Date | Problème | Solution |
@@ -121,3 +123,4 @@ J'avais déjà un projet perso (padel-snipe, Next.js + Supabase + Vercel) avec b
 | 02/10 | La clé serveur n'était pas sur Vercel : l'IA n°2 n'a jamais tourné en ligne | Vu en listant les variables (noms seulement). Bouton admin « Tester maintenant » pour le vérifier en un clic. |
 | 02/10 | Premier parcours Playwright sur GitHub en échec | Il visait l'adresse unique du déploiement, protégée par Vercel : on teste toujours le domaine public. |
 | 22/10 | Clic sur « Moi » (bas de la barre latérale) : page Introuvable | Même famille que les annonces vides du 02/10 : deux liens entre profils et classes, la jointure `classes(nom)` est refusée. Le garde-fou Vitest couvre maintenant aussi `classes`, et la jointure nomme sa clé. |
+| 22/10 | Les migrations contenant un DROP restaient bloquées via le connecteur Supabase (60 s puis abandon, rien d'appliqué) | Migration réécrite sans DROP : `alter policy`, trigger supplémentaire, nouvelles fonctions à côté des anciennes. Bonus : l'ancien code en ligne continue de marcher pendant le déploiement. |

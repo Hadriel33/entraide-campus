@@ -145,7 +145,7 @@ export async function proposerClasse(formData: FormData) {
   if (!nom) redirect("/compte?erreur=classe#classe");
   const { data, error } = await supabase
     .from("classes")
-    .insert({ ecole: profil.ecole, nom, validee: false, proposee_par: user.id })
+    .insert({ ecole: profil.ecole, campus: profil.campus, nom, validee: false, proposee_par: user.id })
     .select("id")
     .single();
   if (error?.code === "P0429") redirect("/compte?ok=limite#classe");

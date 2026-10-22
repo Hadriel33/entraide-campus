@@ -14,7 +14,7 @@ import {
   TYPES,
   type Categorie,
 } from "@/lib/annonces/validation";
-import { ECOLES } from "@/lib/auth/validation";
+import { CAMPUS, estCampus } from "@/lib/auth/validation";
 import { TEINTES, inclinaison, teinte } from "@/lib/design/teintes";
 import { LigneAnnonce } from "@/components/annonces/ligne-annonce";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
@@ -32,7 +32,7 @@ type Filtres = {
   q?: string;
   quartier?: string;
   tram?: string;
-  ecole?: string;
+  campus?: string;
   contrepartie?: string;
   tri?: string;
   page?: string;
@@ -51,7 +51,7 @@ function lienFiltre(actuels: Filtres, change: Filtres) {
     "categorie",
     "quartier",
     "tram",
-    "ecole",
+    "campus",
     "contrepartie",
     "tri",
     "page",
@@ -89,9 +89,9 @@ export default async function PageAnnonces({
       typeof brut.q === "string" && brut.q.trim()
         ? brut.q.trim().slice(0, 80)
         : undefined,
-    ecole:
-      brut.ecole && (ECOLES as readonly string[]).includes(brut.ecole)
-        ? brut.ecole
+    campus:
+      brut.campus && (brut.campus === "tous" || estCampus(brut.campus))
+        ? brut.campus
         : undefined,
     contrepartie:
       brut.contrepartie && brut.contrepartie in CONTREPARTIES
@@ -110,8 +110,11 @@ export default async function PageAnnonces({
 
   const { supabase, user, profil } = await getSession();
   const maintenant = new Date().toISOString();
-  // Filtre par école : jointure obligatoire (!inner) sur le profil de l'auteur.
-  const select = filtres.ecole
+  // Par défaut, le tableau montre MON campus (une coloc ou un covoit, c'est local) ; « tous » ouvre aux 6 campus.
+  const campus =
+    filtres.campus === "tous" ? null : (filtres.campus ?? profil?.campus ?? null);
+  // Filtre par campus : jointure obligatoire (!inner) sur le profil de l'auteur.
+  const select = campus
     ? SELECT_ANNONCE.replace(
         "annonces_auteur_id_fkey(",
         "annonces_auteur_id_fkey!inner(",
@@ -126,7 +129,7 @@ export default async function PageAnnonces({
       ascending: filtres.tri === "bientot",
     })
     .limit(limite);
-  if (filtres.ecole) requete = requete.eq("auteur.ecole", filtres.ecole);
+  if (campus) requete = requete.eq("auteur.campus", campus);
   if (filtres.contrepartie)
     requete = requete.eq("contrepartie", filtres.contrepartie);
   if (filtres.type) requete = requete.eq("type", filtres.type);
@@ -168,7 +171,6 @@ export default async function PageAnnonces({
       label: QUARTIERS[filtres.quartier as keyof typeof QUARTIERS],
     },
     filtres.tram && { cle: "tram", label: `Tram ${filtres.tram}` },
-    filtres.ecole && { cle: "ecole", label: filtres.ecole },
     filtres.contrepartie && {
       cle: "contrepartie",
       label: CONTREPARTIES[filtres.contrepartie as keyof typeof CONTREPARTIES],
@@ -289,7 +291,7 @@ export default async function PageAnnonces({
             </span>
           </h1>
           <p className="mt-2 max-w-xl -rotate-1 font-main text-xl leading-snug text-encre-douce">
-            ESD et ESP Bordeaux. Les coordonnées s&apos;échangent seulement
+            {campus ? `Campus de ${campus}` : "Les 6 campus ESP"}. Les coordonnées s&apos;échangent seulement
             après accord.
           </p>
         </div>
@@ -356,7 +358,7 @@ export default async function PageAnnonces({
             !!(
               filtres.quartier ||
               filtres.tram ||
-              filtres.ecole ||
+              filtres.campus ||
               filtres.contrepartie
             )
           }
@@ -374,7 +376,7 @@ export default async function PageAnnonces({
             >
               <path d="m9 6 6 6-6 6" />
             </svg>
-            Plus de filtres : quartier, tram, école, contrepartie
+            Plus de filtres : campus, quartier, tram, contrepartie
           </summary>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             <label className="flex flex-col gap-1 text-xs font-semibold">
@@ -408,16 +410,17 @@ export default async function PageAnnonces({
               </select>
             </label>
             <label className="flex flex-col gap-1 text-xs font-semibold">
-              École
+              Campus
               <select
-                name="ecole"
-                defaultValue={filtres.ecole ?? ""}
+                name="campus"
+                defaultValue={campus ?? "tous"}
                 className={CLASSE_SAISIE}
               >
-                <option value="">Les deux</option>
-                {ECOLES.map((e) => (
-                  <option key={e} value={e}>
-                    {e}
+                <option value="tous">Tous les campus</option>
+                {CAMPUS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                    {c === profil?.campus ? " (le mien)" : ""}
                   </option>
                 ))}
               </select>

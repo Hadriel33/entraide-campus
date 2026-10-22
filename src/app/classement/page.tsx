@@ -4,22 +4,16 @@ import { exigerSession } from "@/lib/session";
 import { calculerProgression, type Stats } from "@/lib/gamification/progression";
 import { titrePrincipal } from "@/lib/gamification/titres";
 import { classerClasses } from "@/lib/gamification/classes";
+import { classerCampus, debutSaison, nomSaison } from "@/lib/gamification/campus";
 import { Avatar } from "@/components/ui/avatar";
-import { BadgeEcole } from "@/components/ui/badge";
 import { TitrePage } from "@/components/ui/titre-page";
 import { CarteDefi } from "@/components/profil/carte-defi";
 import { Colette } from "@/components/colette/colette";
 
 export const metadata: Metadata = { title: "Classement" };
 
-type Ligne = { id: string; pseudo: string; prenom: string; ecole: string; avatar_chemin: string | null; stats: Stats };
-type Vue = "etudiants" | "classes" | "ecoles";
-
-function debutSemaine() {
-  const d = new Date();
-  const jour = (d.getUTCDay() + 6) % 7; // lundi = 0
-  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - jour)).toISOString();
-}
+type Ligne = { id: string; pseudo: string; prenom: string; campus: string; avatar_chemin: string | null; classe_id: string | null; stats: Stats };
+type Vue = "campus" | "etudiants" | "classes";
 
 const PODIUM = [
   { place: 2, papier: "papier-ciel", hauteur: "h-52", rot: "-2deg", taille: "text-6xl" },
@@ -30,27 +24,29 @@ const PODIUM = [
 export default async function PageClassement({ searchParams }: PageProps<"/classement">) {
   const { supabase, user, profil } = await exigerSession();
   const sp = await searchParams;
+  // La saison = le mois en cours : le championnat repart à zéro le 1er.
   const semaine = sp.periode !== "toujours";
-  const vue: Vue = sp.vue === "classes" || sp.vue === "ecoles" ? sp.vue : "etudiants";
+  const vue: Vue = sp.vue === "classes" || sp.vue === "etudiants" ? sp.vue : "campus";
 
   const [{ data }, { data: profils }, { data: classes }] = await Promise.all([
-    supabase.rpc("stats_classement", semaine ? { depuis: debutSemaine() } : {}),
-    supabase.from("profils").select("id, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif"),
-    supabase.from("classes").select("id, nom, ecole").eq("validee", true),
+    supabase.rpc("classement_campus", semaine ? { depuis: debutSaison() } : {}),
+    supabase.from("profils").select("id, colette_couleur, colette_humeur, colette_accessoire, colette_motif"),
+    supabase.from("classes").select("id, nom, campus").eq("validee", true).eq("campus", profil.campus),
   ]);
   const infos = new Map((profils ?? []).map((p) => [p.id, p]));
   const toutes = ((data ?? []) as Ligne[]).map((l) => {
     const p = calculerProgression(l.stats);
     return { ...l, p, titre: titrePrincipal(l.stats.aides_par_categorie ?? {}, p.niveau.nom), info: infos.get(l.id) };
   });
+  const championnat = classerCampus(toutes.map((l) => ({ campus: l.campus, points: l.p.points })));
+  // Étudiants et classes : ceux de mon campus.
   const lignes = toutes
+    .filter((l) => l.campus === profil.campus)
     .filter((l) => l.p.points > 0 || l.id === user.id)
     .sort((a, b) => b.p.points - a.p.points)
     .slice(0, 30);
 
-  const parClasse = classerClasses(classes ?? [], toutes.map((l) => ({ classe_id: l.info?.classe_id ?? null, points: l.p.points })));
-  // Score par école : la petite rivalité amicale ESD contre ESP.
-  const parEcole = toutes.reduce<Record<string, number>>((acc, l) => ({ ...acc, [l.ecole]: (acc[l.ecole] ?? 0) + l.p.points }), {});
+  const parClasse = classerClasses(classes ?? [], toutes.map((l) => ({ classe_id: l.classe_id, points: l.p.points })));
 
   const lien = (v: Vue, toujours = !semaine) => `/classement?vue=${v}${toujours ? "&periode=toujours" : ""}`;
   const onglet = "rounded-[4px] px-3.5 py-1.5 text-sm font-semibold text-encre-douce aria-[current=page]:bg-surface aria-[current=page]:text-encre aria-[current=page]:shadow-sm";
@@ -58,19 +54,21 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
   // Podium : les 3 premiers (étudiants ou classes) en post-it de hauteurs différentes.
   const podium =
     vue === "classes"
-      ? parClasse.slice(0, 3).map((c) => ({ cle: c.id, nom: c.nom, sous: `${c.ecole} · ${c.actifs} actif${c.actifs > 1 ? "s" : ""}`, points: c.score, moi: c.id === profil.classe_id }))
-      : lignes.filter((l) => l.p.points > 0).slice(0, 3).map((l) => ({ cle: l.id, nom: `@${l.pseudo}`, sous: l.titre, points: l.p.points, moi: l.id === user.id }));
+      ? parClasse.slice(0, 3).map((c) => ({ cle: c.id, nom: c.nom, sous: `${c.actifs} actif${c.actifs > 1 ? "s" : ""}`, points: c.score, moi: c.id === profil.classe_id }))
+      : vue === "campus"
+        ? championnat.filter((c) => c.score > 0).slice(0, 3).map((c) => ({ cle: c.campus, nom: c.campus, sous: `${c.actifs} actif${c.actifs > 1 ? "s" : ""} sur ${c.membres}`, points: c.score, moi: c.campus === profil.campus }))
+        : lignes.filter((l) => l.p.points > 0).slice(0, 3).map((l) => ({ cle: l.id, nom: `@${l.pseudo}`, sous: l.titre, points: l.p.points, moi: l.id === user.id }));
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
-      <TitrePage accroche="Les points viennent des coups de main réellement acceptés. Et ta classe monte avec toi.">Classement</TitrePage>
+      <TitrePage accroche={`Saison de ${nomSaison()} : chaque coup de main accepté fait monter ${profil.campus}. Tout repart à zéro le 1er du mois.`}>Classement</TitrePage>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav className="inline-flex rounded-ui bg-papier-fonce p-1" aria-label="Classement de">
           {[
-            { v: "etudiants" as const, label: "Étudiants" },
+            { v: "campus" as const, label: "Campus" },
+            { v: "etudiants" as const, label: `Étudiants de ${profil.campus}` },
             { v: "classes" as const, label: "Classes" },
-            { v: "ecoles" as const, label: "ESD contre ESP" },
           ].map((o) => (
             <Link key={o.v} href={lien(o.v)} aria-current={vue === o.v ? "page" : undefined} className={onglet}>
               {o.label}
@@ -79,7 +77,7 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
         </nav>
         <nav className="inline-flex rounded-ui bg-papier-fonce p-1" aria-label="Période">
           <Link href={lien(vue, false)} aria-current={semaine ? "page" : undefined} className={onglet}>
-            Cette semaine
+            Ce mois-ci
           </Link>
           <Link href={lien(vue, true)} aria-current={!semaine ? "page" : undefined} className={onglet}>
             Depuis toujours
@@ -87,7 +85,7 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
         </nav>
       </div>
 
-      {vue !== "ecoles" && podium.length > 0 && (
+      {podium.length > 0 && (
         <div className="grid grid-cols-3 items-end gap-3 pt-4 sm:gap-6">
           {PODIUM.map((pl) => {
             const x = podium[pl.place - 1];
@@ -103,7 +101,7 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
                 <strong className="truncate text-sm sm:text-lg">{x.nom}</strong>
                 <span className="truncate text-xs text-encre/65">{x.sous}</span>
                 <span className="mt-auto text-sm font-bold">{x.points} pts</span>
-                {pl.place === 1 && <span className="hidden -rotate-3 self-end font-main text-lg text-alerte sm:block">{vue === "classes" ? "la classe en feu" : "en tête !"}</span>}
+                {pl.place === 1 && <span className="hidden -rotate-3 self-end font-main text-lg text-alerte sm:block">{vue === "classes" ? "la classe en feu" : vue === "campus" ? "campus en feu" : "en tête !"}</span>}
               </div>
             );
           })}
@@ -126,7 +124,6 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
                 </span>
                 <span className={`truncate text-xs ${l.id === user.id ? "text-surface/70" : "text-encre-douce"}`}>{l.titre}</span>
               </Link>
-              <BadgeEcole ecole={l.ecole} />
               <span className="w-16 text-right font-semibold">{l.p.points} pts</span>
             </li>
           ))}
@@ -134,7 +131,7 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
             <li className="flex items-center gap-4 rounded-carte border border-dashed border-ligne-forte p-5">
               <Colette anim="dort" taille={70} />
               <p className="text-sm text-encre-douce">
-                {semaine ? "La semaine commence : le premier coup de main accepté te place en tête." : "Le classement se remplit dès les premières entraides acceptées."}
+                {semaine ? "La saison commence : le premier coup de main accepté te place en tête." : "Le classement se remplit dès les premières entraides acceptées."}
               </p>
             </li>
           )}
@@ -150,7 +147,6 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
                 <span className="flex-1 font-semibold">
                   {c.nom} {c.id === profil.classe_id && <span className="font-main text-base font-normal text-bandeau">ta classe</span>}
                 </span>
-                <BadgeEcole ecole={c.ecole} />
                 <span className="w-16 text-right font-semibold">{c.score} pts</span>
               </li>
             ))}
@@ -172,24 +168,30 @@ export default async function PageClassement({ searchParams }: PageProps<"/class
         </>
       )}
 
-      {vue === "ecoles" && (
-        <div className="grid gap-6 pt-4 sm:grid-cols-2">
-          {[
-            { e: "ESD", papier: "papier-ciel", rot: "-2deg" },
-            { e: "ESP", papier: "papier-lilas", rot: "2deg" },
-          ].map(({ e, papier, rot }) => {
-            const tete = (parEcole[e] ?? 0) >= Math.max(parEcole.ESD ?? 0, parEcole.ESP ?? 0) && (parEcole[e] ?? 0) > 0;
-            return (
-              <div key={e} className={`postit ${papier} flex flex-col gap-2 p-6 pt-8`} style={{ "--rot": rot } as React.CSSProperties}>
-                <span className="punaise" aria-hidden />
-                <span className="titre-charte text-6xl">{e}</span>
-                <span className="titre-charte text-4xl">{parEcole[e] ?? 0} pts</span>
-                <span className="text-sm text-encre/70">{semaine ? "cette semaine" : "cumulés"}</span>
-                {tete && <span className="-rotate-3 self-end font-main text-2xl text-alerte">devant !</span>}
-              </div>
-            );
-          })}
-        </div>
+      {vue === "campus" && (
+        <ol className="flex flex-col gap-2">
+          {championnat.map((c, i) => (
+            <li
+              key={c.campus}
+              className={`apparition flex items-center gap-3 rounded-carte border p-3 ${c.campus === profil.campus ? "border-encre bg-encre text-surface" : "border-ligne bg-surface"}`}
+              style={{ "--i": i } as React.CSSProperties}
+            >
+              <span className="titre-charte w-9 text-center text-2xl">{i + 1}</span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate font-semibold">
+                  {c.campus} {c.campus === profil.campus && <span className="font-main text-base font-normal text-bandeau">ton campus</span>}
+                </span>
+                <span className={`text-xs ${c.campus === profil.campus ? "text-surface/70" : "text-encre-douce"}`}>
+                  {c.membres === 0 ? "pas encore d'inscrits : à vous de lancer le campus" : `${c.actifs} actif${c.actifs > 1 ? "s" : ""} sur ${c.membres} inscrit${c.membres > 1 ? "s" : ""}`}
+                </span>
+              </span>
+              <span className="w-16 text-right font-semibold">{c.score} pts</span>
+            </li>
+          ))}
+          <li className="text-sm text-encre-douce">
+            Score d&apos;un campus = moyenne des points de ses membres actifs : un petit campus soudé peut battre un gros.
+          </li>
+        </ol>
       )}
 
       <CarteDefi supabase={supabase} />

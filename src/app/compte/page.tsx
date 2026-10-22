@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { exigerSession } from "@/lib/session";
 import type { Stats } from "@/lib/gamification/progression";
 import { Avatar } from "@/components/ui/avatar";
-import { BadgeEcole } from "@/components/ui/badge";
+import { BadgeCampus } from "@/components/ui/badge";
 import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { CarteProgression } from "@/components/profil/progression";
@@ -34,7 +34,7 @@ export default async function PageCompte() {
   const [{ data: stats }, { data: coordonnees }, { data: classes }] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
     supabase.from("coordonnees").select("telephone, email, reseau").eq("id", user.id).single(),
-    supabase.from("classes").select("id, nom, validee").eq("ecole", profil.ecole).order("nom"),
+    supabase.from("classes").select("id, nom, validee").eq("campus", profil.campus).order("nom"),
   ]);
 
   return (
@@ -43,7 +43,7 @@ export default async function PageCompte() {
         <TitrePage
           accroche={
             <span className="flex flex-wrap items-center gap-2">
-              @{profil.pseudo} <BadgeEcole ecole={profil.ecole} /> {user.email}
+              @{profil.pseudo} <BadgeCampus campus={profil.campus} /> {user.email}
             </span>
           }
         >
@@ -79,7 +79,7 @@ export default async function PageCompte() {
         {classes && classes.length > 0 ? (
           <form action={choisirClasse} className="flex flex-wrap items-end gap-2">
             <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-semibold">
-              Classe ({profil.ecole})
+              Classe (campus de {profil.campus})
               <select name="classe" defaultValue={profil.classe_id ?? ""} className="min-h-11 rounded-ui border border-ligne-forte bg-surface px-3 text-base font-normal">
                 <option value="">Pas de classe</option>
                 {[
@@ -133,7 +133,7 @@ export default async function PageCompte() {
         <FormulaireIdentite pseudo={profil.pseudo} prenom={profil.prenom} bio={profil.bio ?? ""} />
       </Section>
 
-      <Section id="fil" titre="Le fil du campus" aide="Le fil montre « @lea (ESP) a aidé @tom (ESD) ». Une entraide n'y apparaît que si les deux personnes ont dit oui. Jamais de message ni de coordonnées.">
+      <Section id="fil" titre="Le fil du campus" aide="Le fil montre « @lea (Bordeaux) a aidé @tom (Bordeaux) ». Une entraide n'y apparaît que si les deux personnes ont dit oui. Jamais de message ni de coordonnées.">
         <form action={basculerFil} className="flex flex-wrap items-center gap-3">
           <input type="hidden" name="fil" value={profil.fil_public ? "non" : "oui"} />
           <span className={`rounded-full px-3 py-1 text-sm font-semibold ${profil.fil_public ? "bg-ok-fond text-ok" : "bg-papier-fonce text-encre-douce"}`}>

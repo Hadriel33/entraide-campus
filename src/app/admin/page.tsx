@@ -5,13 +5,15 @@ import { exigerSession } from "@/lib/session";
 import { dateCourte } from "@/lib/annonces/requetes";
 import { CATEGORIES } from "@/lib/annonces/validation";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge, BadgeEcole } from "@/components/ui/badge";
+import { Badge, BadgeCampus } from "@/components/ui/badge";
+import { CAMPUS } from "@/lib/auth/validation";
 import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { TableauImpact } from "./impact";
 import { SanteIA } from "./sante-ia";
 import {
   changerRole,
+  changerCampus,
   creerClasse,
   modererAnnonce,
   supprimerAnnonceAdmin,
@@ -96,7 +98,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
     onglet === "etudiants"
       ? supabase
           .from("profils")
-          .select("id, pseudo, prenom, ecole, avatar_chemin, role, cree_le")
+          .select("id, pseudo, prenom, campus, avatar_chemin, role, cree_le")
           .order("cree_le", { ascending: false })
           .limit(200)
       : Promise.resolve({ data: [] }),
@@ -450,7 +452,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
                     id: string;
                     pseudo: string;
                     prenom: string;
-                    ecole: string;
+                    campus: string;
                     avatar_chemin: string | null;
                     role: string;
                     cree_le: string;
@@ -469,7 +471,15 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
                   <span className="font-semibold">@{e.pseudo}</span>{" "}
                   <span className="text-sm text-encre-douce">{e.prenom}</span>
                 </Link>
-                <BadgeEcole ecole={e.ecole} />
+                <form action={changerCampus.bind(null, e.id)} className="flex items-center gap-1.5">
+                  <label className="sr-only" htmlFor={`campus-${e.id}`}>Campus de @{e.pseudo}</label>
+                  <select id={`campus-${e.id}`} name="campus" defaultValue={e.campus} className="min-h-8 rounded-ui border border-ligne-forte bg-surface px-2 text-sm">
+                    {CAMPUS.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <Bouton variante="discret" className="min-h-8 px-2 text-sm">Changer</Bouton>
+                </form>
                 {e.role === "admin" ? (
                   <Badge variante="ok">Admin</Badge>
                 ) : (
@@ -505,8 +515,8 @@ async function ListeClasses() {
   const { supabase } = await exigerSession();
   const { data: toutes } = await supabase
     .from("classes")
-    .select("id, ecole, nom, validee")
-    .order("ecole")
+    .select("id, campus, nom, validee")
+    .order("campus")
     .order("nom");
   const classes = (toutes ?? []).filter((c) => c.validee);
   const propositions = (toutes ?? []).filter((c) => !c.validee);
@@ -522,7 +532,7 @@ async function ListeClasses() {
               key={c.id}
               className="flex flex-wrap items-center gap-2 rounded-ui bg-surface px-3 py-2"
             >
-              <BadgeEcole ecole={c.ecole} />
+              <BadgeCampus campus={c.campus} />
               <span className="flex-1 font-medium">{c.nom}</span>
               <form action={validerClasse.bind(null, c.id)}>
                 <Bouton className="min-h-8 px-3 text-sm">Valider</Bouton>
@@ -541,13 +551,14 @@ async function ListeClasses() {
         className="flex flex-wrap items-end gap-2 rounded-carte border border-ligne bg-surface p-4"
       >
         <label className="flex flex-col gap-1 text-sm font-semibold">
-          École
+          Campus
           <select
-            name="ecole"
+            name="campus"
             className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3"
           >
-            <option value="ESD">ESD</option>
-            <option value="ESP">ESP</option>
+            {CAMPUS.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
           </select>
         </label>
         <label className="flex min-w-60 flex-1 flex-col gap-1 text-sm font-semibold">
@@ -564,11 +575,11 @@ async function ListeClasses() {
         <Bouton>Ajouter</Bouton>
       </form>
       <div className="grid gap-6 sm:grid-cols-2">
-        {["ESD", "ESP"].map((e) => (
+        {CAMPUS.map((e) => (
           <div key={e} className="flex flex-col gap-2">
             <h2 className="titre-charte text-xl">{e}</h2>
             {(classes ?? [])
-              .filter((c) => c.ecole === e)
+              .filter((c) => c.campus === e)
               .map((c) => (
                 <div
                   key={c.id}
@@ -582,7 +593,7 @@ async function ListeClasses() {
                   </form>
                 </div>
               ))}
-            {!(classes ?? []).some((c) => c.ecole === e) && (
+            {!(classes ?? []).some((c) => c.campus === e) && (
               <p className="text-sm text-encre-douce">
                 Aucune classe pour l&apos;instant.
               </p>

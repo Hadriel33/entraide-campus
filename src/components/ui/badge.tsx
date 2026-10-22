@@ -4,8 +4,7 @@ import type { ReactNode } from "react";
 const STYLES = {
   offre: "bg-offre text-encre",
   besoin: "bg-besoin text-encre",
-  esd: "bg-surface text-encre ring-1 ring-encre/20",
-  esp: "bg-encre text-surface",
+  campus: "bg-surface text-encre ring-1 ring-encre/20",
   neutre: "bg-papier-fonce text-encre font-medium",
   ok: "bg-ok-fond text-ok",
 } as const;
@@ -22,6 +21,16 @@ export function Badge({ variante = "neutre", point, children }: { variante?: Var
   );
 }
 
-export function BadgeEcole({ ecole }: { ecole: string }) {
-  return <Badge variante={ecole === "ESP" ? "esp" : "esd"}>{ecole}</Badge>;
+// Le campus ESP de la personne (les deux écoles ont fusionné : on ne les distingue plus).
+export function BadgeCampus({ campus }: { campus?: string | null }) {
+  if (!campus) return null;
+  return (
+    <Badge variante="campus">
+      <svg viewBox="0 0 24 24" className="size-3" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+        <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" />
+        <circle cx="12" cy="9.5" r="2.5" />
+      </svg>
+      {campus}
+    </Badge>
+  );
 }

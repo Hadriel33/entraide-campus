@@ -1,7 +1,7 @@
 // Défi de la semaine : un défi différent chaque semaine (rotation fixe sur le numéro de semaine ISO).
 // La progression est calculée en base (fonction progression_defi, migration 0014) ; la même rotation y est codée.
 export const DEFIS = [
-  { code: "croisement", titre: "Entraide ESD × ESP", description: "Réussis une mise en relation avec un étudiant de l'autre école.", objectif: 1 },
+  { code: "croisement", titre: "Autre formation", description: "Réussis une mise en relation avec un étudiant d'une autre formation.", objectif: 1 },
   { code: "aider", titre: "Main tendue", description: "Accepte 2 demandes de contact sur tes annonces.", objectif: 2 },
   { code: "avis", titre: "Retour d'expérience", description: "Laisse 2 avis après des entraides.", objectif: 2 },
   { code: "publier", titre: "Nouvelle annonce", description: "Publie une annonce cette semaine.", objectif: 1 },

@@ -39,7 +39,7 @@ export default async function Home() {
             </span>
           </h1>
           <p className="max-w-xl font-serif text-xl leading-snug text-encre/80 sm:text-[1.4rem]">
-            Le tableau d&apos;affichage des étudiants de l&apos;ESD et de l&apos;ESP Bordeaux. Un shooting, un coup de main sur ton code, une coloc, un covoit : tout
+            Le tableau d&apos;affichage des étudiants de l&apos;ESP, campus par campus. Un shooting, un coup de main sur ton code, une coloc, un covoit : tout
             s&apos;échange ici.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -115,24 +115,28 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ESD × ESP */}
+      {/* Le championnat des campus */}
       <section className="mx-auto grid w-full max-w-6xl items-center gap-16 px-4 py-20 md:grid-cols-2">
-        <div className="relative h-80" aria-hidden>
-          <div className="absolute top-0 left-0 w-72 -rotate-3 bg-ciel p-7 shadow-[6px_6px_0_0_var(--color-encre)] sm:w-80">
-            <span className="titre-charte block text-6xl">ESD</span>
-            <span className="font-semibold">Dev, data, UX, no-code</span>
-          </div>
-          <div className="absolute right-0 bottom-0 w-72 rotate-3 bg-lilas p-7 shadow-[6px_6px_0_0_var(--color-encre)] sm:w-80">
-            <span className="titre-charte block text-6xl">ESP</span>
-            <span className="font-semibold">Créa, pub, photo, vidéo</span>
-          </div>
-          <span className="absolute top-36 left-1/2 -translate-x-1/3 -rotate-[8deg] font-main text-4xl font-bold text-alerte">ça matche</span>
+        <div className="relative grid grid-cols-3 gap-3" aria-hidden>
+          {[
+            { c: "Paris", fond: "bg-ciel", rot: "-3deg" },
+            { c: "Lyon", fond: "bg-lilas", rot: "2deg" },
+            { c: "Bordeaux", fond: "bg-bandeau", rot: "-1deg" },
+            { c: "Toulouse", fond: "bg-ocre", rot: "3deg" },
+            { c: "Nantes", fond: "bg-ciel", rot: "-2deg" },
+            { c: "Lille", fond: "bg-lilas", rot: "1.5deg" },
+          ].map((x) => (
+            <div key={x.c} className={`${x.fond} flex aspect-square items-end p-3 shadow-[4px_4px_0_0_var(--color-encre)]`} style={{ rotate: x.rot }}>
+              <span className="titre-charte text-xl sm:text-2xl">{x.c}</span>
+            </div>
+          ))}
+          <span className="absolute -top-8 right-0 -rotate-[6deg] font-main text-3xl font-bold text-alerte">qui sera en tête ?</span>
         </div>
         <div className="flex flex-col gap-5">
-          <h2 className="titre-charte text-titre">Le dev de l&apos;un, la créa de l&apos;autre</h2>
+          <h2 className="titre-charte text-titre">Six campus, un championnat</h2>
           <p className="font-serif text-xl leading-relaxed text-encre/80">
-            Sur un même campus, deux écoles qui se complètent. Chaque entraide entre un étudiant ESD et un étudiant ESP rapporte un bonus « croisement » au
-            classement, et ta classe monte avec toi.
+            Chaque coup de main accepté fait gagner des points à ton campus. Une saison dure un mois : le 1er, tout repart à zéro, et ta classe
+            monte avec toi.
           </p>
         </div>
       </section>
@@ -142,7 +146,7 @@ export default async function Home() {
         <div className="flex flex-col gap-5">
           <h2 className="titre-charte text-titre">Entre étudiants de l&apos;école, point</h2>
           <p className="font-serif text-xl leading-relaxed text-encre/80">
-            Pour entrer, il faut un mail de l&apos;ESD ou de l&apos;ESP. Pas d&apos;inconnus, pas de faux profils : tout le monde sur le tableau est sur le campus.
+            Pour entrer, il faut ton mail de l&apos;école (l&apos;ancienne adresse marche aussi). Pas d&apos;inconnus, pas de faux profils : tout le monde sur le tableau est de l&apos;école.
           </p>
         </div>
         <div className="postit papier-gris flex flex-col gap-3 p-7 pt-9" style={{ "--rot": "1.5deg" } as React.CSSProperties}>
@@ -172,7 +176,7 @@ export default async function Home() {
               { valeur: impact.etudiants, label: "étudiants inscrits", teinte: "teinte-bandeau" },
               { valeur: impact.annonces_actives, label: "post-it sur le tableau", teinte: "teinte-lilas" },
               { valeur: impact.entraides, label: "entraides réalisées", teinte: "teinte-ciel" },
-              { valeur: impact.croisements, label: "entre ESD et ESP", teinte: "teinte-ocre" },
+              { valeur: impact.croisements, label: "entre deux formations", teinte: "teinte-ocre" },
             ].map((c) => (
               <div key={c.label} className={`couche-fixe ${c.teinte} flex flex-col-reverse rounded-carte border border-ligne bg-surface p-5`}>
                 <dt className="text-sm text-encre-douce">{c.label}</dt>

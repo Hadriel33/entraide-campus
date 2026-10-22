@@ -19,7 +19,7 @@ import { BoutonFavori } from "@/components/annonces/bouton-favori";
 import { BoutonPartager } from "@/components/annonces/bouton-partager";
 import { inclinaison, teinte } from "@/lib/design/teintes";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge, BadgeEcole } from "@/components/ui/badge";
+import { Badge, BadgeCampus } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import {
   BlocCoordonnees,
@@ -164,9 +164,7 @@ export default async function PageAnnonce({
           <div>
             <p className="flex items-center gap-2 font-semibold">
               @{annonce.auteur?.pseudo}{" "}
-              {annonce.auteur?.ecole && (
-                <BadgeEcole ecole={annonce.auteur.ecole} />
-              )}
+              <BadgeCampus campus={annonce.auteur?.campus} />
             </p>
             <p className="text-sm text-encre-douce">
               {prenom} · publiée le {dateCourte(annonce.cree_le)}

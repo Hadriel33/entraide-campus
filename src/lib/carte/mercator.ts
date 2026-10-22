@@ -56,7 +56,7 @@ export function ratio(c: Cadre = CADRE_BORDEAUX) {
 
 // Coordonnées GPS des quartiers proposés dans les annonces.
 export const GPS_QUARTIERS = {
-  victor_hugo: [44.8333, -0.5736], // campus ESD / ESP, place de la Ferme de Richemont
+  victor_hugo: [44.8333, -0.5736], // campus ESP Bordeaux, place de la Ferme de Richemont
   centre: [44.8412, -0.5745],
   chartrons: [44.8545, -0.5705],
   saint_michel: [44.8318, -0.5655],

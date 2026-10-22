@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
-import { BadgeEcole } from "@/components/ui/badge";
+import { BadgeCampus } from "@/components/ui/badge";
 import {
   CATEGORIES,
   QUARTIERS,
@@ -138,7 +138,7 @@ export function CarteAnnonce({
             colette={annonce.auteur}
           />
           <span className="truncate">@{annonce.auteur?.pseudo}</span>
-          {annonce.auteur?.ecole && <BadgeEcole ecole={annonce.auteur.ecole} />}
+          <BadgeCampus campus={annonce.auteur?.campus} />
         </span>
         <span className="flex shrink-0 flex-col items-end leading-none">
           {/* Annotation au feutre : la contrepartie, comme griffonnée sur le post-it. */}

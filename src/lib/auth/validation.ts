@@ -3,6 +3,14 @@ import { normaliserPseudo, validerPseudo } from "@/lib/profils/validation";
 export const ECOLES = ["ESD", "ESP"] as const;
 export type Ecole = (typeof ECOLES)[number];
 
+// L'ESD rejoint l'ESP : on ne distingue plus les écoles à l'écran, on se mesure entre campus ESP.
+export const CAMPUS = ["Paris", "Lyon", "Bordeaux", "Toulouse", "Nantes", "Lille"] as const;
+export type Campus = (typeof CAMPUS)[number];
+
+export function estCampus(valeur: string): valeur is Campus {
+  return (CAMPUS as readonly string[]).includes(valeur);
+}
+
 export type Resultat<C extends string> = { ok: boolean; erreurs: Partial<Record<C, string>> };
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,8 +30,9 @@ export function validerInscription(champs: {
   motDePasse: string;
   prenom: string;
   pseudo: string;
-}): Resultat<"email" | "motDePasse" | "prenom" | "pseudo"> & { ecole?: Ecole } {
-  const erreurs: Resultat<"email" | "motDePasse" | "prenom" | "pseudo">["erreurs"] = {};
+  campus: string;
+}): Resultat<"email" | "motDePasse" | "prenom" | "pseudo" | "campus"> & { ecole?: Ecole; campus?: Campus } {
+  const erreurs: Resultat<"email" | "motDePasse" | "prenom" | "pseudo" | "campus">["erreurs"] = {};
   const prenom = champs.prenom.trim();
   const ecole = ecoleDepuisEmail(champs.email);
 
@@ -34,9 +43,10 @@ export function validerInscription(champs: {
   else if (prenom.length > 40) erreurs.prenom = "40 caractères maximum.";
   const erreurPseudo = validerPseudo(normaliserPseudo(champs.pseudo));
   if (erreurPseudo) erreurs.pseudo = erreurPseudo;
+  if (!estCampus(champs.campus)) erreurs.campus = "Choisis ton campus.";
 
   const ok = Object.keys(erreurs).length === 0;
-  return ok && ecole ? { ok, erreurs, ecole } : { ok, erreurs };
+  return ok && ecole && estCampus(champs.campus) ? { ok, erreurs, ecole, campus: champs.campus } : { ok, erreurs };
 }
 
 export function validerConnexion(champs: {

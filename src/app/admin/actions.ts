@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { exigerSession } from "@/lib/session";
+import { estCampus } from "@/lib/auth/validation";
 
 // Vérification côté serveur, en plus de la RLS et des fonctions SQL qui refusent déjà un non-admin.
 async function exigerAdmin() {
@@ -44,6 +45,16 @@ export async function changerRole(cible: string, role: "admin" | "etudiant") {
   redirect("/admin?onglet=etudiants");
 }
 
+// Corriger le campus d'un étudiant (erreur à l'inscription). La base vérifie aussi que c'est un admin.
+export async function changerCampus(cible: string, formData: FormData) {
+  const { supabase } = await exigerAdmin();
+  const campus = String(formData.get("campus") ?? "");
+  if (!estCampus(campus)) redirect("/admin?onglet=etudiants&erreur=campus");
+  await supabase.rpc("changer_campus", { cible, nouveau: campus });
+  revalidatePath("/admin");
+  redirect("/admin?onglet=etudiants");
+}
+
 // Décision humaine sur une annonce passée par la modération IA : l'admin a toujours le dernier mot.
 export async function validerModeration(id: string) {
   const { supabase } = await exigerAdmin();
@@ -70,13 +81,13 @@ export async function validerModeration(id: string) {
 
 export async function creerClasse(formData: FormData) {
   const { supabase } = await exigerAdmin();
-  const ecole = String(formData.get("ecole") ?? "");
+  const campus = String(formData.get("campus") ?? "");
   const nom = String(formData.get("nom") ?? "")
     .trim()
     .replace(/\s+/g, " ");
-  if (!["ESD", "ESP"].includes(ecole) || nom.length < 2 || nom.length > 60)
+  if (!estCampus(campus) || nom.length < 2 || nom.length > 60)
     redirect("/admin?onglet=classes&erreur=classe");
-  await supabase.from("classes").insert({ ecole, nom });
+  await supabase.from("classes").insert({ ecole: "ESP", campus, nom });
   revalidatePath("/admin");
   redirect("/admin?onglet=classes&ok=classe_creee");
 }
