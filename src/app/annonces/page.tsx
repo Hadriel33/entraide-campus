@@ -15,6 +15,7 @@ import {
   type Categorie,
 } from "@/lib/annonces/validation";
 import { CAMPUS, estCampus } from "@/lib/auth/validation";
+import { quartiersDu } from "@/lib/carte/mercator";
 import { TEINTES, inclinaison, teinte } from "@/lib/design/teintes";
 import { LigneAnnonce } from "@/components/annonces/ligne-annonce";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
@@ -377,14 +378,21 @@ export default async function PageAnnonces({
                 defaultValue={filtres.quartier ?? ""}
                 className={CLASSE_SAISIE}
               >
-                <option value="">Tout Bordeaux</option>
-                {Object.entries(QUARTIERS).map(([v, l]) => (
-                  <option key={v} value={v}>
-                    {l}
-                  </option>
+                <option value="">Tous les quartiers</option>
+                {/* Les quartiers du campus affiché ; avec « tous les campus », rangés par ville. */}
+                {(campus ? [campus] : [...CAMPUS]).map((c) => (
+                  <optgroup key={c} label={c}>
+                    {quartiersDu(c).map((q) => (
+                      <option key={q} value={q}>
+                        {QUARTIERS[q as keyof typeof QUARTIERS]}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
+                <option value="hors_bordeaux">{QUARTIERS.hors_bordeaux}</option>
               </select>
             </label>
+            {(campus === null || campus === "Bordeaux") && (
             <label className="flex flex-col gap-1 text-xs font-semibold">
               Tram
               <select
@@ -400,6 +408,7 @@ export default async function PageAnnonces({
                 ))}
               </select>
             </label>
+            )}
             <label className="flex flex-col gap-1 text-xs font-semibold">
               Campus
               <select

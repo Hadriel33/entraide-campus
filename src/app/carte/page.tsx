@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { exigerSession } from "@/lib/session";
 import { QUARTIERS, TRAMS } from "@/lib/annonces/validation";
+import { CAMPUS, estCampus } from "@/lib/auth/validation";
 import { teinte } from "@/lib/design/teintes";
 import {
-  CADRE_BORDEAUX,
-  GPS_QUARTIERS,
+  CARTES,
+  pointDuQuartier,
+  quartiersDu,
   ratio,
   tuiles,
   versPourcent,
@@ -30,35 +32,48 @@ const CLASSE_TRAM: Record<string, string> = {
   D: "bg-tram-d",
 };
 
-// La vraie carte de Bordeaux et de ses environs : tuiles OpenStreetMap posées à la main (sans librairie),
-// un post-it punaisé à la position GPS de chaque quartier. Fond adouci, ou inversé en mode tableau noir.
-export default async function PageCarte() {
-  const { supabase } = await exigerSession();
-  const { data } = await supabase
-    .from("annonces")
-    .select("id, titre, categorie, quartier")
-    .eq("statut", "publiee")
-    .gt("expire_le", new Date().toISOString())
-    .order("cree_le", { ascending: false })
-    .limit(300);
+// La vraie carte autour de chaque campus ESP : tuiles OpenStreetMap posées à la main (sans librairie),
+// un post-it punaisé à la position GPS de chaque quartier. Mon campus par défaut, les 5 autres en un clic.
+export default async function PageCarte({ searchParams }: PageProps<"/carte">) {
+  const { supabase, profil } = await exigerSession();
+  const demande = (await searchParams).campus;
+  const campus = typeof demande === "string" && estCampus(demande) ? demande : (estCampus(profil.campus) ? profil.campus : "Bordeaux");
+  const carte = CARTES[campus];
+  const quartiers = quartiersDu(campus) as Quartier[];
+  const maintenant = new Date().toISOString();
+  const [{ data }, { count: sansLieu }] = await Promise.all([
+    supabase
+      .from("annonces")
+      .select("id, titre, categorie, quartier")
+      .eq("statut", "publiee")
+      .gt("expire_le", maintenant)
+      .in("quartier", quartiers)
+      .order("cree_le", { ascending: false })
+      .limit(300),
+    // « Ailleurs ou sans lieu » : les annonces des étudiants de ce campus sans quartier de la carte.
+    supabase
+      .from("annonces")
+      .select("id, auteur:profils!annonces_auteur_id_fkey!inner(campus)", { count: "exact", head: true })
+      .eq("statut", "publiee")
+      .gt("expire_le", maintenant)
+      .eq("auteur.campus", campus)
+      .or("quartier.is.null,quartier.eq.hors_bordeaux"),
+  ]);
   const annonces = (data ?? []) as Mini[];
   const parQuartier = annonces.reduce<Record<string, Mini[]>>((acc, a) => {
     if (a.quartier) (acc[a.quartier] ??= []).push(a);
     return acc;
   }, {});
-  const ailleurs =
-    (parQuartier.hors_bordeaux?.length ?? 0) +
-    annonces.filter((a) => !a.quartier).length;
-  const quartiers = Object.keys(
-    GPS_QUARTIERS,
-  ) as (keyof typeof GPS_QUARTIERS)[];
+  const ailleurs = sansLieu ?? 0;
+  const lienQuartier = (q: string) => `/annonces?campus=${campus}&quartier=${q}`;
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <TitrePage accroche="Bordeaux et ses environs : chaque punaise est un quartier. Clique pour voir ses annonces.">
+        <TitrePage accroche={`${campus} et ses environs : chaque punaise est un quartier, la jaune est le campus. Clique pour voir ses annonces.`}>
           La carte
         </TitrePage>
+        {campus === "Bordeaux" && (
         <nav
           className="flex flex-wrap items-center gap-2 text-sm font-semibold"
           aria-label="Lignes de tram"
@@ -73,20 +88,36 @@ export default async function PageCarte() {
             </Link>
           ))}
         </nav>
+        )}
       </div>
+
+      {/* Les 6 campus : le mien d'abord, les autres pour voir ce qui se passe ailleurs. */}
+      <nav className="-mt-4 flex flex-wrap gap-2" aria-label="Campus">
+        {[...CAMPUS].sort((a, b) => Number(b === profil.campus) - Number(a === profil.campus)).map((c) => (
+          <Link
+            key={c}
+            href={`/carte?campus=${c}`}
+            aria-current={c === campus ? "page" : undefined}
+            className="presse rounded-full border border-ligne-forte bg-surface px-3.5 py-1.5 text-sm font-semibold hover:bg-papier-fonce aria-[current=page]:border-encre aria-[current=page]:bg-encre aria-[current=page]:text-surface"
+          >
+            {c}
+            {c === profil.campus && <span className="ml-1 font-main font-normal">(le mien)</span>}
+          </Link>
+        ))}
+      </nav>
 
       <figure className="flex flex-col gap-2">
         <div
           className="relative w-full overflow-hidden rounded-carte border border-ligne bg-papier-fonce"
-          style={{ aspectRatio: ratio() }}
+          style={{ aspectRatio: ratio(carte.cadre) }}
         >
           {/* Fond de carte OpenStreetMap, adouci par un filtre (inversé en mode tableau noir, voir globals.css). */}
           <div className="fond-carte absolute inset-0" aria-hidden>
-            {tuiles().map((t) => (
+            {tuiles(carte.cadre).map((t) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={`${t.x}-${t.y}`}
-                src={`https://tile.openstreetmap.org/${CADRE_BORDEAUX.zoom}/${t.x}/${t.y}.png`}
+                src={`https://tile.openstreetmap.org/${carte.cadre.zoom}/${t.x}/${t.y}.png`}
                 alt=""
                 draggable={false}
                 className="absolute max-w-none select-none"
@@ -102,13 +133,14 @@ export default async function PageCarte() {
 
           {quartiers.map((q, i) => {
             const liste = parQuartier[q] ?? [];
-            const [lat, lng] = GPS_QUARTIERS[q];
-            const { gauche, haut } = versPourcent(lat, lng);
+            const [lat, lng] = pointDuQuartier(q)!;
+            const { gauche, haut } = versPourcent(lat, lng, carte.cadre);
+            const estCampusQ = q === carte.campus;
             const premiere = liste[0];
             return (
               <div
                 key={q}
-                className={`group absolute -translate-x-1/2 -translate-y-full hover:z-20 focus-within:z-20 ${q === "victor_hugo" ? "z-[15]" : "z-10"}`}
+                className={`group absolute -translate-x-1/2 -translate-y-full hover:z-20 focus-within:z-20 ${estCampusQ ? "z-[15]" : "z-10"}`}
                 style={{ left: `${gauche}%`, top: `${haut}%` }}
               >
                 {/* Clic : le post-it du quartier s'ouvre sur la carte (popover natif), avec ses annonces. */}
@@ -120,7 +152,7 @@ export default async function PageCarte() {
                 >
                   {/* Petit post-it plié avec le nombre d'annonces, et sa punaise sur le point exact */}
                   <span
-                    className={`colle postit ${premiere ? teinte(premiere.categorie).papier : "papier-gris"} flex items-center gap-1 px-2 pt-2.5 pb-1 text-xs font-bold ${liste.length ? "" : "opacity-80"}`}
+                    className={`colle postit ${estCampusQ ? "papier-jaune ring-2 ring-encre" : premiere ? teinte(premiere.categorie).papier : "papier-gris"} flex items-center gap-1 px-2 pt-2.5 pb-1 text-xs font-bold ${liste.length || estCampusQ ? "" : "opacity-80"}`}
                     style={
                       {
                         "--i": i,
@@ -214,7 +246,7 @@ export default async function PageCarte() {
                       <Link
                         href={
                           liste.length
-                            ? `/annonces?quartier=${q}`
+                            ? lienQuartier(q)
                             : "/annonces/nouvelle"
                         }
                         className="-rotate-2 font-main text-xl text-alerte hover:underline"
@@ -251,7 +283,7 @@ export default async function PageCarte() {
         <figcaption className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-encre-douce">
           {ailleurs > 0 ? (
             <Link
-              href="/annonces?quartier=hors_bordeaux"
+              href={lienQuartier("hors_bordeaux")}
               className="rounded-ui bg-postit-gris px-2.5 py-1 text-xs font-semibold text-encre hover:underline"
             >
               Ailleurs ou sans lieu : {ailleurs}
@@ -279,12 +311,12 @@ export default async function PageCarte() {
           Par quartier
         </h2>
         <ul className="grid grid-cols-2 gap-x-5 gap-y-7 pt-2 sm:grid-cols-3 lg:grid-cols-4">
-          {(Object.keys(QUARTIERS) as Quartier[]).map((q, i) => {
+          {[...quartiers, "hors_bordeaux" as Quartier].map((q, i) => {
             const liste = parQuartier[q] ?? [];
             return (
               <li key={q}>
                 <Link
-                  href={`/annonces?quartier=${q}`}
+                  href={lienQuartier(q)}
                   className={`postit ${liste[0] ? teinte(liste[0].categorie).papier : "papier-gris"} flex h-full flex-col gap-1 p-4 pt-5`}
                   style={
                     { "--rot": `${(i % 3) - 1}deg` } as React.CSSProperties
@@ -296,7 +328,7 @@ export default async function PageCarte() {
                       {QUARTIERS[q]}
                     </strong>
                     <span className="titre-charte text-2xl">
-                      {liste.length}
+                      {q === "hors_bordeaux" ? ailleurs : liste.length}
                     </span>
                   </span>
                   {liste[0] && (

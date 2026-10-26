@@ -9,7 +9,7 @@ import { redigerAvecColette, type EtatAnnonce, type EtatRedaction } from "@/app/
 type Action = (etat: EtatAnnonce, formData: FormData) => Promise<EtatAnnonce>;
 
 // Colette rédactrice : une phrase, et elle remplit le formulaire. L'étudiant relit tout avant de publier.
-export function AssistantRedaction({ action, initial }: { action: Action; initial: Record<string, string> }) {
+export function AssistantRedaction({ action, initial, campus }: { action: Action; initial: Record<string, string>; campus?: string }) {
   const [etat, rediger, enCours] = useActionState<EtatRedaction, FormData>(redigerAvecColette, {});
   const valeurs = etat.brouillon ? { ...initial, ...etat.brouillon } : initial;
 
@@ -50,7 +50,7 @@ export function AssistantRedaction({ action, initial }: { action: Action; initia
       </form>
 
       {/* key : le formulaire se remplit à nouveau à chaque brouillon */}
-      <FormulaireAnnonce key={JSON.stringify(etat.brouillon ?? {})} action={action} libelle="Publier l'annonce" annulerVers="/annonces" initial={valeurs} />
+      <FormulaireAnnonce key={JSON.stringify(etat.brouillon ?? {})} action={action} libelle="Publier l'annonce" annulerVers="/annonces" initial={valeurs} campus={campus} />
     </div>
   );
 }

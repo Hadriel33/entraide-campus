@@ -30,3 +30,14 @@
 - Migration **additive, sans DROP** : l'ancien code en ligne continue de marcher pendant le déploiement (nouvelles fonctions `classement_campus` et `fil_du_campus`, les anciennes restent).
 - Les blocs SQL contenant un `DROP` restaient bloqués côté connecteur Supabase (attente de confirmation) : remplacés par `alter policy` et un trigger supplémentaire.
 - La colonne `ecole` reste en base (déduite de l'email), invisible à l'écran.
+
+## Bilan (26/10/2026)
+| Lot | État | Vérification |
+|---|---|---|
+| 0 | Fait | Garde-fou des jointures étendu à `classes` |
+| A | Fait | 8 tests SQL campus, garde-fou « pas d'ESD à l'écran », championnat testé |
+| B | Fait | Aperçu ordinateur et 375 px (barre latérale, menu Moi, inscription) |
+| C | Fait | 5 tests de correspondance, aperçu des 6 formes |
+| D | Fait | 11 tests SQL sur 12 via le connecteur (le 12e, suppression, à coller dans l'éditeur), 5 tests Vitest, aperçu de la bulle |
+| E | Fait | 3 tests SQL, 6 tests Vitest (dont l'écart entre punaises), cartes vérifiées sur les tuiles |
+Reste à faire à la main : la recette à 2 comptes sur le fil, les salons et la bulle (`docs/RECETTE.md`).

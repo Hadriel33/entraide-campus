@@ -91,6 +91,8 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     ["/compte", /Mon profil/i],
     ["/mes-annonces", /annonces/i],
     ["/mur", /Le tableau/i],
+    ["/fil", /Le fil/i],
+    ["/reglages", /Réglages/i],
   ] as const) {
     const erreurs = surveillerErreurs(page);
     await page.goto(chemin);
@@ -101,4 +103,15 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     await pasDeDebordement(page);
     expect(erreurs, chemin).toEqual([]);
   }
+});
+
+test("la bulle de Colette ouvre les salons du campus", async ({ page }) => {
+  const erreurs = surveillerErreurs(page);
+  await page.goto("/fil");
+  await page.getByRole("button", { name: /^Messages/ }).click();
+  await page.getByRole("tab", { name: "Salons" }).click();
+  await expect(page.getByRole("button", { name: /Général/ })).toBeVisible();
+  await page.getByRole("button", { name: /Général/ }).click();
+  await expect(page.getByPlaceholder(/Écrire dans Général/)).toBeVisible();
+  expect(erreurs).toEqual([]);
 });
