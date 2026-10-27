@@ -38,6 +38,6 @@
 | A | Fait | 8 tests SQL campus, garde-fou « pas d'ESD à l'écran », championnat testé |
 | B | Fait | Aperçu ordinateur et 375 px (barre latérale, menu Moi, inscription) |
 | C | Fait | 5 tests de correspondance, aperçu des 6 formes |
-| D | Fait | 11 tests SQL sur 12 via le connecteur (le 12e, suppression, à coller dans l'éditeur), 5 tests Vitest, aperçu de la bulle |
+| D | Fait | 12 tests SQL sur 12 (le 12e, suppression, lancé par Hadriel dans l'éditeur SQL le 27/10), 5 tests Vitest, aperçu de la bulle |
 | E | Fait | 3 tests SQL, 6 tests Vitest (dont l'écart entre punaises), cartes vérifiées sur les tuiles |
 Reste à faire à la main : la recette à 2 comptes sur le fil, les salons et la bulle (`docs/RECETTE.md`).
