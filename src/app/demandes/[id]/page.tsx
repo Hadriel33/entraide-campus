@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigerSession } from "@/lib/session";
 import { Avatar } from "@/components/ui/avatar";
-import { BadgeEcole } from "@/components/ui/badge";
+import { BadgeCampus } from "@/components/ui/badge";
 import {
   BlocCoordonnees,
   type Coordonnees,
@@ -19,10 +19,10 @@ type Personne = {
   id: string;
   prenom: string;
   pseudo: string;
-  ecole: string;
+  campus: string;
   avatar_chemin: string | null;
 };
-const PERSONNE = "id, prenom, pseudo, ecole, avatar_chemin";
+const PERSONNE = "id, prenom, pseudo, campus, avatar_chemin";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default async function PageConversation({
@@ -103,7 +103,7 @@ export default async function PageConversation({
             <Link href={`/profils/${autre.pseudo}`} className="hover:underline">
               @{autre.pseudo}
             </Link>
-            <BadgeEcole ecole={autre.ecole} />
+            <BadgeCampus campus={autre.campus} />
           </h1>
           {demande.annonce && (
             <p className="truncate text-sm text-encre-douce">

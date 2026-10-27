@@ -7,6 +7,7 @@ export type ProfilSession = {
   prenom: string;
   pseudo: string;
   ecole: string;
+  campus: string;
   avatar_chemin: string | null;
   bio: string | null;
   competences: string[];
@@ -29,7 +30,7 @@ export const getSession = cache(async () => {
   if (!user) return { supabase, user: null, profil: null };
   const { data: profil } = await supabase
     .from("profils")
-    .select("id, prenom, pseudo, ecole, avatar_chemin, bio, competences, role, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, fil_public")
+    .select("id, prenom, pseudo, ecole, campus, avatar_chemin, bio, competences, role, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, fil_public")
     .eq("id", user.id)
     .single<ProfilSession>();
   return { supabase, user, profil };

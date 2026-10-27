@@ -78,7 +78,7 @@ export function CarteProgression({
       {moi && (
         <p className="text-xs text-encre-douce">
           Aider rapporte 30 points par personne aidée, recevoir de l&apos;aide
-          10, un avis reçu 5, une entraide ESD × ESP 10 de plus, un défi de la
+          10, un avis reçu 5, une entraide entre deux formations 10 de plus, un défi de la
           semaine 20. Les points se calculent tout seuls : personne ne peut les
           modifier.
         </p>

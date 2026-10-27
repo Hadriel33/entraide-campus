@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { ecoleDepuisEmail, validerConnexion, validerInscription } from "../validation";
+import { CAMPUS, ecoleDepuisEmail, validerConnexion, validerInscription } from "../validation";
 
 const inscriptionValide = {
   email: "sam.riviere@mail-esp.com",
   motDePasse: "photo2026!",
   prenom: "Sam",
   pseudo: "sam.photo",
+  campus: "Bordeaux",
 };
 
 describe("ecoleDepuisEmail", () => {
@@ -30,7 +31,7 @@ describe("ecoleDepuisEmail", () => {
 
 describe("validerInscription", () => {
   it("accepte une inscription complète avec un email de l'école", () => {
-    expect(validerInscription(inscriptionValide)).toEqual({ ok: true, erreurs: {}, ecole: "ESP" });
+    expect(validerInscription(inscriptionValide)).toEqual({ ok: true, erreurs: {}, ecole: "ESP", campus: "Bordeaux" });
   });
 
   it("refuse un email qui n'est pas celui de l'école", () => {
@@ -80,5 +81,23 @@ describe("validerConnexion", () => {
 
   it("refuse un mot de passe vide", () => {
     expect(validerConnexion({ email: "lea@mail-esd.com", motDePasse: "" }).erreurs.motDePasse).toBeDefined();
+  });
+});
+
+// Retour du prof (22/10) : l'ESD rejoint l'ESP, on choisit son campus parmi les 6 campus ESP.
+describe("campus à l'inscription", () => {
+  it("propose les 6 campus de l'ESP", () => {
+    expect([...CAMPUS]).toEqual(["Paris", "Lyon", "Bordeaux", "Toulouse", "Nantes", "Lille"]);
+  });
+  it("renvoie le campus choisi", () => {
+    expect(validerInscription({ ...inscriptionValide, campus: "Lyon" }).campus).toBe("Lyon");
+  });
+  it("accepte encore les deux adresses, ESD et ESP", () => {
+    expect(validerInscription({ ...inscriptionValide, email: "lea@mail-esd.com" }).ok).toBe(true);
+    expect(validerInscription({ ...inscriptionValide, email: "lea@mail-esp.com" }).ok).toBe(true);
+  });
+  it("refuse un campus vide ou inconnu", () => {
+    expect(validerInscription({ ...inscriptionValide, campus: "" }).erreurs.campus).toBeTruthy();
+    expect(validerInscription({ ...inscriptionValide, campus: "Mars" }).erreurs.campus).toBeTruthy();
   });
 });

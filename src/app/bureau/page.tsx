@@ -57,7 +57,7 @@ type Contact = {
   } | null;
   annonce: { titre: string } | null;
 };
-type Ligne = { id: string; pseudo: string; stats: Stats };
+type Ligne = { id: string; pseudo: string; campus: string; stats: Stats };
 
 function debutSemaine() {
   const d = new Date();
@@ -114,9 +114,9 @@ export default async function PageBureau() {
       .neq("auteur_id", user.id)
       .order("cree_le", { ascending: false })
       .limit(60),
-    supabase.rpc("stats_classement", { depuis: debutSemaine() }),
+    supabase.rpc("classement_campus", { depuis: debutSemaine() }),
     supabase.from("profils").select("id, classe_id"),
-    supabase.from("classes").select("id, nom, ecole").eq("validee", true),
+    supabase.from("classes").select("id, nom, campus").eq("validee", true).eq("campus", profil.campus),
     lireEtatAccueil(supabase, profil),
   ]);
 
@@ -179,8 +179,8 @@ export default async function PageBureau() {
     (recentes ?? []) as unknown as Annonce[],
   );
 
-  // Classements de la semaine : étudiants et classes
-  const lignes = ((classement ?? []) as Ligne[]).map((l) => ({
+  // Classements de la semaine, dans mon campus : étudiants et classes
+  const lignes = ((classement ?? []) as Ligne[]).filter((l) => l.campus === profil.campus).map((l) => ({
     ...l,
     points: calculerProgression(l.stats).points,
   }));
@@ -391,7 +391,7 @@ export default async function PageBureau() {
                         {annonce.titre}
                       </span>
                       <span className="text-xs text-encre/60">
-                        @{annonce.auteur?.pseudo} · {annonce.auteur?.ecole}
+                        @{annonce.auteur?.pseudo} · {annonce.auteur?.campus}
                       </span>
                     </Link>
                   </li>

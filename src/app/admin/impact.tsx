@@ -18,8 +18,8 @@ type Impact = {
     en_attente: number;
     delai_median_heures: number | null;
   };
-  croisement: { entraides: number; esd_esp: number };
-  ecoles: Record<string, number>;
+  croisement: { entraides: number; formations: number };
+  campus: Record<string, number>;
   categories: {
     categorie: Categorie;
     offres: number;
@@ -125,7 +125,7 @@ export async function TableauImpact({
         {[
           {
             valeur: e.inscrits,
-            label: `inscrits (ESD ${s.ecoles.ESD ?? 0}, ESP ${s.ecoles.ESP ?? 0})`,
+            label: `inscrits (${Object.entries(s.campus ?? {}).map(([c, n]) => `${c} ${n}`).join(", ") || "aucun"})`,
             teinte: "teinte-bandeau",
           },
           {
@@ -134,8 +134,8 @@ export async function TableauImpact({
             teinte: "teinte-lilas",
           },
           {
-            valeur: `${pct(s.croisement.esd_esp, s.croisement.entraides)} %`,
-            label: "des entraides entre ESD et ESP",
+            valeur: `${pct(s.croisement.formations, s.croisement.entraides)} %`,
+            label: "des entraides entre deux formations",
             teinte: "teinte-ciel",
           },
           {

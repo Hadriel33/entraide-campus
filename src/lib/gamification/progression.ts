@@ -6,7 +6,7 @@ export type Stats = {
   categories: number; // catégories différentes
   aides_donnees: number; // mises en relation acceptées où j'apporte l'aide
   aides_recues: number; // mises en relation acceptées où je reçois l'aide
-  croisements: number; // entraides avec un étudiant de l'autre école
+  croisements: number; // entraides avec un étudiant d'une autre formation
   nb_avis: number;
   note_moyenne: number | null;
   defis_reussis?: number; // défis de la semaine réussis (26 dernières semaines)
@@ -105,11 +105,11 @@ export function calculerProgression(s: Stats) {
     ),
     badge(
       "croisement",
-      "ESD × ESP",
-      "S'entraider avec un étudiant de l'autre école",
+      "Passerelle",
+      "S'entraider avec un étudiant d'une autre formation",
       s.croisements,
       1,
-      "Une entraide acceptée avec quelqu'un de l'autre école compte double au classement.",
+      "Une entraide acceptée avec quelqu'un d'une autre formation rapporte un bonus au classement.",
       "/annonces",
     ),
     badge(

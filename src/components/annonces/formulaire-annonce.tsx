@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { Champ } from "@/components/ui/champ";
 import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES } from "@/lib/annonces/validation";
+import { quartiersDu } from "@/lib/carte/mercator";
 import type { EtatAnnonce } from "@/app/annonces/actions";
 
 type Action = (etat: EtatAnnonce, formData: FormData) => Promise<EtatAnnonce>;
@@ -20,15 +21,22 @@ export function FormulaireAnnonce({
   initial = {},
   libelle,
   annulerVers,
+  campus = "Bordeaux",
 }: {
   action: Action;
   initial?: Record<string, string>;
   libelle: string;
   annulerVers: string;
+  campus?: string;
 }) {
   const [etat, envoyer, enCours] = useActionState<EtatAnnonce, FormData>(action, {});
   const v = etat.valeurs ?? initial;
   const e = etat.erreurs ?? {};
+  // Les quartiers de MON campus (et « Ailleurs ») ; on garde celui de l'annonce si elle vient d'ailleurs.
+  const quartiers = [...new Set([...quartiersDu(campus), "hors_bordeaux", ...(v.quartier ? [v.quartier] : [])])].filter(
+    (q) => q in QUARTIERS,
+  ) as (keyof typeof QUARTIERS)[];
+  const avecTram = campus === "Bordeaux";
 
   return (
     <form action={envoyer} className="flex flex-col gap-5" noValidate>
@@ -104,14 +112,15 @@ export function FormulaireAnnonce({
           Quartier (facultatif)
           <select name="quartier" defaultValue={v.quartier ?? ""} aria-invalid={!!e.quartier} className={CLASSE_SAISIE}>
             <option value="">Pas précisé</option>
-            {Object.entries(QUARTIERS).map(([valeur, label]) => (
+            {quartiers.map((valeur) => (
               <option key={valeur} value={valeur}>
-                {label}
+                {QUARTIERS[valeur]}
               </option>
             ))}
           </select>
           <Erreur texte={e.quartier} />
         </label>
+        {avecTram && (
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
           Tram le plus proche (facultatif)
           <select name="tram" defaultValue={v.tram ?? ""} aria-invalid={!!e.tram} className={CLASSE_SAISIE}>
@@ -124,6 +133,7 @@ export function FormulaireAnnonce({
           </select>
           <Erreur texte={e.tram} />
         </label>
+        )}
       </div>
 
       <Champ label="Précision sur le lieu (facultatif)" name="lieu" erreur={e.lieu} aide="Exemple : arrêt Porte de Bourgogne, studio photo du campus" defaultValue={v.lieu ?? ""} />

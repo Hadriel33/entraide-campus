@@ -38,8 +38,9 @@ export async function inscrire(_: EtatFormulaire, formData: FormData): Promise<E
     motDePasse: texte(formData, "motDePasse"),
     prenom: texte(formData, "prenom").trim(),
     pseudo: normaliserPseudo(texte(formData, "pseudo")),
+    campus: texte(formData, "campus"),
   };
-  const valeurs = { email: champs.email, prenom: champs.prenom, pseudo: champs.pseudo };
+  const valeurs = { email: champs.email, prenom: champs.prenom, pseudo: champs.pseudo, campus: champs.campus };
 
   const validation = validerInscription(champs);
   if (!validation.ok) return { erreurs: validation.erreurs, valeurs };
@@ -53,7 +54,7 @@ export async function inscrire(_: EtatFormulaire, formData: FormData): Promise<E
     email: champs.email,
     password: champs.motDePasse,
     options: {
-      data: { prenom: champs.prenom, pseudo: champs.pseudo }, // l'école est déduite de l'email par la base
+      data: { prenom: champs.prenom, pseudo: champs.pseudo, campus: champs.campus }, // l'école est déduite de l'email par la base
       emailRedirectTo: `${origine}/auth/confirmer`,
     },
   });
@@ -113,5 +114,5 @@ export async function changerMotDePasse(_: EtatFormulaire, formData: FormData): 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password: motDePasse });
   if (error) return { message: messageErreur(error.code, error.message) };
-  redirect("/compte?ok=mot_de_passe");
+  redirect("/reglages?ok=mot_de_passe");
 }

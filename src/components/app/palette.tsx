@@ -41,8 +41,18 @@ const PAGES: Commande[] = [
   },
   {
     label: "Mon profil",
-    aide: "Photo, compétences, coordonnées",
+    aide: "Photo, compétences, Colette, classe",
     href: "/compte",
+  },
+  {
+    label: "Le fil",
+    aide: "Entraides réussies, nouveaux post-it, commentaires",
+    href: "/fil",
+  },
+  {
+    label: "Réglages",
+    aide: "Coordonnées, confidentialité, apparence, compte",
+    href: "/reglages",
   },
   {
     label: "Annonces gratuites",

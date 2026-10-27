@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { FormulaireAnnonce } from "@/components/annonces/formulaire-annonce";
 import { TitrePage } from "@/components/ui/titre-page";
 import { modifierAnnonce } from "../../actions";
+import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Modifier l'annonce" };
 
@@ -30,6 +31,7 @@ export default async function PageModifierAnnonce({ params }: PageProps<"/annonc
         initial={{ ...annonce, lieu: annonce.lieu ?? "", quartier: annonce.quartier ?? "", tram: annonce.tram ?? "" }}
         libelle="Enregistrer"
         annulerVers={`/annonces/${annonce.id}`}
+        campus={(await getSession()).profil?.campus}
       />
     </div>
   );

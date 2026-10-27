@@ -20,7 +20,7 @@ export function LigneAnnonce({ annonce }: { annonce: Annonce }) {
         </span>
         <span className="w-32 text-xs text-encre-douce">{CONTREPARTIES[annonce.contrepartie]}</span>
         <span className="w-36 truncate text-xs">
-          @{annonce.auteur?.pseudo} · {annonce.auteur?.ecole}
+          @{annonce.auteur?.pseudo} · {annonce.auteur?.campus}
         </span>
         <span className="w-14 text-right text-xs text-encre-douce">{dateCourte(annonce.cree_le)}</span>
       </Link>

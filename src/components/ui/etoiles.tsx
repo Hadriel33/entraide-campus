@@ -1,4 +1,4 @@
-// Étoile en SVG (pas de caractère ★ : règle « aucun pictogramme texte » du test front-portable).
+// Étoile en SVG (pas de caractère étoile : règle « aucun pictogramme texte » du test front-portable).
 export function Etoile({ pleine = true, className = "size-5" }: { pleine?: boolean; className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden fill={pleine ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">

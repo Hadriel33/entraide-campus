@@ -46,7 +46,7 @@ const BLAGUES: Record<Categorie, string[]> = {
     "Promis, je le traite comme un objet de collection.",
   ],
   binome: [
-    "Duo ESD × ESP : on fait trembler le classement ?",
+    "Duo de choc : on fait trembler le classement du campus ?",
     "Toi la tête, moi les jambes ? Ou l'inverse, on verra.",
   ],
   shooting: [

@@ -64,7 +64,7 @@ export async function enregistrerCoordonnees(_: EtatProfil, formData: FormData):
   if (!validation.ok) return { erreurs: validation.erreurs };
   const { error } = await supabase.from("coordonnees").update(validation.valeurs).eq("id", user.id);
   if (error) return { message: "Enregistrement impossible. Réessaie." };
-  redirect("/compte?ok=coordonnees");
+  redirect("/reglages?ok=coordonnees#coordonnees");
 }
 
 // ---------- IA n°1 : compétences depuis le CV ----------
@@ -108,7 +108,7 @@ export async function supprimerMonCompte() {
   const { error } = await supabase.rpc("supprimer_mon_compte");
   if (error) {
     console.error("Suppression de compte", error);
-    redirect("/compte?erreur=suppression");
+    redirect("/reglages?erreur=suppression#compte");
   }
   await supabase.auth.signOut();
   redirect("/?ok=compte_supprime");
@@ -145,7 +145,7 @@ export async function proposerClasse(formData: FormData) {
   if (!nom) redirect("/compte?erreur=classe#classe");
   const { data, error } = await supabase
     .from("classes")
-    .insert({ ecole: profil.ecole, nom, validee: false, proposee_par: user.id })
+    .insert({ ecole: profil.ecole, campus: profil.campus, nom, validee: false, proposee_par: user.id })
     .select("id")
     .single();
   if (error?.code === "P0429") redirect("/compte?ok=limite#classe");
@@ -160,5 +160,5 @@ export async function basculerFil(formData: FormData) {
   const { supabase, user } = await exigerSession();
   await supabase.from("profils").update({ fil_public: formData.get("fil") === "oui" }).eq("id", user.id);
   revalidatePath("/", "layout");
-  redirect("/compte?ok=fil#fil");
+  redirect("/reglages?ok=fil#fil");
 }

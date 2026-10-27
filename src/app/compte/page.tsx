@@ -2,63 +2,75 @@ import type { Metadata } from "next";
 import { exigerSession } from "@/lib/session";
 import type { Stats } from "@/lib/gamification/progression";
 import { Avatar } from "@/components/ui/avatar";
-import { BadgeEcole } from "@/components/ui/badge";
+import { BadgeCampus } from "@/components/ui/badge";
 import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
-import { CarteProgression } from "@/components/profil/progression";
-import { CarteDefi } from "@/components/profil/carte-defi";
-import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./formulaires";
+import { Section, Sommaire } from "@/components/ui/section";
+import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
+import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
+import { FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
-import { ZoneSensible } from "./zone-sensible";
 import { AtelierColette } from "./atelier-colette";
-import { basculerFil, choisirClasse, proposerClasse } from "./actions";
+import { choisirClasse, proposerClasse } from "./actions";
 import { Bouton } from "@/components/ui/bouton";
-import Link from "next/link";
 
 export const metadata: Metadata = { title: "Mon profil" };
 
-function Section({ id, titre, aide, children }: { id?: string; titre: string; aide?: string; children: React.ReactNode }) {
-  return (
-    <section id={id} className="apparition flex scroll-mt-6 flex-col gap-4 rounded-carte border border-ligne bg-surface p-5 target:border-encre target:shadow-[4px_4px_0_0_var(--color-bandeau)] sm:p-6">
-      <div className="flex flex-col gap-1">
-        <h2 className="titre-charte text-section">{titre}</h2>
-        {aide && <p className="text-sm text-encre-douce">{aide}</p>}
-      </div>
-      {children}
-    </section>
-  );
-}
-
+// Mon profil : seulement « qui je suis » (identité, compétences, Colette, classe).
+// Coordonnées, confidentialité, apparence et compte sont dans Réglages.
 export default async function PageCompte() {
   const { supabase, user, profil } = await exigerSession();
-  const [{ data: stats }, { data: coordonnees }, { data: classes }] = await Promise.all([
+  const [{ data: stats }, { data: classes }, etatAccueil] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
-    supabase.from("coordonnees").select("telephone, email, reseau").eq("id", user.id).single(),
-    supabase.from("classes").select("id, nom, validee").eq("ecole", profil.ecole).order("nom"),
+    supabase.from("classes").select("id, nom, validee").eq("campus", profil.campus).order("nom"),
+    lireEtatAccueil(supabase, profil),
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <TitrePage
           accroche={
             <span className="flex flex-wrap items-center gap-2">
-              @{profil.pseudo} <BadgeEcole ecole={profil.ecole} /> {user.email}
+              @{profil.pseudo} <BadgeCampus campus={profil.campus} /> {user.email}
             </span>
           }
         >
           Mon profil
         </TitrePage>
-        <BoutonLien href={`/profils/${profil.pseudo}`} variante="contour">
-          Voir mon profil public
-        </BoutonLien>
+        <div className="flex flex-wrap gap-2">
+          <BoutonLien href={`/profils/${profil.pseudo}`} variante="contour">
+            Voir mon profil public
+          </BoutonLien>
+          <BoutonLien href="/reglages" variante="contour">
+            Réglages
+          </BoutonLien>
+        </div>
       </div>
+      {/* « Bien démarrer » : les étapes du profil, ici et plus sur le tableau. Disparaît quand tout est fait. */}
+      <ChecklistAccueil etat={etatAccueil} />
+      <Sommaire
+        liens={[
+          { href: "#photo", label: "Qui je suis" },
+          { href: "#competences", label: "Compétences" },
+          { href: "#colette", label: "Ma Colette" },
+          { href: "#classe", label: "Ma classe" },
+        ]}
+      />
 
-      {stats && <CarteProgression stats={stats as Stats} moi />}
-      <CarteDefi supabase={supabase} />
-
-      <Section id="photo" titre="Photo de profil">
+      <Section id="photo" titre="Qui je suis" aide="Ce que les autres étudiants voient sur ton profil et tes annonces.">
         <FormulairePhoto apercu={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" colette={profil} />} />
+        <div className="border-t border-ligne pt-4">
+          <FormulaireIdentite pseudo={profil.pseudo} prenom={profil.prenom} bio={profil.bio ?? ""} />
+        </div>
+      </Section>
+
+      <Section
+        id="competences"
+        titre="Mes compétences"
+        aide="Ce que tu peux proposer aux autres. Dépose ton CV : l'IA te fait des propositions, tu gardes ce qui est juste."
+      >
+        <AssistantCompetences actuelles={profil.competences ?? []} />
       </Section>
 
       <Section
@@ -79,7 +91,7 @@ export default async function PageCompte() {
         {classes && classes.length > 0 ? (
           <form action={choisirClasse} className="flex flex-wrap items-end gap-2">
             <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-semibold">
-              Classe ({profil.ecole})
+              Classe (campus de {profil.campus})
               <select name="classe" defaultValue={profil.classe_id ?? ""} className="min-h-11 rounded-ui border border-ligne-forte bg-surface px-3 text-base font-normal">
                 <option value="">Pas de classe</option>
                 {[
@@ -104,7 +116,7 @@ export default async function PageCompte() {
             <Bouton>Enregistrer</Bouton>
           </form>
         ) : (
-          <p className="font-main text-lg text-encre-douce">Les classes de ton école n&apos;ont pas encore été ajoutées.</p>
+          <p className="font-main text-lg text-encre-douce">Les classes de ton campus n&apos;ont pas encore été ajoutées : propose la tienne.</p>
         )}
         <details className="group/proposer">
           <summary className="w-fit cursor-pointer list-none text-sm font-semibold text-encre-douce hover:text-encre [&::-webkit-details-marker]:hidden">
@@ -121,45 +133,6 @@ export default async function PageCompte() {
         </details>
       </Section>
 
-      <Section
-        id="competences"
-        titre="Mes compétences"
-        aide="Ce que tu peux proposer aux autres. Dépose ton CV : l'IA te fait des propositions, tu gardes ce qui est juste."
-      >
-        <AssistantCompetences actuelles={profil.competences ?? []} />
-      </Section>
-
-      <Section titre="Mon identité" aide="Ce que les autres étudiants voient sur ton profil et tes annonces.">
-        <FormulaireIdentite pseudo={profil.pseudo} prenom={profil.prenom} bio={profil.bio ?? ""} />
-      </Section>
-
-      <Section id="fil" titre="Le fil du campus" aide="Le fil montre « @lea (ESP) a aidé @tom (ESD) ». Une entraide n'y apparaît que si les deux personnes ont dit oui. Jamais de message ni de coordonnées.">
-        <form action={basculerFil} className="flex flex-wrap items-center gap-3">
-          <input type="hidden" name="fil" value={profil.fil_public ? "non" : "oui"} />
-          <span className={`rounded-full px-3 py-1 text-sm font-semibold ${profil.fil_public ? "bg-ok-fond text-ok" : "bg-papier-fonce text-encre-douce"}`}>
-            {profil.fil_public ? "Tu apparais dans le fil" : "Tu n'apparais pas dans le fil"}
-          </span>
-          <Bouton variante="contour">{profil.fil_public ? "Ne plus apparaître" : "Apparaître dans le fil"}</Bouton>
-        </form>
-      </Section>
-
-      <Section
-        id="coordonnees"
-        titre="Mes coordonnées"
-        aide="Cachées par défaut. Seules les personnes dont tu acceptes la demande (ou qui acceptent la tienne) peuvent les voir."
-      >
-        <FormulaireCoordonnees telephone={coordonnees?.telephone ?? ""} email={coordonnees?.email ?? ""} reseau={coordonnees?.reseau ?? ""} />
-      </Section>
-
-      <Section titre="Mot de passe">
-        <Link href="/compte/mot-de-passe" className="self-start text-sm font-semibold underline-offset-2 hover:underline">
-          Changer mon mot de passe
-        </Link>
-      </Section>
-
-      <Section titre="Supprimer mon compte" aide="Ton droit à l'effacement (RGPD). Voir aussi la page Confidentialité.">
-        <ZoneSensible />
-      </Section>
     </div>
   );
 }

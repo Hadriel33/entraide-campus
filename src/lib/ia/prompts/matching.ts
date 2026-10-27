@@ -3,7 +3,7 @@ import { CATEGORIES } from "@/lib/annonces/validation";
 // Prompt de l'IA n°3 : Colette classe le mur « pour moi », en comprenant le sens (pas seulement les mots).
 // Rangé à part pour être relu et amélioré (consigne du cours). Version 1 (02/10/2026).
 
-export const PROMPT_MATCHING = `Tu aides un étudiant de l'ESD ou de l'ESP Bordeaux à trouver, sur le mur d'entraide de son campus,
+export const PROMPT_MATCHING = `Tu aides un étudiant de l'ESP (école de digital et de communication) à trouver, sur le mur d'entraide de son campus,
 les annonces qui le concernent vraiment.
 
 Tu reçois, entre balises <profil>, ses compétences validées et les catégories où il propose ou cherche de l'aide,
