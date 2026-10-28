@@ -133,3 +133,29 @@ test("chaque post-it a la forme et le pictogramme de sa catégorie", async ({ pa
   }
   expect(new Set(vus.map((v) => v.forme)).size, "plusieurs formes sur le tableau").toBeGreaterThanOrEqual(3);
 });
+
+test("les IA de Colette sont expliquées et signalées là où elles travaillent", async ({ page }) => {
+  const erreurs = surveillerErreurs(page);
+  await page.goto("/ia");
+  await expect(page.getByRole("heading", { name: /Les IA de Colette/i })).toBeVisible();
+  for (const n of [1, 2, 3, 4]) await expect(page.locator(`#ia-${n}`)).toBeVisible();
+  // La pastille bleue sur le formulaire de publication renvoie à l'IA n°2.
+  await page.goto("/annonces/nouvelle");
+  await expect(page.locator('a[href="/ia#ia-2"]')).toBeVisible();
+  await page.goto("/compte");
+  await expect(page.locator('a[href="/ia#ia-1"]')).toBeVisible();
+  await pasDeDebordement(page);
+  expect(erreurs).toEqual([]);
+});
+
+test("le bureau montre ma série de semaines, le fil retient ma visite", async ({ page }) => {
+  await page.goto("/bureau");
+  await expect(page.getByRole("heading", { name: "Ma série" })).toBeVisible();
+  await page.goto("/fil");
+  await page.waitForLoadState("networkidle");
+  const cookies = await page.context().cookies();
+  expect(cookies.some((c) => c.name === "fil_vu"), "la date de visite du fil n'est pas retenue").toBe(true);
+  // Deuxième visite : le bandeau des nouveautés apparaît.
+  await page.reload();
+  await expect(page.getByRole("status").filter({ hasText: /dernière visite/ })).toBeVisible();
+});

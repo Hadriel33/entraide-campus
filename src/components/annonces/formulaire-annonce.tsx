@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { Champ } from "@/components/ui/champ";
+import { BadgeIA } from "@/components/ia/badge-ia";
 import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES } from "@/lib/annonces/validation";
 import { quartiersDu } from "@/lib/carte/mercator";
 import type { EtatAnnonce } from "@/app/annonces/actions";
@@ -143,6 +144,10 @@ export function FormulaireAnnonce({
           {etat.message}
         </p>
       )}
+      <p className="flex flex-wrap items-center gap-2 text-sm text-encre-douce">
+        <BadgeIA numero={2} />
+        Avant d&apos;être affiché, ton post-it est relu par Colette (arnaque, numéro laissé en clair). Si elle a un doute, elle te propose une correction.
+      </p>
       <div className="flex flex-wrap gap-3">
         <Bouton disabled={enCours}>{enCours ? "Enregistrement..." : libelle}</Bouton>
         <BoutonLien href={annulerVers} variante="discret">

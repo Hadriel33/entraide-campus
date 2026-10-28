@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { niveauMatch, suggerer } from "@/lib/matching/suggestions";
 import { matcherAnnonces } from "@/lib/ia/modele";
+import { BadgeIA } from "@/components/ia/badge-ia";
 import { Colette } from "@/components/colette/colette";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { normaliserRecherche } from "@/lib/annonces/recherche";
@@ -695,6 +696,7 @@ export default async function PageAnnonces({
             className="shrink-0"
           />
           <p className="min-w-56 flex-1 text-sm leading-snug">
+            <BadgeIA numero={3} className="mr-1.5 align-middle" />
             {coletteOk === true
               ? "Colette a relu les 40 dernières annonces et garde celles qui te vont vraiment, même écrites avec d'autres mots."
               : coletteOk === false

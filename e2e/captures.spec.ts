@@ -10,6 +10,8 @@ const PAGES = [
   ["classement", "/classement"],
   ["profil", "/compte"],
   ["reglages", "/reglages"],
+  ["ia", "/ia"],
+  ["nouvelle", "/annonces/nouvelle"],
 ] as const;
 
 for (const [nom, chemin] of PAGES) {

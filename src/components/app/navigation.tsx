@@ -69,6 +69,9 @@ function MenuMoi({ pseudo, campus, avatar }: { pseudo: string; campus: string; a
             <Link href="/reglages" className={lien} onClick={() => setOuvert(false)} role="menuitem">
               Réglages
             </Link>
+            <Link href="/ia" className={lien} onClick={() => setOuvert(false)} role="menuitem">
+              Les IA de Colette
+            </Link>
             <BoutonTheme className="px-3 py-2 font-medium" />
             <form action={deconnecter} className="border-t border-ligne pt-0.5">
               <button className="presse w-full rounded-ui px-3 py-2 text-left text-sm text-encre-douce hover:bg-papier-fonce hover:text-encre" role="menuitem">
@@ -250,6 +253,7 @@ const ICONES = {
   admin: "M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z",
   moi: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6",
   crayon: "M4 20l4-1 11-11-3-3L5 16zM14 6l3 3",
+  ia: "M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
   reglages: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4",
 };
 
@@ -294,6 +298,7 @@ function OngletsMobile({
         { href: `/profils/${pseudo}`, label: "Mon profil public", icone: "moi" as const },
         { href: "/compte", label: "Modifier mon profil", icone: "crayon" as const },
         { href: "/reglages", label: "Réglages", icone: "reglages" as const },
+        { href: "/ia", label: "Les IA de Colette", icone: "ia" as const },
       ],
     },
   ];

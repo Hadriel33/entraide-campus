@@ -138,7 +138,7 @@ export function AtelierColette({
           <legend className="mb-1 text-sm font-semibold">Motif du papier</legend>
           <Choix groupe="motif" liste={MOTIFS_COLETTE} valeur={m} changer={setM} stats={stats} indice={setSurvol} />
         </fieldset>
-        <p className="text-xs text-encre-douce">Les pièces avec un cadenas se gagnent en s&apos;entraidant. Passe la souris dessus pour savoir comment.</p>
+        <p className="text-xs text-encre-douce">Les pièces avec un cadenas se gagnent en s&apos;entraidant, en commentant ou en revenant chaque semaine. Passe la souris dessus pour savoir comment.</p>
         <Bouton className="self-start">Garder cette Colette</Bouton>
       </div>
     </form>

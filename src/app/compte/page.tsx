@@ -18,8 +18,9 @@ export const metadata: Metadata = { title: "Mon profil" };
 
 // Mon profil : seulement « qui je suis » (identité, compétences, Colette, classe).
 // Coordonnées, confidentialité, apparence et compte sont dans Réglages.
-export default async function PageCompte() {
+export default async function PageCompte({ searchParams }: PageProps<"/compte">) {
   const { supabase, user, profil } = await exigerSession();
+  const { erreur } = await searchParams;
   const [{ data: stats }, { data: classes }, etatAccueil] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
     supabase.from("classes").select("id, nom, validee").eq("campus", profil.campus).order("nom"),
@@ -78,6 +79,13 @@ export default async function PageCompte() {
         titre="Ma Colette"
         aide={profil.avatar_chemin ? "Ton personnage dans l'appli (badges, classement). Ta photo reste ton avatar principal." : "Pas de photo ? Ta Colette te représente partout dans l'appli."}
       >
+        {(erreur === "verrouille" || erreur === "colette") && (
+          <p role="alert" className="mb-4 rounded-ui border border-alerte bg-surface px-4 py-3 text-sm font-semibold text-alerte">
+            {erreur === "verrouille"
+              ? "Cette pièce n'est pas encore débloquée : ta Colette n'a pas changé. Le cadenas te dit comment la gagner."
+              : "Ce choix n'existe pas : ta Colette n'a pas changé."}
+          </p>
+        )}
         <AtelierColette
           couleur={profil.colette_couleur}
           humeur={profil.colette_humeur}

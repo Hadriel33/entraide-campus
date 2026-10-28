@@ -5,13 +5,14 @@ import { Colette, type AnimColette } from "./colette";
 
 const CLE = "postit-tuto";
 const ETAPES: { anim: AnimColette; texte: string }[] = [
-  { anim: "coucou", texte: "Salut, moi c'est Colette ! Ici c'est ton bureau : tout ce qui t'attend est punaisé en haut." },
+  { anim: "coucou", texte: "Salut, je suis Colette la guide (casquette verte, pancarte « ? »). Ta Colette à toi, tu la crées dans ton profil. Ici, c'est ton bureau : tout ce qui t'attend est punaisé en haut." },
   {
     anim: "accroche",
-    texte: "Dans Annonces, chaque post-it est une annonce. Sa couleur te dit la famille : lilas pour la créa, ciel pour la tech, jaune pour les projets, ocre pour la vie de campus.",
+    texte: "Sur le tableau, chaque post-it est une annonce. Le pictogramme en haut dit la catégorie, la forme dit le type : billet pour un covoit, petite annonce pour une coloc, étiquette pour un prêt, polaroid pour un shooting.",
   },
   { anim: "tampon", texte: "Un post-it te plaît ? « Demander le contact ». Ton numéro reste caché tant que tu n'as pas dit oui." },
-  { anim: "lit", texte: "Dépose ton CV dans ton profil : je le lis et je te propose tes compétences. Et choisis ta classe pour la faire monter au classement !" },
+  { anim: "lit", texte: "Mes 4 IA : je lis ton CV pour proposer tes compétences, j'écris un post-it à partir d'une phrase, je le relis avant publication, et je trie le tableau « Pour moi ». Tout est expliqué dans « Les IA de Colette »." },
+  { anim: "saute", texte: "Le fil, c'est la vie du campus : réagis, commente, mentionne avec @pseudo. Reviens chaque semaine pour garder ta série et gagner des tenues." },
 ];
 
 // Le stockage local peut être bloqué (navigation privée) : dans ce cas le tuto ne s'affiche simplement pas.
@@ -47,10 +48,13 @@ export function TutoColette() {
   const derniere = etape === ETAPES.length - 1;
 
   return (
-    <div role="dialog" aria-label="Visite guidée avec Colette" className="pop fixed right-4 bottom-24 z-50 flex max-w-sm items-end gap-2 md:bottom-6">
-      <div className="relative flex flex-col gap-3 rounded-carte border border-encre bg-surface p-4 shadow-[4px_4px_0_0_var(--color-bandeau)]">
-        <span className="text-xs font-semibold text-encre-douce">
-          Étape {etape + 1} sur {ETAPES.length}
+    <div role="dialog" aria-label="Visite guidée avec Colette" className="pop fixed right-4 bottom-40 z-50 flex max-w-sm items-end gap-2 md:bottom-24">
+      <div className="relative flex flex-col gap-3 rounded-carte border border-encre bg-surface p-4 shadow-[4px_4px_0_0_var(--color-ok)]">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="rounded-full bg-ok-fond px-2 py-0.5 text-xs font-bold text-ok">Colette, ta guide</span>
+          <span className="text-xs font-semibold text-encre-douce">
+            {etape + 1} / {ETAPES.length}
+          </span>
         </span>
         <p key={etape} className="apparition text-[0.95rem] leading-snug">
           {e.texte}
@@ -69,7 +73,25 @@ export function TutoColette() {
         </div>
         <span className="absolute -right-2 bottom-6 size-4 rotate-45 border-t border-r border-encre bg-surface" aria-hidden />
       </div>
-      <Colette key={e.anim} anim={e.anim} taille={96} className="shrink-0" />
+      <Colette key={e.anim} anim={e.anim} accessoire="guide" couleur="ciel" saison={false} taille={96} className="shrink-0" />
     </div>
+  );
+}
+
+// Relancer la visite guidée (page « Les IA de Colette ») : on oublie qu'elle a été vue.
+export function BoutonRevoirTuto({ className = "" }: { className?: string }) {
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={() => {
+        try {
+          localStorage.removeItem(CLE);
+        } catch {}
+        window.dispatchEvent(new Event(CLE));
+      }}
+    >
+      Revoir la visite avec la guide
+    </button>
   );
 }

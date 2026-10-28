@@ -7,7 +7,7 @@ export type Commentaire = {
   auteur_id: string;
   contenu: string;
   cree_le: string;
-  auteur: { pseudo: string; avatar_chemin: string | null; colette_couleur?: string } | null;
+  auteur: { pseudo: string; avatar_chemin: string | null; colette_couleur?: string; colette_humeur?: string; colette_accessoire?: string; colette_motif?: string } | null;
 };
 
 // Réactions et commentaires d'une liste de posts, en deux requêtes (la RLS ne renvoie que les posts visibles).
@@ -17,7 +17,7 @@ export async function chargerSocial(supabase: SupabaseClient, cible: "annonce" |
     supabase.from("reactions").select("cible_id, type, auteur_id").eq("cible_type", cible).in("cible_id", ids),
     supabase
       .from("commentaires")
-      .select("id, cible_id, auteur_id, contenu, cree_le, auteur:profils!commentaires_auteur_id_fkey(pseudo, avatar_chemin, colette_couleur)")
+      .select("id, cible_id, auteur_id, contenu, cree_le, auteur:profils!commentaires_auteur_id_fkey(pseudo, avatar_chemin, colette_couleur, colette_humeur, colette_accessoire, colette_motif)")
       .eq("cible_type", cible)
       .in("cible_id", ids)
       .order("cree_le", { ascending: true })
