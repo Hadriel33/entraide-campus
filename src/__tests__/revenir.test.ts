@@ -41,3 +41,12 @@ describe("revenir sur le fil", () => {
     expect(texteSerie(4)).toBe("4 semaines d'affilée");
   });
 });
+
+describe("la flamme « ça chauffe » sur les post-its qui font parler", () => {
+  it("rien sans commentaire, une bulle de 1 à 2, la flamme dès 3", async () => {
+    const { niveauDiscussion } = await import("@/lib/social/revenir");
+    expect(niveauDiscussion(0)).toBe("aucune");
+    expect(niveauDiscussion(2)).toBe("calme");
+    expect(niveauDiscussion(3)).toBe("chaude");
+  });
+});

@@ -14,3 +14,10 @@ export function texteSerie(n: number) {
 }
 
 export const COOKIE_FIL = "fil_vu";
+
+// Un post-it qui fait parler s'enflamme (3 commentaires ou plus) : ça donne envie d'aller voir.
+export const SEUIL_CHAUD = 3;
+export function niveauDiscussion(n: number): "aucune" | "calme" | "chaude" {
+  if (n <= 0) return "aucune";
+  return n >= SEUIL_CHAUD ? "chaude" : "calme";
+}

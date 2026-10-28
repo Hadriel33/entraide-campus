@@ -273,6 +273,18 @@ export default async function PageAnnonces({
     ...Object.entries(TYPES).map(([valeur, label]) => ({ valeur, label })),
   ];
 
+  // Combien de commentaires sous chaque post-it affiché (la flamme « ça chauffe » dès 3). Connecté seulement (RLS).
+  const nbCommentaires = new Map<string, number>();
+  if (user && annonces.length > 0) {
+    const { data: lignes } = await supabase
+      .from("commentaires")
+      .select("cible_id")
+      .eq("cible_type", "annonce")
+      .in("cible_id", annonces.map((a) => a.id))
+      .limit(2000);
+    for (const l of lignes ?? []) nbCommentaires.set(l.cible_id, (nbCommentaires.get(l.cible_id) ?? 0) + 1);
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
       {/* Le look du tableau : grand titre en bandeaux, « En direct », et le mode projection à côté. */}
@@ -742,6 +754,7 @@ export default async function PageAnnonces({
               annonce={a}
               index={i % PAR_PAGE}
               match={matchs.get(a.id)}
+              nbCommentaires={nbCommentaires.get(a.id) ?? 0}
             />
           ))}
         </div>

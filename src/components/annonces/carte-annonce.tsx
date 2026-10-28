@@ -12,6 +12,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { inclinaison, teinte } from "@/lib/design/teintes";
 import { forme, type Forme } from "@/lib/design/formes";
 import { PictoCategorie } from "./picto-categorie";
+import { CompteurDiscussion } from "@/components/social/compteur-discussion";
 
 // Ce que la forme raconte, écrit à la main en tête du post-it (les cours et compétences n'en ont pas besoin).
 const ETIQUETTE_FORME: Partial<Record<Forme, string>> = {
@@ -39,11 +40,13 @@ export function CarteAnnonce({
   index = 0,
   afficherExpiration = false,
   match,
+  nbCommentaires = 0,
 }: {
   annonce: Annonce;
   index?: number;
   afficherExpiration?: boolean;
   match?: { niveau: string; raisons: string[] };
+  nbCommentaires?: number;
 }) {
   const jours = joursRestants(annonce.expire_le);
   const t = teinte(annonce.categorie);
@@ -189,7 +192,8 @@ export function CarteAnnonce({
           <span className="-rotate-3 font-main text-xl font-bold text-alerte">
             {ANNOTATION[annonce.contrepartie]}
           </span>
-          <span className="mt-1 text-[11px] text-encre/60">
+          <span className="mt-1 flex items-center gap-2 text-[11px] text-encre/60">
+            <CompteurDiscussion n={nbCommentaires} />
             {dateCourte(annonce.cree_le)}
           </span>
         </span>
@@ -198,10 +202,8 @@ export function CarteAnnonce({
         // Les languettes « contact » de la petite annonce de laverie. Elles ne donnent jamais de numéro :
         // les coordonnées passent toujours par « Demander le contact » (règle d'or n°1).
         <div className="languettes" aria-hidden>
-          {["contact", "contact", "contact", "contact", "contact", "contact"].map((l, i) => (
-            <span key={i} className={i === 2 ? "arrachee" : undefined}>
-              {l}
-            </span>
+          {Array.from({ length: 6 }, (_, i) => (
+            <span key={i}>contact</span>
           ))}
         </div>
       )}

@@ -15,6 +15,7 @@ import { EtatVide } from "@/components/colette/etat-vide";
 import { Reactions } from "@/components/social/reactions";
 import { Commentaires } from "@/components/social/commentaires";
 import { MarquerFilVu } from "@/components/social/marquer-fil-vu";
+import { CompteurDiscussion } from "@/components/social/compteur-discussion";
 import { PictoCategorie } from "@/components/annonces/picto-categorie";
 import { COOKIE_FIL, estNouveau } from "@/lib/social/revenir";
 
@@ -68,7 +69,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
   const estAdmin = profil.role === "admin";
   const derniereVisite = (await cookies()).get(COOKIE_FIL)?.value ?? null;
   const nouveaux = posts.filter((p) => estNouveau(p.quand, derniereVisite)).length;
-  const pastilleNouveau = <span className="pop shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold tracking-wide text-surface uppercase">Nouveau</span>;
+  const pastilleNouveau = <span className="sautille shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold tracking-wide text-surface uppercase">Nouveau</span>;
   const onglet = "rounded-[4px] px-3.5 py-1.5 text-sm font-semibold text-encre-douce aria-[current=page]:bg-surface aria-[current=page]:text-encre aria-[current=page]:shadow-sm";
 
   return (
@@ -143,6 +144,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                   <span className="ml-auto flex shrink-0 flex-col items-end gap-1">
                     {estNouveau(p.quand, derniereVisite) && pastilleNouveau}
                     <span className="-rotate-3 font-main text-lg text-ok">entraide !</span>
+                    <CompteurDiscussion n={socialE.commentaires.get(p.e.id)?.length ?? 0} />
                   </span>
                 </div>
                 <p className="rounded-ui border-l-4 border-ok bg-ok-fond px-4 py-2.5 text-base font-semibold">« {p.e.titre} »</p>
@@ -174,7 +176,10 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                       {tous && <BadgeCampus campus={p.a.auteur?.campus} />}
                     </p>
                   </div>
-                  {estNouveau(p.quand, derniereVisite) && <span className="ml-auto">{pastilleNouveau}</span>}
+                  <span className="ml-auto flex shrink-0 flex-col items-end gap-1">
+                    {estNouveau(p.quand, derniereVisite) && pastilleNouveau}
+                    <CompteurDiscussion n={socialA.commentaires.get(p.a.id)?.length ?? 0} />
+                  </span>
                 </div>
                 <Link
                   href={`/annonces/${p.a.id}`}

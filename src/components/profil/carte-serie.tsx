@@ -8,8 +8,8 @@ export function CarteSerie({ serie }: { serie: number }) {
   return (
     <section className="flex items-start gap-4 rounded-carte border border-encre bg-surface p-5 shadow-[3px_3px_0_0_var(--color-accent)]">
       <span className={`flex size-14 shrink-0 flex-col items-center justify-center rounded-full ${serie > 0 ? "bg-accent text-surface" : "bg-papier-fonce text-encre-douce"}`}>
-        <svg viewBox="0 0 24 24" className="size-5" fill="currentColor" aria-hidden>
-          <path d="M12 2c3 3.5 5 6.5 5 10a5 5 0 0 1-10 0c0-1.8.7-3.4 2-4.6.2 1.6 1 2.6 2 3 0-3.4.4-5.8 1-8.4z" />
+        <svg viewBox="0 0 24 24" className="size-5 overflow-visible" fill="currentColor" aria-hidden>
+          <path className={serie > 0 ? "flamme-danse" : undefined} d="M12 2c3 3.5 5 6.5 5 10a5 5 0 0 1-10 0c0-1.8.7-3.4 2-4.6.2 1.6 1 2.6 2 3 0-3.4.4-5.8 1-8.4z" />
         </svg>
         <span className="text-sm leading-none font-bold">{serie}</span>
       </span>
