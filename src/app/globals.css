@@ -132,6 +132,11 @@ body {
   filter: drop-shadow(0 0 1.5px color-mix(in oklab, #ffffff 70%, transparent));
 }
 
+/* Bouton du thème : le libellé suit data-theme par le CSS (même HTML côté serveur et navigateur). */
+.theme-si-noir { display: none; }
+:root[data-theme="noir"] .theme-si-noir { display: revert; }
+:root[data-theme="noir"] .theme-si-clair { display: none; }
+
 /* ============ Post-it ============
    Papier coloré (--postit), légèrement incliné (--rot, calculé depuis l'id), coin bas
    arrondi comme un papier qui rebique. Au survol il se redresse et se décolle. */

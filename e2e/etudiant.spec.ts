@@ -100,6 +100,8 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
       page.getByRole("heading", { name: titre }).first(),
       chemin,
     ).toBeVisible();
+    // On attend la fin du chargement : une erreur tardive est rangée sur SA page, pas sur la suivante.
+    await page.waitForLoadState("networkidle");
     await pasDeDebordement(page);
     expect(erreurs, chemin).toEqual([]);
   }

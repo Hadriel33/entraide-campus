@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   deciderModeration,
+  resumerErreur,
   detecterCoordonnees,
   nettoyerCompetences,
   proposerCorrection,
@@ -226,5 +227,21 @@ describe("IA n°3 : nettoyage du classement « pour moi »", async () => {
 
   it("renvoie une liste vide si l'IA n'a rien renvoyé", () => {
     expect(nettoyerMatchs(null, ["a"]).size).toBe(0);
+  });
+});
+
+describe("resumerErreur (cause affichée dans Admin › Tester maintenant)", () => {
+  it("donne le type et le message, en court", () => {
+    const e = Object.assign(new Error("Rate limit exceeded for free tier"), { name: "GatewayRateLimitError" });
+    expect(resumerErreur(e)).toBe("GatewayRateLimitError : Rate limit exceeded for free tier");
+    expect(resumerErreur(new Error("x".repeat(400))).length).toBeLessThanOrEqual(160);
+  });
+  it("ne montre jamais un jeton ou une clé", () => {
+    expect(resumerErreur(new Error("Invalid token Bearer abc.def.ghi"))).not.toContain("abc.def.ghi");
+    expect(resumerErreur(new Error("bad key sk-12345678901234567890"))).not.toContain("sk-1234");
+  });
+  it("accepte n'importe quoi", () => {
+    expect(resumerErreur("délai dépassé")).toBe("délai dépassé");
+    expect(resumerErreur(undefined)).toBe("erreur inconnue");
   });
 });
