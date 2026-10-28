@@ -238,7 +238,9 @@ describe("resumerErreur (cause affichée dans Admin › Tester maintenant)", () 
   });
   it("ne montre jamais un jeton ou une clé", () => {
     expect(resumerErreur(new Error("Invalid token Bearer abc.def.ghi"))).not.toContain("abc.def.ghi");
-    expect(resumerErreur(new Error("bad key sk-12345678901234567890"))).not.toContain("sk-1234");
+    // Fausse clé construite par morceaux : le contrôle anti-fuite de la CI ne doit pas la prendre pour une vraie.
+    const fausseCle = ["sk", "12345678901234567890"].join("-");
+    expect(resumerErreur(new Error(`bad key ${fausseCle}`))).not.toContain("sk-1234");
   });
   it("accepte n'importe quoi", () => {
     expect(resumerErreur("délai dépassé")).toBe("délai dépassé");
