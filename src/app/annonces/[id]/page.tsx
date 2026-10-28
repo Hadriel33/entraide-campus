@@ -206,51 +206,14 @@ export default async function PageAnnonce({
         </p>
       </div>
 
-      <dl className="divide-y divide-ligne rounded-carte border border-ligne bg-surface text-sm">
-        <div className="flex justify-between gap-4 px-4 py-3">
-          <dt className="text-encre-douce">Contrepartie</dt>
-          <dd className="font-medium">{CONTREPARTIES[annonce.contrepartie]}</dd>
+      {/* La barre sociale tout de suite sous le post-it : soutenir, réagir. */}
+      {social && user && (
+        <div className="-mt-3 flex flex-wrap items-center gap-3">
+          <BoutonSoutien grand annonceId={annonce.id} resume={social.soutiens.get(annonce.id) ?? { n: 0, moi: false }} proprietaire={estEquipe} />
+          <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estEquipe} />
         </div>
-        {annonce.quartier && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Quartier</dt>
-            <dd className="font-medium">{QUARTIERS[annonce.quartier]}</dd>
-          </div>
-        )}
-        {annonce.tram && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Tram</dt>
-            <dd>
-              <span className="rounded-ui bg-encre px-2 py-0.5 text-sm font-semibold text-surface">
-                Ligne {annonce.tram}
-              </span>
-            </dd>
-          </div>
-        )}
-        {annonce.lieu && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Lieu</dt>
-            <dd className="font-medium">{annonce.lieu}</dd>
-          </div>
-        )}
-        {estEquipe && annonce.statut === "publiee" && (
-          <div className="flex items-center justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Visibilité</dt>
-            <dd className="flex items-center gap-3 font-medium">
-              {jours === 0
-                ? "Expirée, invisible dans la liste"
-                : `Encore ${jours} jour${jours > 1 ? "s" : ""}`}
-              {estAuteur && jours <= 7 && (
-                <form action={prolongerAnnonce.bind(null, annonce.id)}>
-                  <Bouton variante="contour" className="min-h-8 px-2.5 text-sm">
-                    Prolonger
-                  </Bouton>
-                </form>
-              )}
-            </dd>
-          </div>
-        )}
-      </dl>
+      )}
+
 
       {/* IA n°2 : ce que Colette a remarqué, et sa proposition de correction (l'auteur décide). */}
       {estEquipe && moderation?.moderation_suggestion && (
@@ -411,6 +374,52 @@ export default async function PageAnnonce({
         </section>
       )}
 
+      <dl className="divide-y divide-ligne rounded-carte border border-ligne bg-surface text-sm">
+        <div className="flex justify-between gap-4 px-4 py-3">
+          <dt className="text-encre-douce">Contrepartie</dt>
+          <dd className="font-medium">{CONTREPARTIES[annonce.contrepartie]}</dd>
+        </div>
+        {annonce.quartier && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Quartier</dt>
+            <dd className="font-medium">{QUARTIERS[annonce.quartier]}</dd>
+          </div>
+        )}
+        {annonce.tram && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Tram</dt>
+            <dd>
+              <span className="rounded-ui bg-encre px-2 py-0.5 text-sm font-semibold text-surface">
+                Ligne {annonce.tram}
+              </span>
+            </dd>
+          </div>
+        )}
+        {annonce.lieu && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Lieu</dt>
+            <dd className="font-medium">{annonce.lieu}</dd>
+          </div>
+        )}
+        {estEquipe && annonce.statut === "publiee" && (
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Visibilité</dt>
+            <dd className="flex items-center gap-3 font-medium">
+              {jours === 0
+                ? "Expirée, invisible dans la liste"
+                : `Encore ${jours} jour${jours > 1 ? "s" : ""}`}
+              {estAuteur && jours <= 7 && (
+                <form action={prolongerAnnonce.bind(null, annonce.id)}>
+                  <Bouton variante="contour" className="min-h-8 px-2.5 text-sm">
+                    Prolonger
+                  </Bouton>
+                </form>
+              )}
+            </dd>
+          </div>
+        )}
+      </dl>
+
       <div className="flex flex-wrap gap-2">
         {!estEquipe && (
           <BoutonFavori annonceId={annonce.id} favori={!!favori} />
@@ -459,11 +468,7 @@ export default async function PageAnnonce({
       )}
       {social && user && (
         <section id="commentaires" className="flex scroll-mt-6 flex-col gap-3 border-t border-ligne pt-6">
-          <h2 className="titre-charte text-section">Soutiens, réactions et commentaires</h2>
-          <div className="flex flex-wrap items-center gap-3">
-            <BoutonSoutien grand annonceId={annonce.id} resume={social.soutiens.get(annonce.id) ?? { n: 0, moi: false }} proprietaire={estEquipe} />
-            <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estEquipe} />
-          </div>
+          <h2 className="titre-charte text-section">Commentaires</h2>
           <Commentaires
             cible="annonce"
             id={annonce.id}

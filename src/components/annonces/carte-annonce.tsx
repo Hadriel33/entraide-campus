@@ -93,6 +93,10 @@ export function CarteAnnonce({
         >
           <span>{annonce.titre}</span>
         </ViewTransition>
+        {/* Au survol, une flèche glisse : « ça s'ouvre ». */}
+        <span aria-hidden className="ml-1 inline-block -translate-x-1 opacity-0 transition-[opacity,translate] duration-200 group-hover:translate-x-0 group-hover:opacity-100">
+          →
+        </span>
       </Link>
     </h3>
   );
