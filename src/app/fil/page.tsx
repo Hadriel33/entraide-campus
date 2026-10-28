@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { exigerSession } from "@/lib/session";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
@@ -13,6 +14,10 @@ import { TitrePage } from "@/components/ui/titre-page";
 import { EtatVide } from "@/components/colette/etat-vide";
 import { Reactions } from "@/components/social/reactions";
 import { Commentaires } from "@/components/social/commentaires";
+import { MarquerFilVu } from "@/components/social/marquer-fil-vu";
+import { CompteurDiscussion } from "@/components/social/compteur-discussion";
+import { PictoCategorie } from "@/components/annonces/picto-categorie";
+import { COOKIE_FIL, estNouveau } from "@/lib/social/revenir";
 
 export const metadata: Metadata = { title: "Le fil" };
 
@@ -62,11 +67,27 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
     chargerSocial(supabase, "annonce", listeAnnonces.map((a) => a.id), user.id),
   ]);
   const estAdmin = profil.role === "admin";
+  const derniereVisite = (await cookies()).get(COOKIE_FIL)?.value ?? null;
+  const nouveaux = posts.filter((p) => estNouveau(p.quand, derniereVisite)).length;
+  const pastilleNouveau = <span className="sautille shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold tracking-wide text-surface uppercase">Nouveau</span>;
   const onglet = "rounded-[4px] px-3.5 py-1.5 text-sm font-semibold text-encre-douce aria-[current=page]:bg-surface aria-[current=page]:text-encre aria-[current=page]:shadow-sm";
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <TitrePage accroche="Les coups de main réussis et les nouveaux post-it. Réagis, commente, et file sur le tableau.">Le fil</TitrePage>
+
+      <MarquerFilVu />
+      {derniereVisite && (
+        <p className="rounded-ui border border-ligne-forte bg-surface px-4 py-3 text-[0.95rem]" role="status">
+          {nouveaux > 0 ? (
+            <>
+              <strong>{nouveaux} nouveauté{nouveaux > 1 ? "s" : ""}</strong> depuis ta dernière visite, marquée{nouveaux > 1 ? "s" : ""} « Nouveau ».
+            </>
+          ) : (
+            <>Rien de neuf depuis ta dernière visite. Et si c&apos;était toi, le prochain post-it ?</>
+          )}
+        </p>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav className="inline-flex rounded-ui bg-papier-fonce p-1" aria-label="Fil de">
@@ -89,7 +110,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
           Publie un post-it ou accepte une demande : ça apparaîtra ici.
         </EtatVide>
       ) : (
-        <ol className="flex flex-col gap-5">
+        <ol className="flex flex-col gap-7">
           {posts.map((p, i) =>
             p.genre === "entraide" ? (
               <li
@@ -106,7 +127,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                     </span>
                   </span>
                   <div className="flex min-w-0 flex-col">
-                    <p>
+                    <p className="text-[0.95rem] leading-snug">
                       <Link href={`/profils/${p.e.aidant_pseudo}`} className="font-semibold hover:underline">
                         @{p.e.aidant_pseudo}
                       </Link>{" "}
@@ -120,9 +141,13 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                       {tous && <> · {p.e.aidant_campus}</>}
                     </p>
                   </div>
-                  <span className="ml-auto shrink-0 -rotate-3 font-main text-lg text-ok">entraide !</span>
+                  <span className="ml-auto flex shrink-0 flex-col items-end gap-1">
+                    {estNouveau(p.quand, derniereVisite) && pastilleNouveau}
+                    <span className="-rotate-3 font-main text-lg text-ok">entraide !</span>
+                    <CompteurDiscussion n={socialE.commentaires.get(p.e.id)?.length ?? 0} />
+                  </span>
                 </div>
-                <p className="rounded-ui bg-papier-fonce px-3 py-2 text-sm">« {p.e.titre} »</p>
+                <p className="rounded-ui border-l-4 border-ok bg-ok-fond px-4 py-2.5 text-base font-semibold">« {p.e.titre} »</p>
                 <Reactions
                   cible="entraide"
                   id={p.e.id}
@@ -140,7 +165,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                 <div className="flex items-center gap-3">
                   <Avatar chemin={p.a.auteur?.avatar_chemin} nom={p.a.auteur?.pseudo ?? "?"} colette={p.a.auteur} />
                   <div className="flex min-w-0 flex-col">
-                    <p>
+                    <p className="text-[0.95rem] leading-snug">
                       <Link href={`/profils/${p.a.auteur?.pseudo}`} className="font-semibold hover:underline">
                         @{p.a.auteur?.pseudo}
                       </Link>{" "}
@@ -151,6 +176,10 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                       {tous && <BadgeCampus campus={p.a.auteur?.campus} />}
                     </p>
                   </div>
+                  <span className="ml-auto flex shrink-0 flex-col items-end gap-1">
+                    {estNouveau(p.quand, derniereVisite) && pastilleNouveau}
+                    <CompteurDiscussion n={socialA.commentaires.get(p.a.id)?.length ?? 0} />
+                  </span>
                 </div>
                 <Link
                   href={`/annonces/${p.a.id}`}
@@ -162,7 +191,10 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                     <span className={`titre-charte rounded-[3px] px-1.5 pt-0.5 text-sm ${p.a.type === "cherche" ? "bg-encre text-surface" : "border-[1.5px] border-encre"}`}>
                       {TYPES[p.a.type]}
                     </span>
-                    {CATEGORIES[p.a.categorie]}
+                    <span className="flex items-center gap-1.5">
+                      <PictoCategorie categorie={p.a.categorie} className="size-4" />
+                      {CATEGORIES[p.a.categorie]}
+                    </span>
                   </span>
                   <strong className="text-lg leading-tight">{p.a.titre}</strong>
                   <span className="line-clamp-2 text-sm text-encre/75">{p.a.description}</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { basculerReaction } from "@/app/fil/actions";
 import { REACTIONS, type ResumeReactions, type TypeReaction } from "@/lib/social/social";
 
@@ -29,6 +29,8 @@ export function Reactions({
     [type]: { n: etat[type].n + (etat[type].moi ? -1 : 1), moi: !etat[type].moi },
   }));
   const [, demarrer] = useTransition();
+  // Le « +1 » qui s'envole : la clé change à chaque clic pour relancer l'animation.
+  const [envol, setEnvol] = useState<{ type: TypeReaction; cle: number } | null>(null);
 
   return (
     <div className="flex flex-wrap gap-1.5" aria-label="Réactions">
@@ -43,6 +45,7 @@ export function Reactions({
             title={proprietaire ? "Les autres réagissent à tes posts" : r.label}
             onClick={() =>
               demarrer(async () => {
+                if (!e.moi) setEnvol({ type: r.type, cle: Date.now() });
                 basculer(r.type);
                 await basculerReaction(cible, id, r.type, resume[r.type].moi);
               })
@@ -53,7 +56,12 @@ export function Reactions({
               <path d={ICONES[r.type]} />
             </svg>
             <span className="sr-only">{r.label}</span>
-            {e.n > 0 && <span>{e.n}</span>}
+            {e.n > 0 && <span key={e.n} className="pop">{e.n}</span>}
+            {envol?.type === r.type && (
+              <span key={envol.cle} className="envol absolute -top-2 right-0 font-main text-lg leading-none text-accent" aria-hidden>
+                +1
+              </span>
+            )}
           </button>
         );
       })}

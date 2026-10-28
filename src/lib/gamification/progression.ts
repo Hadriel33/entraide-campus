@@ -11,6 +11,9 @@ export type Stats = {
   note_moyenne: number | null;
   defis_reussis?: number; // défis de la semaine réussis (26 dernières semaines)
   aides_par_categorie?: Partial<Record<string, number>>; // pour les titres de spécialité
+  commentaires?: number; // commentaires écrits (migration 0027)
+  reactions_recues?: number; // réactions reçues sur mes posts
+  serie?: number; // semaines d'affilée où j'ai participé (publier, commenter, réagir, écrire, s'entraider)
 };
 
 export const BAREME = {

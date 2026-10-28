@@ -100,6 +100,8 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
       page.getByRole("heading", { name: titre }).first(),
       chemin,
     ).toBeVisible();
+    // On attend la fin du chargement : une erreur tardive est rangée sur SA page, pas sur la suivante.
+    await page.waitForLoadState("networkidle");
     await pasDeDebordement(page);
     expect(erreurs, chemin).toEqual([]);
   }
@@ -114,4 +116,46 @@ test("la bulle de Colette ouvre les salons du campus", async ({ page }) => {
   await page.getByRole("button", { name: /Général/ }).click();
   await expect(page.getByPlaceholder(/Écrire dans Général/)).toBeVisible();
   expect(erreurs).toEqual([]);
+});
+
+// Retour du prof : on reconnaît chaque type d'annonce au premier coup d'œil (forme + pictogramme).
+test("chaque post-it a la forme et le pictogramme de sa catégorie", async ({ page }) => {
+  const { forme } = await import("../src/lib/design/formes");
+  await page.goto("/annonces?campus=tous");
+  const postits = page.locator("article[data-forme]");
+  await expect(postits.first()).toBeVisible();
+  const vus = await postits.evaluateAll((els) =>
+    els.map((e) => ({ forme: e.getAttribute("data-forme"), categorie: e.getAttribute("data-categorie"), picto: !!e.querySelector("svg") })),
+  );
+  for (const v of vus) {
+    expect(v.forme, `catégorie ${v.categorie}`).toBe(forme(v.categorie ?? ""));
+    expect(v.picto, `pictogramme ${v.categorie}`).toBe(true);
+  }
+  expect(new Set(vus.map((v) => v.forme)).size, "plusieurs formes sur le tableau").toBeGreaterThanOrEqual(3);
+});
+
+test("les IA de Colette sont expliquées et signalées là où elles travaillent", async ({ page }) => {
+  const erreurs = surveillerErreurs(page);
+  await page.goto("/ia");
+  await expect(page.getByRole("heading", { name: /Les IA de Colette/i })).toBeVisible();
+  for (const n of [1, 2, 3, 4]) await expect(page.locator(`#ia-${n}`)).toBeVisible();
+  // La pastille bleue sur le formulaire de publication renvoie à l'IA n°2.
+  await page.goto("/annonces/nouvelle");
+  await expect(page.locator('a[href="/ia#ia-2"]')).toBeVisible();
+  await page.goto("/compte");
+  await expect(page.locator('a[href="/ia#ia-1"]')).toBeVisible();
+  await pasDeDebordement(page);
+  expect(erreurs).toEqual([]);
+});
+
+test("le bureau montre ma série de semaines, le fil retient ma visite", async ({ page }) => {
+  await page.goto("/bureau");
+  await expect(page.getByRole("heading", { name: "Ma série" })).toBeVisible();
+  await page.goto("/fil");
+  await page.waitForLoadState("networkidle");
+  const cookies = await page.context().cookies();
+  expect(cookies.some((c) => c.name === "fil_vu"), "la date de visite du fil n'est pas retenue").toBe(true);
+  // Deuxième visite : le bandeau des nouveautés apparaît.
+  await page.reload();
+  await expect(page.getByRole("status").filter({ hasText: /dernière visite/ })).toBeVisible();
 });

@@ -10,7 +10,18 @@ import { joursRestants } from "@/lib/annonces/expiration";
 import { dateCourte, type Annonce } from "@/lib/annonces/requetes";
 import { Avatar } from "@/components/ui/avatar";
 import { inclinaison, teinte } from "@/lib/design/teintes";
-import { forme } from "@/lib/design/formes";
+import { forme, type Forme } from "@/lib/design/formes";
+import { PictoCategorie } from "./picto-categorie";
+import { CompteurDiscussion } from "@/components/social/compteur-discussion";
+
+// Ce que la forme raconte, écrit à la main en tête du post-it (les cours et compétences n'en ont pas besoin).
+const ETIQUETTE_FORME: Partial<Record<Forme, string>> = {
+  billet: "billet de trajet",
+  languettes: "petite annonce",
+  etiquette: "à emprunter",
+  polaroid: "shooting",
+  duo: "on cherche un duo",
+};
 
 // Version courte de la contrepartie, écrite au feutre sur le post-it.
 const ANNOTATION: Record<Contrepartie, string> = {
@@ -29,30 +40,32 @@ export function CarteAnnonce({
   index = 0,
   afficherExpiration = false,
   match,
+  nbCommentaires = 0,
 }: {
   annonce: Annonce;
   index?: number;
   afficherExpiration?: boolean;
   match?: { niveau: string; raisons: string[] };
+  nbCommentaires?: number;
 }) {
   const jours = joursRestants(annonce.expire_le);
   const t = teinte(annonce.categorie);
   const cherche = annonce.type === "cherche";
   const f = forme(annonce.categorie);
 
+  // En-tête : d'abord QUOI (pictogramme et catégorie, ce qu'on repère de loin), puis propose / cherche.
   const entete = (
     <div className="flex items-center justify-between gap-2">
+      <span className="flex min-w-0 items-center gap-2">
+        <span className={`flex size-9 shrink-0 items-center justify-center rounded-full ${t.point} ring-2 ring-encre`} aria-hidden>
+          <PictoCategorie categorie={annonce.categorie} className="size-5" />
+        </span>
+        <span className="text-xs leading-tight font-bold tracking-wide uppercase">{CATEGORIES[annonce.categorie]}</span>
+      </span>
       <span
         className={`titre-charte shrink-0 rounded-[3px] px-1.5 pt-0.5 text-sm whitespace-nowrap ${cherche ? "bg-encre text-surface" : "border-[1.5px] border-encre"}`}
       >
         {TYPES[annonce.type]}
-      </span>
-      <span className="flex min-w-0 items-center gap-1.5 text-right text-xs font-semibold">
-        <span
-          className={`size-2 shrink-0 rounded-full ${t.point} ring-1 ring-encre/20`}
-          aria-hidden
-        />
-        {CATEGORIES[annonce.categorie]}
       </span>
     </div>
   );
@@ -77,6 +90,8 @@ export function CarteAnnonce({
 
   return (
     <article
+      data-forme={f}
+      data-categorie={annonce.categorie}
       className={`group colle postit ${t.papier} forme-${f} flex min-h-56 flex-col gap-3 p-5 ${f === "etiquette" ? "pt-11" : "pt-6"}`}
       style={
         {
@@ -92,18 +107,24 @@ export function CarteAnnonce({
       )}
       {f === "polaroid" ? (
         // Polaroid : le type, la catégorie et le titre dans la « photo », le reste sur le cadre blanc.
-        <div className={`polaroid-photo ${t.papier} bg-(--postit)`}>
-          {entete}
-          {titre}
-        </div>
+        <>
+          <div className={`polaroid-photo ${t.papier} bg-(--postit)`}>
+            {entete}
+            {titre}
+          </div>
+          <span className="-mt-1 -rotate-1 self-center font-main text-base leading-none text-encre/70">{ETIQUETTE_FORME.polaroid}</span>
+        </>
       ) : f === "billet" ? (
         // Billet : l'en-tête au-dessus de la ligne pointillée, comme le talon d'un ticket.
-        <div className="billet-tete flex flex-col gap-1">
-          <span className="font-main text-sm leading-none text-encre/60">billet de trajet</span>
+        <div className="billet-tete flex flex-col gap-1.5">
+          <span className="font-main text-base leading-none text-encre/70">{ETIQUETTE_FORME.billet}</span>
           {entete}
         </div>
       ) : (
-        entete
+        <>
+          {ETIQUETTE_FORME[f] && <span className="-mb-1.5 font-main text-base leading-none text-encre/70">{ETIQUETTE_FORME[f]}</span>}
+          {entete}
+        </>
       )}
 
       {/* Tri « Pour moi » : pourquoi ce post-it te correspond (compétences du CV, catégories). */}
@@ -171,7 +192,8 @@ export function CarteAnnonce({
           <span className="-rotate-3 font-main text-xl font-bold text-alerte">
             {ANNOTATION[annonce.contrepartie]}
           </span>
-          <span className="mt-1 text-[11px] text-encre/60">
+          <span className="mt-1 flex items-center gap-2 text-[11px] text-encre/60">
+            <CompteurDiscussion n={nbCommentaires} />
             {dateCourte(annonce.cree_le)}
           </span>
         </span>
@@ -180,10 +202,8 @@ export function CarteAnnonce({
         // Les languettes « contact » de la petite annonce de laverie. Elles ne donnent jamais de numéro :
         // les coordonnées passent toujours par « Demander le contact » (règle d'or n°1).
         <div className="languettes" aria-hidden>
-          {["contact", "contact", "contact", "contact", "contact", "contact"].map((l, i) => (
-            <span key={i} className={i === 2 ? "arrachee" : undefined}>
-              {l}
-            </span>
+          {Array.from({ length: 6 }, (_, i) => (
+            <span key={i}>contact</span>
           ))}
         </div>
       )}

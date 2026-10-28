@@ -28,6 +28,8 @@ import {
 // Modèle servi par Vercel AI Gateway. Authentification automatique par le jeton OIDC du projet :
 // aucune clé d'API dans le code ni dans les variables. Gratuit sur l'offre de base (choix de Hadriel).
 const MODELE = "google/gemini-2.5-flash";
+// Si Gemini ne répond pas (panne, limite de l'offre gratuite), la passerelle essaie ces modèles, dans l'ordre.
+const SECOURS = { gateway: { models: ["google/gemini-2.5-flash-lite", "openai/gpt-4.1-mini"] } };
 
 // IA n°1 : compétences depuis un CV (PDF). Renvoie null si l'IA est indisponible ou trop lente.
 export async function extraireCompetences(
@@ -59,6 +61,7 @@ export async function extraireCompetences(
       ],
       abortSignal: AbortSignal.timeout(25_000),
       maxRetries: 1,
+      providerOptions: SECOURS,
     });
     return nettoyerCompetences(output.competences);
   } catch (erreur) {
@@ -68,11 +71,14 @@ export async function extraireCompetences(
 }
 
 // IA n°2 : modération d'une annonce. Renvoie null si l'IA est indisponible (l'annonce reste « en attente »).
-export async function modererAnnonce(annonce: {
-  titre: string;
-  description: string;
-  lieu: string | null;
-}): Promise<ReponseModeration | null> {
+export async function modererAnnonce(
+  annonce: {
+    titre: string;
+    description: string;
+    lieu: string | null;
+  },
+  surErreur?: (erreur: unknown) => void,
+): Promise<ReponseModeration | null> {
   try {
     const { output } = await generateText({
       model: MODELE,
@@ -89,10 +95,12 @@ export async function modererAnnonce(annonce: {
       prompt: `<annonce>\nTitre : ${annonce.titre}\nDescription : ${annonce.description}\nLieu : ${annonce.lieu ?? "non précisé"}\n</annonce>`,
       abortSignal: AbortSignal.timeout(15_000),
       maxRetries: 1,
+      providerOptions: SECOURS,
     });
     return output;
   } catch (erreur) {
     console.error("IA modération indisponible", erreur);
+    surErreur?.(erreur);
     return null;
   }
 }
@@ -124,6 +132,7 @@ ${idee}
 </idee>`,
       abortSignal: AbortSignal.timeout(15_000),
       maxRetries: 1,
+      providerOptions: SECOURS,
     });
     return nettoyerBrouillon(output);
   } catch (erreur) {
@@ -138,6 +147,7 @@ ${idee}
 export async function matcherAnnonces(
   profil: ProfilMatching,
   annonces: AnnonceMatching[],
+  surErreur?: (erreur: unknown) => void,
 ): Promise<Map<string, Match> | null> {
   if (annonces.length === 0) return new Map();
   try {
@@ -160,6 +170,7 @@ export async function matcherAnnonces(
       prompt: promptMatching(profil, annonces),
       abortSignal: AbortSignal.timeout(20_000),
       maxRetries: 1,
+      providerOptions: SECOURS,
     });
     return nettoyerMatchs(
       output.resultats,
@@ -167,6 +178,7 @@ export async function matcherAnnonces(
     );
   } catch (erreur) {
     console.error("IA matching indisponible", erreur);
+    surErreur?.(erreur);
     return null;
   }
 }

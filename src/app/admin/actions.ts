@@ -117,21 +117,28 @@ export type EtatIA = {
 export async function verifierIA(): Promise<EtatIA> {
   await exigerAdmin();
   const { modererAnnonce, matcherAnnonces } = await import("@/lib/ia/modele");
+  const { resumerErreur } = await import("@/lib/ia/regles");
   const chrono = async <T>(f: () => Promise<T>) => {
     const t0 = Date.now();
     const r = await f();
     return { r, ms: Date.now() - t0 };
   };
-  const [m, p] = await Promise.all([
-    chrono(() =>
-      modererAnnonce({
+  // L'un après l'autre : deux appels simultanés peuvent toucher la limite de l'offre gratuite.
+  const causes: { moderation?: string; matching?: string } = {};
+  const m = await chrono(() =>
+    modererAnnonce(
+      {
         titre: "Cours de maths",
         description: "Appelle-moi au 06 12 34 56 78 pour réserver un cours.",
         lieu: null,
-      }),
+      },
+      (e) => (causes.moderation = resumerErreur(e)),
     ),
-    chrono(() =>
-      matcherAnnonces({ competences: ["Power BI"], propose: [], cherche: [] }, [
+  );
+  const p = await chrono(() =>
+    matcherAnnonces(
+      { competences: ["Power BI"], propose: [], cherche: [] },
+      [
         {
           id: "test",
           type: "cherche",
@@ -140,9 +147,10 @@ export async function verifierIA(): Promise<EtatIA> {
           description:
             "On voudrait un tableau de bord clair au lieu de notre Excel.",
         },
-      ]),
+      ],
+      (e) => (causes.matching = resumerErreur(e)),
     ),
-  ]);
+  );
   return {
     cleServeur: !!process.env.SUPABASE_SECRET_KEY,
     moderation: m.r
@@ -151,13 +159,13 @@ export async function verifierIA(): Promise<EtatIA> {
           ms: m.ms,
           detail: `verdict « ${m.r.statut} » sur une annonce avec un numéro`,
         }
-      : { ok: false, ms: m.ms, detail: "pas de réponse du modèle" },
+      : { ok: false, ms: m.ms, detail: `pas de réponse du modèle : ${causes.moderation ?? "cause inconnue"}` },
     matching: p.r
       ? {
           ok: (p.r.get("test")?.pertinence ?? 0) >= 2,
           ms: p.ms,
           detail: `note ${p.r.get("test")?.pertinence ?? 0}/3 : ${p.r.get("test")?.raison || "sans raison"}`,
         }
-      : { ok: false, ms: p.ms, detail: "pas de réponse du modèle" },
+      : { ok: false, ms: p.ms, detail: `pas de réponse du modèle : ${causes.matching ?? "cause inconnue"}` },
   };
 }

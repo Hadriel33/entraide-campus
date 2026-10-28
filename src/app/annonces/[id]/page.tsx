@@ -36,6 +36,7 @@ import {
 } from "@/app/demandes/actions";
 import { appliquerCorrection, changerStatut, prolongerAnnonce, supprimerAnnonce } from "../actions";
 import { Colette } from "@/components/colette/colette";
+import { BadgeIA } from "@/components/ia/badge-ia";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -239,6 +240,7 @@ export default async function PageAnnonce({
           <div className="flex items-center gap-3">
             <Colette anim="reflechit" taille={70} className="shrink-0" />
             <div>
+              <BadgeIA numero={2} />
               <h2 id="correction" className="font-main text-2xl leading-tight">
                 Colette te propose une version corrigée
               </h2>
@@ -276,6 +278,7 @@ export default async function PageAnnonce({
         <div role="status" className="flex items-center gap-4 rounded-carte bg-postit-lilas p-4 text-sm">
           <Colette anim="reflechit" taille={70} className="shrink-0" />
           <p>
+            <BadgeIA numero={2} className="mb-1" />
             <strong className="block font-main text-xl">Colette a un petit doute</strong>
             {moderation.moderation_raisons.join(" ") || "Un modérateur va jeter un œil."} En attendant, seuls toi et l&apos;admin la voyez.
           </p>

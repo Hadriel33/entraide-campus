@@ -210,3 +210,17 @@ export function nettoyerMatchs(
   }
   return matchs;
 }
+
+// Cause d'une panne d'IA, courte et lisible, pour l'admin (jamais de jeton ni de clé dans le texte).
+export function resumerErreur(erreur: unknown): string {
+  let texte: string;
+  if (erreur instanceof Error) texte = erreur.name && erreur.name !== "Error" ? `${erreur.name} : ${erreur.message}` : erreur.message;
+  else if (typeof erreur === "string") texte = erreur;
+  else return "erreur inconnue";
+  texte = texte
+    .replace(/Bearer\s+\S+/gi, "Bearer [masqué]")
+    .replace(/\b(sk|vck|sb_secret)[-_][A-Za-z0-9_-]{6,}/g, "[clé masquée]")
+    .replace(/\s+/g, " ")
+    .trim();
+  return texte.length > 160 ? `${texte.slice(0, 157)}...` : texte || "erreur inconnue";
+}

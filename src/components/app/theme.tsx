@@ -18,12 +18,14 @@ function abonner(rappel: () => void) {
 
 export const SCRIPT_THEME = `try{if(localStorage.getItem("${CLE}")==="noir")document.documentElement.dataset.theme="noir"}catch(e){}`;
 
+// Le libellé et l'icône suivent le thème par le CSS (data-theme sur <html>), pas par l'état React : le HTML du
+// serveur et celui du navigateur sont donc toujours identiques (aucun écart à l'hydratation).
 export function BoutonTheme({ className = "" }: { className?: string }) {
   const theme = useSyncExternalStore(abonner, lire, () => "clair");
   const noir = theme === "noir";
 
   function basculer() {
-    const suivant = noir ? "clair" : "noir";
+    const suivant = lire() === "noir" ? "clair" : "noir";
     if (suivant === "noir") document.documentElement.dataset.theme = "noir";
     else delete document.documentElement.dataset.theme;
     try {
@@ -37,6 +39,7 @@ export function BoutonTheme({ className = "" }: { className?: string }) {
       type="button"
       onClick={basculer}
       aria-pressed={noir}
+      suppressHydrationWarning
       className={`presse flex items-center gap-2 rounded-ui text-sm hover:bg-papier-fonce ${className}`}
     >
       <svg
@@ -49,13 +52,11 @@ export function BoutonTheme({ className = "" }: { className?: string }) {
         strokeLinejoin="round"
         aria-hidden
       >
-        {noir ? (
-          <path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0" />
-        ) : (
-          <path d="M3 5h18v12H3zM8 21h8M12 17v4M7 9h5M7 12h3" />
-        )}
+        <path className="theme-si-noir" d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0" />
+        <path className="theme-si-clair" d="M3 5h18v12H3zM8 21h8M12 17v4M7 9h5M7 12h3" />
       </svg>
-      {noir ? "Mode clair" : "Tableau noir"}
+      <span className="theme-si-noir">Mode clair</span>
+      <span className="theme-si-clair">Tableau noir</span>
     </button>
   );
 }

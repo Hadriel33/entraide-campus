@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CATEGORIES, CONTREPARTIES, TYPES } from "@/lib/annonces/validation";
 import { dateCourte, type Annonce } from "@/lib/annonces/requetes";
 import { teinte } from "@/lib/design/teintes";
+import { PictoCategorie } from "./picto-categorie";
 
 // Vue liste : une annonce par ligne, bien droite, pour lire vite.
 export function LigneAnnonce({ annonce }: { annonce: Annonce }) {
@@ -15,7 +16,7 @@ export function LigneAnnonce({ annonce }: { annonce: Annonce }) {
         <span className={`titre-charte w-24 shrink-0 text-sm ${annonce.type === "cherche" ? "text-encre" : "text-encre-douce"}`}>{TYPES[annonce.type]}</span>
         <span className="min-w-0 flex-1 font-semibold group-hover:underline">{annonce.titre}</span>
         <span className="flex items-center gap-1.5 text-xs font-medium text-encre-douce">
-          <span className={`size-2 rounded-full ${t.point}`} aria-hidden />
+          <PictoCategorie categorie={annonce.categorie} className="size-4 text-encre" />
           {CATEGORIES[annonce.categorie]}
         </span>
         <span className="w-32 text-xs text-encre-douce">{CONTREPARTIES[annonce.contrepartie]}</span>

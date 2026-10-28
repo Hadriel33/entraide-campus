@@ -17,9 +17,12 @@ import {
   Colette,
   type Accessoire,
   type CouleurColette,
+  type Humeur,
+  type Motif,
 } from "@/components/colette/colette";
 import { Badges } from "@/components/profil/badges";
 import { CarteDefi } from "@/components/profil/carte-defi";
+import { CarteSerie } from "@/components/profil/carte-serie";
 import { FilCampus } from "@/components/campus/fil";
 import { messageColette } from "@/lib/gamification/message-colette";
 import { defiDeLaSemaine } from "@/lib/gamification/defis";
@@ -251,6 +254,9 @@ export default async function PageBureau() {
               anim={nbAttente > 2 ? "debordee" : "coucou"}
               couleur={(profil.colette_couleur || "jaune") as CouleurColette}
               accessoire={(profil.colette_accessoire || "aucun") as Accessoire}
+              humeur={(profil.colette_humeur || "contente") as Humeur}
+              motif={(profil.colette_motif || "uni") as Motif}
+              saison={false}
               taille={92}
               className="shrink-0"
             />
@@ -416,6 +422,7 @@ export default async function PageBureau() {
         </div>
 
         <aside className="flex flex-col gap-6">
+          {stats && <CarteSerie serie={(stats as Stats).serie ?? 0} />}
           <CarteDefi supabase={supabase} />
 
           <FilCampus supabase={supabase} moiDansLeFil={profil.fil_public} />

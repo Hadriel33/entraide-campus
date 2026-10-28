@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Colette } from "@/components/colette/colette";
 import { Bouton } from "@/components/ui/bouton";
+import { BadgeIA } from "@/components/ia/badge-ia";
 import { FormulaireAnnonce } from "./formulaire-annonce";
 import { redigerAvecColette, type EtatAnnonce, type EtatRedaction } from "@/app/annonces/actions";
 
@@ -20,7 +21,7 @@ export function AssistantRedaction({ action, initial, campus }: { action: Action
           <Colette anim={enCours ? "reflechit" : "coucou"} taille={64} className="shrink-0" />
           <div>
             <p className="font-main text-2xl leading-tight">Pas envie de tout remplir ?</p>
-            <p className="text-sm text-encre-douce">Décris ton idée en une phrase, Colette écrit l&apos;annonce. Tu relis avant de publier.</p>
+            <p className="flex flex-wrap items-center gap-2 text-sm text-encre-douce"><BadgeIA numero={4} />Décris ton idée en une phrase, Colette écrit l&apos;annonce. Tu relis avant de publier.</p>
           </div>
         </div>
         <label className="flex flex-col gap-1.5">

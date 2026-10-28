@@ -23,11 +23,17 @@ export type Accessoire =
   | "cape"
   | "etoile"
   | "couronne"
+  | "fleur"
+  | "micro"
+  | "lunettes_coeur"
+  | "flamme"
+  // Tenue de la guide (le tuto) : on la reconnaît, ce n'est pas ta Colette
+  | "guide"
   // Tenues de saison (portées par la mascotte, pas choisissables en avatar)
   | "cartable"
   | "sorciere"
   | "cafe";
-export type Motif = "uni" | "ligne" | "pois" | "quadrille" | "dore";
+export type Motif = "uni" | "ligne" | "pois" | "quadrille" | "dore" | "mariniere" | "etoiles";
 export type AnimColette = "flotte" | "coucou" | "lit" | "tampon" | "accroche" | "saute" | "dort" | "cherche" | "reflechit" | "debordee";
 
 const PAPIER: Record<CouleurColette, [string, string]> = {
@@ -291,6 +297,52 @@ function AccessoireDevant({ a }: { a: Accessoire }) {
           <circle cx="100" cy="27" r="3" fill="var(--color-ciel)" />
         </g>
       );
+    case "fleur":
+      return (
+        <g stroke={K} strokeWidth="2">
+          <circle cx="40" cy="26" r="8" fill={BLANC} />
+          <circle cx="56" cy="28" r="8" fill={BLANC} />
+          <circle cx="58" cy="44" r="8" fill={BLANC} />
+          <circle cx="42" cy="46" r="8" fill={BLANC} />
+          <circle cx="34" cy="36" r="8" fill={BLANC} />
+          <circle cx="47" cy="36" r="7" fill="var(--color-bandeau)" />
+        </g>
+      );
+    case "micro":
+      return (
+        <g>
+          <path d="M142 130 L153 106" stroke={K} strokeWidth="7" strokeLinecap="round" />
+          <circle cx="156" cy="98" r="10" fill="var(--color-encre-douce)" stroke={K} strokeWidth="2.5" />
+          <path d="M150 94 h12 M148 99 h16 M150 104 h12" stroke={BLANC} strokeWidth="1.5" />
+          <rect x="140" y="112" width="12" height="6" rx="2" fill={ROUGE} transform="rotate(-65 146 115)" />
+        </g>
+      );
+    case "lunettes_coeur":
+      return (
+        <g stroke={K} strokeWidth="2.5" strokeLinejoin="round">
+          <path d="M66 87 C50 76 57 64 66 73 C75 64 82 76 66 87 Z" fill={ROUGE} />
+          <path d="M100 87 C84 76 91 64 100 73 C109 64 116 76 100 87 Z" fill={ROUGE} />
+          <path d="M78 76 h10" />
+        </g>
+      );
+    case "flamme":
+      return (
+        <g className="col-flamme" stroke={K} strokeWidth="2" strokeLinejoin="round">
+          <path d="M83 -8 C98 6 100 18 92 30 C93 22 88 17 86 13 C84 21 76 21 78 30 C66 19 72 4 83 -8 Z" fill={ROUGE} />
+          <path d="M84 8 C90 16 90 22 86 28 C84 24 80 24 80 28 C77 22 80 14 84 8 Z" fill="var(--color-bandeau)" stroke="none" />
+        </g>
+      );
+    case "guide":
+      return (
+        <g>
+          {/* Casquette verte de guide et pancarte « ? » : impossible de la confondre avec ta Colette */}
+          <path d="M34 34 Q56 2 112 22 L138 30 Q120 38 34 34 Z" fill="var(--color-ok)" stroke={K} strokeWidth="2.5" strokeLinejoin="round" />
+          <circle cx="76" cy="14" r="4" fill={K} />
+          <path d="M152 116 L160 34" stroke="var(--color-bois)" strokeWidth="5" strokeLinecap="round" />
+          <rect x="146" y="10" width="40" height="32" rx="4" fill="var(--color-bandeau)" stroke={K} strokeWidth="2.5" />
+          <text x="166" y="35" textAnchor="middle" fontFamily="var(--font-main)" fontWeight="700" fontSize="26" fill={K}>?</text>
+        </g>
+      );
     case "cartable":
       return <path d="M44 34 Q40 80 50 110 M122 34 Q126 80 116 110" stroke="var(--color-bois)" strokeWidth="6" fill="none" strokeLinecap="round" />;
     case "sorciere":
@@ -355,6 +407,17 @@ function MotifPapier({ m }: { m: Motif }) {
           <pattern id={id} width="16" height="16" patternUnits="userSpaceOnUse">
             <circle cx="4" cy="4" r="2.4" fill={BLANC} opacity="0.8" />
             <circle cx="12" cy="12" r="2.4" fill={BLANC} opacity="0.8" />
+          </pattern>
+        )}
+        {m === "mariniere" && (
+          <pattern id={id} width="12" height="14" patternUnits="userSpaceOnUse">
+            <rect y="0" width="12" height="5" fill="var(--color-encre-bleue)" opacity="0.32" />
+          </pattern>
+        )}
+        {m === "etoiles" && (
+          <pattern id={id} width="24" height="24" patternUnits="userSpaceOnUse">
+            <path d="M6 1 l1.4 3 3.2 .4 -2.3 2.2 .6 3.2 -2.9 -1.6 -2.9 1.6 .6 -3.2 -2.3 -2.2 3.2 -.4 z" fill={BLANC} opacity="0.85" />
+            <path d="M18 13 l1.1 2.3 2.5 .3 -1.8 1.7 .5 2.5 -2.3 -1.2 -2.3 1.2 .5 -2.5 -1.8 -1.7 2.5 -.3 z" fill="var(--color-bandeau)" />
           </pattern>
         )}
         {m === "quadrille" && (
@@ -499,7 +562,7 @@ export function Colette({
   if (deSaison) accessoire = deSaison.tenue;
   const [fond, coin] = PAPIER[couleur];
   const joue = couleur === "lilas" ? "var(--color-ocre)" : "var(--color-lilas)";
-  const cachePunaise = ["diplome", "noel", "couronne", "casque", "sorciere"].includes(accessoire);
+  const cachePunaise = ["diplome", "noel", "couronne", "casque", "sorciere", "guide"].includes(accessoire);
   const corps = anim === "flotte" || anim === "coucou" ? "col-flotte" : anim === "saute" ? "col-saute" : anim === "dort" ? "col-respire" : anim === "cherche" ? "col-cherche" : anim === "debordee" ? "col-tremble" : anim === "reflechit" ? "col-penche" : "";
 
   return (

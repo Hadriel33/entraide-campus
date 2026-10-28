@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { niveauMatch, suggerer } from "@/lib/matching/suggestions";
 import { matcherAnnonces } from "@/lib/ia/modele";
+import { BadgeIA } from "@/components/ia/badge-ia";
 import { Colette } from "@/components/colette/colette";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { normaliserRecherche } from "@/lib/annonces/recherche";
@@ -19,6 +20,7 @@ import { quartiersDu } from "@/lib/carte/mercator";
 import { TEINTES, inclinaison, teinte } from "@/lib/design/teintes";
 import { LigneAnnonce } from "@/components/annonces/ligne-annonce";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
+import { PictoCategorie } from "@/components/annonces/picto-categorie";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { EnDirect } from "../mur/en-direct";
 import { EtatVide } from "@/components/colette/etat-vide";
@@ -270,6 +272,18 @@ export default async function PageAnnonces({
     { valeur: undefined, label: "Tout" },
     ...Object.entries(TYPES).map(([valeur, label]) => ({ valeur, label })),
   ];
+
+  // Combien de commentaires sous chaque post-it affiché (la flamme « ça chauffe » dès 3). Connecté seulement (RLS).
+  const nbCommentaires = new Map<string, number>();
+  if (user && annonces.length > 0) {
+    const { data: lignes } = await supabase
+      .from("commentaires")
+      .select("cible_id")
+      .eq("cible_type", "annonce")
+      .in("cible_id", annonces.map((a) => a.id))
+      .limit(2000);
+    for (const l of lignes ?? []) nbCommentaires.set(l.cible_id, (nbCommentaires.get(l.cible_id) ?? 0) + 1);
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
@@ -548,9 +562,11 @@ export default async function PageAnnonces({
                 >
                   {valeur && (
                     <span
-                      className={`size-2 rounded-full ${teinte(valeur).point}`}
+                      className={`flex size-5 items-center justify-center rounded-full ${teinte(valeur).point} text-encre`}
                       aria-hidden
-                    />
+                    >
+                      <PictoCategorie categorie={valeur} className="size-3" />
+                    </span>
                   )}
                   {label}
                   <span className="text-xs text-encre-douce group-aria-[current=page]/chip:text-surface/70">
@@ -574,6 +590,24 @@ export default async function PageAnnonces({
                   aria-hidden
                 />
                 {t.famille}
+              </span>
+            ))}
+          </p>
+          <p
+            className="flex flex-wrap items-center gap-x-3 gap-y-1"
+            aria-label="Légende des formes"
+          >
+            <span className="font-semibold">Les formes :</span>
+            {[
+              { c: "covoiturage", l: "covoit = billet" },
+              { c: "coloc", l: "coloc = petite annonce" },
+              { c: "materiel", l: "prêt = étiquette" },
+              { c: "shooting", l: "shooting = polaroid" },
+              { c: "binome", l: "binôme = duo" },
+            ].map((x) => (
+              <span key={x.c} className="flex items-center gap-1">
+                <PictoCategorie categorie={x.c} className="size-3.5" />
+                {x.l}
               </span>
             ))}
           </p>
@@ -674,6 +708,7 @@ export default async function PageAnnonces({
             className="shrink-0"
           />
           <p className="min-w-56 flex-1 text-sm leading-snug">
+            <BadgeIA numero={3} className="mr-1.5 align-middle" />
             {coletteOk === true
               ? "Colette a relu les 40 dernières annonces et garde celles qui te vont vraiment, même écrites avec d'autres mots."
               : coletteOk === false
@@ -719,6 +754,7 @@ export default async function PageAnnonces({
               annonce={a}
               index={i % PAR_PAGE}
               match={matchs.get(a.id)}
+              nbCommentaires={nbCommentaires.get(a.id) ?? 0}
             />
           ))}
         </div>

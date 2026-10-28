@@ -1,4 +1,5 @@
 "use client";
+import { BadgeIA } from "@/components/ia/badge-ia";
 
 import { useActionState, useState, useTransition } from "react";
 import { Bouton } from "@/components/ui/bouton";
@@ -35,8 +36,9 @@ export function AssistantCompetences({ actuelles }: { actuelles: string[] }) {
           Choisir mon CV (PDF)
           <input type="file" name="cv" accept="application/pdf" className="sr-only" onChange={(e) => e.currentTarget.form?.requestSubmit()} />
         </label>
-        <span className="text-xs text-encre-douce">
-          L&apos;IA lit ton CV et propose tes compétences. Ton CV n&apos;est pas conservé.
+        <span className="flex flex-wrap items-center gap-2 text-xs text-encre-douce">
+          <BadgeIA numero={1} />
+          Colette lit ton CV et propose tes compétences, tu valides. Ton CV n&apos;est pas conservé.
         </span>
       </form>
       {analyseEnCours && (

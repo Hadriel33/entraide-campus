@@ -24,6 +24,11 @@ export const ACCESSOIRES_COLETTE: Record<string, Objet> = {
   cape: { nom: "Cape de super-héros", condition: (s) => s.aides_donnees >= 3, aide: "Aide 3 personnes" },
   couronne: { nom: "Couronne", condition: (s) => s.nb_avis >= 3 && (s.note_moyenne ?? 0) >= 4.5, aide: "3 avis, moyenne 4,5" },
   diplome: { nom: "Diplôme", condition: (s) => s.aides_donnees >= 10, aide: "Aide 10 personnes" },
+  // Migration 0027 : des pièces qui récompensent la participation et le retour chaque semaine.
+  fleur: { nom: "Fleur" },
+  micro: { nom: "Micro", condition: (s) => (s.commentaires ?? 0) >= 3, aide: "Écris 3 commentaires" },
+  lunettes_coeur: { nom: "Lunettes cœur", condition: (s) => (s.reactions_recues ?? 0) >= 5, aide: "Reçois 5 réactions" },
+  flamme: { nom: "Flamme", condition: (s) => (s.serie ?? 0) >= 3, aide: "Participe 3 semaines d'affilée" },
 };
 
 export const MOTIFS_COLETTE: Record<string, Objet> = {
@@ -32,6 +37,8 @@ export const MOTIFS_COLETTE: Record<string, Objet> = {
   pois: { nom: "À pois", condition: (s) => s.aides_recues >= 1, aide: "Reçois un coup de main" },
   quadrille: { nom: "Quadrillé", condition: (s) => s.categories >= 3, aide: "Publie dans 3 catégories" },
   dore: { nom: "Doré", condition: (s) => s.aides_donnees >= 10, aide: "Aide 10 personnes" },
+  mariniere: { nom: "Marinière" },
+  etoiles: { nom: "Étoilé", condition: (s) => (s.serie ?? 0) >= 2, aide: "Participe 2 semaines d'affilée" },
 };
 
 export function estDebloque(objet: Objet | undefined, s: Stats | null) {

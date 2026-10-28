@@ -5,6 +5,7 @@ import Link from "next/link";
 import { commenter, supprimerCommentaire, type EtatCommentaire } from "@/app/fil/actions";
 import type { Commentaire } from "@/lib/social/requetes";
 import { Avatar } from "@/components/ui/avatar";
+import { decouperMentions } from "@/lib/social/mentions";
 import { ilYa } from "@/lib/temps";
 
 // Commentaires sous un post : les 2 derniers visibles, le reste dépliable, et un champ pour répondre.
@@ -55,7 +56,17 @@ export function Commentaires({
                     </button>
                   )}
                 </span>
-                <span className="break-words">{c.contenu}</span>
+                <span className="break-words">
+                  {decouperMentions(c.contenu).map((m, i) =>
+                    "pseudo" in m ? (
+                      <Link key={i} href={`/profils/${m.pseudo}`} className="font-semibold text-encre-bleue hover:underline">
+                        @{m.pseudo}
+                      </Link>
+                    ) : (
+                      m.texte
+                    ),
+                  )}
+                </span>
               </div>
             </li>
           ))}
@@ -72,7 +83,7 @@ export function Commentaires({
           name="contenu"
           maxLength={300}
           autoComplete="off"
-          placeholder="Écrire un commentaire..."
+          placeholder="Écrire un commentaire… (@pseudo pour prévenir quelqu’un)"
           className="min-h-10 min-w-0 flex-1 rounded-full border border-ligne-forte bg-surface px-4 text-sm outline-none focus:border-encre"
         />
         <button disabled={enCours} className="presse min-h-10 rounded-full bg-encre px-4 text-sm font-semibold text-surface disabled:opacity-60">

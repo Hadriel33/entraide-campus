@@ -53,8 +53,8 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
               motif={(profil.colette_motif || "uni") as Motif}
               saison={false}
               anim="flotte"
-              taille={54}
-              className="absolute -right-6 -bottom-3"
+              taille={72}
+              className="absolute -right-9 -bottom-4"
             />
           )}
         </div>
@@ -68,6 +68,11 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
               <span className="rounded-full bg-papier-fonce px-2 py-0.5 text-xs font-semibold text-encre">{(profil.classe as unknown as { nom: string }).nom}</span>
             )}
             <span className="text-xs">membre depuis le {dateCourte(profil.cree_le)}</span>
+            {(s?.serie ?? 0) > 0 && (
+              <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-surface" title="Semaines d'affilée où cette personne a participé">
+                Série : {s?.serie} semaine{(s?.serie ?? 0) > 1 ? "s" : ""}
+              </span>
+            )}
           </p>
           {profil.bio && <p className="max-w-xl font-serif text-lg">{profil.bio}</p>}
           {profil.competences?.length > 0 && (

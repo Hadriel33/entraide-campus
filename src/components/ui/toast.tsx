@@ -22,7 +22,7 @@ const MESSAGES: Record<string, string> = {
   photo: "Photo de profil mise à jour.",
   coordonnees: "Coordonnées enregistrées.",
   competences: "Compétences enregistrées sur ton profil.",
-  colette: "Ta Colette est prête.",
+  colette: "Ta Colette est à jour : profil, post-its, commentaires et menu.",
   classe: "Classe enregistrée : tu joues pour elle au classement.",
   classe_creee: "Classe ajoutée.",
   classe_proposee: "Classe proposée : elle compte au classement dès qu'un admin la valide.",
