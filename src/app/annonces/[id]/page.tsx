@@ -21,6 +21,7 @@ import { inclinaison, teinte } from "@/lib/design/teintes";
 import { Avatar } from "@/components/ui/avatar";
 import { chargerSocial } from "@/lib/social/requetes";
 import { Reactions } from "@/components/social/reactions";
+import { BoutonSoutien } from "@/components/social/bouton-soutien";
 import { Commentaires } from "@/components/social/commentaires";
 import { Badge, BadgeCampus } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
@@ -437,8 +438,11 @@ export default async function PageAnnonce({
       )}
       {social && user && (
         <section id="commentaires" className="flex scroll-mt-6 flex-col gap-3 border-t border-ligne pt-6">
-          <h2 className="titre-charte text-section">Réactions et commentaires</h2>
-          <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estAuteur} />
+          <h2 className="titre-charte text-section">Soutiens, réactions et commentaires</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <BoutonSoutien grand annonceId={annonce.id} resume={social.soutiens.get(annonce.id) ?? { n: 0, moi: false }} proprietaire={estAuteur} />
+            <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estAuteur} />
+          </div>
           <Commentaires
             cible="annonce"
             id={annonce.id}

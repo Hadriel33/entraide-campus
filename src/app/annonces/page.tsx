@@ -4,6 +4,7 @@ import { getSession } from "@/lib/session";
 import { niveauMatch, suggerer } from "@/lib/matching/suggestions";
 import { matcherAnnonces } from "@/lib/ia/modele";
 import { BadgeIA } from "@/components/ia/badge-ia";
+import { resumerSoutiens, type ResumeSoutien } from "@/lib/social/soutiens";
 import { Colette } from "@/components/colette/colette";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { normaliserRecherche } from "@/lib/annonces/recherche";
@@ -99,17 +100,20 @@ export default async function PageAnnonces({
         ? brut.contrepartie
         : undefined,
     tri:
-      brut.tri === "bientot" || brut.tri === "pour_moi" ? brut.tri : undefined,
+      brut.tri === "bientot" || brut.tri === "pour_moi" || brut.tri === "ca_monte" ? brut.tri : undefined,
     vue: brut.vue === "liste" ? "liste" : undefined,
     colette: brut.colette === "1" && brut.tri === "pour_moi" ? "1" : undefined,
     page: brut.page && /^[2-5]$/.test(brut.page) ? brut.page : undefined,
   };
   const pourMoi = filtres.tri === "pour_moi";
   // « Pour moi » trie par correspondance : on lit plus large, puis on classe côté serveur.
-  const limite = pourMoi ? 300 : PAR_PAGE * Number(filtres.page ?? 1);
+  const limite = pourMoi ? 300 : filtres.tri === "ca_monte" ? 100 : PAR_PAGE * Number(filtres.page ?? 1);
   const recherche = filtres.q ? normaliserRecherche(filtres.q) : "";
 
   const { supabase, user, profil } = await getSession();
+  // « Ça monte » : l'ordre vient des soutiens des 30 derniers jours (RPC), les filtres s'appliquent ensuite.
+  const caMonte = filtres.tri === "ca_monte" && !!user;
+  const ordreCaMonte = caMonte ? (((await supabase.rpc("annonces_ca_monte", { limite: 100 })).data ?? []) as { annonce_id: string; n: number }[]) : [];
   const maintenant = new Date().toISOString();
   // Par défaut, le tableau montre MON campus (une coloc ou un covoit, c'est local) ; « tous » ouvre aux 6 campus.
   const campus =
@@ -131,6 +135,7 @@ export default async function PageAnnonces({
     })
     .limit(limite);
   if (campus) requete = requete.eq("auteur.campus", campus);
+  if (caMonte) requete = requete.in("id", ordreCaMonte.length ? ordreCaMonte.map((o) => o.annonce_id) : ["00000000-0000-0000-0000-000000000000"]);
   if (filtres.contrepartie)
     requete = requete.eq("contrepartie", filtres.contrepartie);
   if (filtres.type) requete = requete.eq("type", filtres.type);
@@ -153,6 +158,10 @@ export default async function PageAnnonces({
       .limit(2000),
   ]);
   let annonces = (data ?? []) as unknown as Annonce[];
+  if (caMonte) {
+    const rang = new Map(ordreCaMonte.map((o, i) => [o.annonce_id, i]));
+    annonces = [...annonces].sort((a, b) => (rang.get(a.id) ?? 999) - (rang.get(b.id) ?? 999));
+  }
   const parCategorie = (toutes ?? []).reduce<Record<string, number>>(
     (acc, a) => ({ ...acc, [a.categorie]: (acc[a.categorie] ?? 0) + 1 }),
     {},
@@ -274,15 +283,17 @@ export default async function PageAnnonces({
   ];
 
   // Combien de commentaires sous chaque post-it affiché (la flamme « ça chauffe » dès 3). Connecté seulement (RLS).
+  // Et combien de soutiens (« Je soutiens »), avec le mien.
   const nbCommentaires = new Map<string, number>();
+  let soutiens = new Map<string, ResumeSoutien>();
   if (user && annonces.length > 0) {
-    const { data: lignes } = await supabase
-      .from("commentaires")
-      .select("cible_id")
-      .eq("cible_type", "annonce")
-      .in("cible_id", annonces.map((a) => a.id))
-      .limit(2000);
+    const ids = annonces.map((a) => a.id);
+    const [{ data: lignes }, { data: lignesSoutien }] = await Promise.all([
+      supabase.from("commentaires").select("cible_id").eq("cible_type", "annonce").in("cible_id", ids).limit(2000),
+      supabase.from("soutiens").select("annonce_id, auteur_id").in("annonce_id", ids).limit(5000),
+    ]);
     for (const l of lignes ?? []) nbCommentaires.set(l.cible_id, (nbCommentaires.get(l.cible_id) ?? 0) + 1);
+    soutiens = resumerSoutiens(lignesSoutien ?? [], user.id);
   }
 
   return (
@@ -526,7 +537,7 @@ export default async function PageAnnonces({
           >
             {[
               { tri: undefined, label: "Plus récentes" },
-              ...(user ? [{ tri: "pour_moi", label: "Pour moi" }] : []),
+              ...(user ? [{ tri: "ca_monte", label: "Ça monte" }, { tri: "pour_moi", label: "Pour moi" }] : []),
               { tri: "bientot", label: "Expirent bientôt" },
             ].map((o) => (
               <Link
@@ -740,6 +751,17 @@ export default async function PageAnnonces({
         </p>
       )}
 
+      {caMonte && (
+        <p className="flex items-center gap-2 rounded-ui border border-encre bg-surface px-4 py-3 text-[0.95rem] shadow-[3px_3px_0_0_var(--color-bandeau)]">
+          <svg viewBox="0 0 24 24" className="bond size-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+          <span>
+            Les post-its les plus soutenus ces 30 derniers jours. Un pote cherche quelque chose, ou ça te concerne aussi ? <strong>Soutiens-le</strong> pour le faire monter.
+          </span>
+        </p>
+      )}
+
       {annonces.length > 0 && filtres.vue === "liste" ? (
         <ul className="flex flex-col gap-1.5">
           {annonces.map((a) => (
@@ -755,6 +777,8 @@ export default async function PageAnnonces({
               index={i % PAR_PAGE}
               match={matchs.get(a.id)}
               nbCommentaires={nbCommentaires.get(a.id) ?? 0}
+              soutien={user ? (soutiens.get(a.id) ?? { n: 0, moi: false }) : undefined}
+              proprietaire={a.auteur_id === user?.id}
             />
           ))}
         </div>
