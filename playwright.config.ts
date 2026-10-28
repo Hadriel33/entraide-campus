@@ -35,7 +35,7 @@ export default defineConfig({
           {
             // Le parcours d'écriture (publier puis supprimer) ne tourne qu'ici, une fois par passage.
             name: "etudiant",
-            testMatch: /(etudiant|ecriture)\.spec\.ts/,
+            testMatch: /(etudiant|ecriture|captures)\.spec\.ts/,
             dependencies: ["connexion"],
             use: {
               ...devices["Desktop Chrome"],
@@ -44,7 +44,7 @@ export default defineConfig({
           },
           {
             name: "etudiant-telephone",
-            testMatch: /etudiant\.spec\.ts/,
+            testMatch: /(etudiant|captures)\.spec\.ts/,
             dependencies: ["connexion"],
             use: {
               ...devices["Pixel 7"],

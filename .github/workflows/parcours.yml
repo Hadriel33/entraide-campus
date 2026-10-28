@@ -36,6 +36,14 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Parcours (public, puis étudiant connecté)
         run: npm run e2e
+      - name: Captures du site connecté
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: captures
+          path: captures/
+          retention-days: 14
+          if-no-files-found: ignore
       - name: Rapport en cas d'échec
         if: failure()
         uses: actions/upload-artifact@v4
