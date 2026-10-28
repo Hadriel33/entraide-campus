@@ -364,6 +364,17 @@ body {
   25% { transform: translateY(-8px) scale(1.15); opacity: 1; }
   100% { transform: translateY(-30px) scale(1); opacity: 0; }
 }
+/* La flèche de « Je soutiens » : elle s'écrase, bondit et retombe. */
+@keyframes bond {
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(2px) scale(1.25, 0.7); }
+  50% { transform: translateY(-9px) scale(0.85, 1.2); }
+  75% { transform: translateY(1px) scale(1.1, 0.9); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@utility bond {
+  animation: bond 560ms cubic-bezier(0.3, 0.7, 0.3, 1) both;
+}
 @utility envol {
   animation: envol 850ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   pointer-events: none;

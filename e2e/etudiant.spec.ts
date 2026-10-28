@@ -159,3 +159,14 @@ test("le bureau montre ma série de semaines, le fil retient ma visite", async (
   await page.reload();
   await expect(page.getByRole("status").filter({ hasText: /dernière visite/ })).toBeVisible();
 });
+
+test("« Ça monte » classe les post-its soutenus, chaque post-it a son bouton « Je soutiens »", async ({ page }) => {
+  const erreurs = surveillerErreurs(page);
+  await page.goto("/annonces?tri=ca_monte&campus=tous");
+  await expect(page.getByText(/Les post-its les plus soutenus/)).toBeVisible();
+  const postits = page.locator("article[data-forme]");
+  await expect(postits.first(), "« Ça monte » est vide : la fonction annonces_ca_monte a échoué ?").toBeVisible();
+  await expect(postits.first().getByRole("button", { name: /soutien/i })).toBeVisible();
+  await pasDeDebordement(page);
+  expect(erreurs).toEqual([]);
+});

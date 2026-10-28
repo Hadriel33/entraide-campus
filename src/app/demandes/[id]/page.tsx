@@ -38,7 +38,7 @@ export default async function PageConversation({
   const { data } = await supabase
     .from("demandes_contact")
     .select(
-      `id, statut, annonce:annonces(id, titre, type, categorie, auteur_id), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`,
+      `id, statut, annonce:annonces(id, titre, type, categorie, auteur_id, auteur:profils!annonces_auteur_id_fkey(${PERSONNE})), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`,
     )
     .eq("id", id)
     .maybeSingle();
@@ -51,12 +51,32 @@ export default async function PageConversation({
       type: string;
       categorie: Categorie;
       auteur_id: string;
+      auteur: Personne | null;
     } | null;
     demandeur: Personne;
     destinataire: Personne;
   } | null;
   if (!demande || demande.statut !== "acceptee") notFound();
 
+  // Post-it de groupe : la discussion réunit le demandeur, celui qui a accepté et toute l'équipe (règle d'or n°3 : ses participants).
+  const { data: membres } = demande.annonce
+    ? await supabase
+        .from("annonce_membres")
+        .select(`membre:profils!annonce_membres_membre_id_fkey(${PERSONNE})`)
+        .eq("annonce_id", demande.annonce.id)
+        .eq("statut", "accepte")
+    : { data: [] };
+  const participants = new Map<string, Personne>();
+  for (const p of [
+    demande.demandeur,
+    demande.destinataire,
+    demande.annonce?.auteur ?? null,
+    ...((membres ?? []) as unknown as { membre: Personne | null }[]).map((m) => m.membre),
+  ])
+    if (p) participants.set(p.id, p);
+  const enGroupe = participants.size > 2;
+  // Les coordonnées ne s'échangent qu'entre le demandeur et celui qui a accepté (règle d'or n°1).
+  const dansLaPaire = user.id === demande.demandeur.id || user.id === demande.destinataire.id;
   const autre =
     demande.demandeur.id === user.id ? demande.destinataire : demande.demandeur;
   const [{ data: messages }, { data: coordonnees }] = await Promise.all([
@@ -97,13 +117,32 @@ export default async function PageConversation({
         </p>
       )}
       <header className="apparition flex flex-wrap items-center gap-3">
-        <Avatar chemin={autre.avatar_chemin} nom={autre.pseudo} taille="lg" />
+        {enGroupe ? (
+          <span className="flex shrink-0">
+            {[...participants.values()].map((p, i) => (
+              <span key={p.id} className={`rounded-full ring-2 ring-papier ${i ? "-ml-3" : ""}`}>
+                <Avatar chemin={p.avatar_chemin} nom={p.pseudo} taille="lg" />
+              </span>
+            ))}
+          </span>
+        ) : (
+          <Avatar chemin={autre.avatar_chemin} nom={autre.pseudo} taille="lg" />
+        )}
         <div className="min-w-0 flex-1">
-          <h1 className="flex items-center gap-2 text-xl font-semibold">
-            <Link href={`/profils/${autre.pseudo}`} className="hover:underline">
-              @{autre.pseudo}
-            </Link>
-            <BadgeCampus campus={autre.campus} />
+          <h1 className="flex flex-wrap items-center gap-2 text-xl font-semibold">
+            {enGroupe ? (
+              <>
+                Discussion de groupe
+                <span className="rounded-full bg-bandeau px-2 py-0.5 text-xs font-bold">{participants.size} personnes</span>
+              </>
+            ) : (
+              <>
+                <Link href={`/profils/${autre.pseudo}`} className="hover:underline">
+                  @{autre.pseudo}
+                </Link>
+                <BadgeCampus campus={autre.campus} />
+              </>
+            )}
           </h1>
           {demande.annonce && (
             <p className="truncate text-sm text-encre-douce">
@@ -118,19 +157,22 @@ export default async function PageConversation({
           )}
         </div>
       </header>
-      <details className="text-sm">
-        <summary className="cursor-pointer text-encre-douce hover:text-encre">
-          Voir les coordonnées de {autre.prenom}
-        </summary>
-        <div className="mt-2">
-          <BlocCoordonnees c={coordonnees} prenom={autre.prenom} />
-        </div>
-      </details>
+      {dansLaPaire && (
+        <details className="text-sm">
+          <summary className="cursor-pointer text-encre-douce hover:text-encre">
+            Voir les coordonnées de {autre.prenom}
+          </summary>
+          <div className="mt-2">
+            <BlocCoordonnees c={coordonnees} prenom={autre.prenom} />
+          </div>
+        </details>
+      )}
       <Conversation
         demandeId={id}
         moi={user.id}
         initiaux={(messages ?? []) as Message[]}
-        prenomAutre={autre.prenom}
+        prenomAutre={enGroupe ? "le groupe" : autre.prenom}
+        noms={enGroupe ? Object.fromEntries([...participants.values()].map((p) => [p.id, p.pseudo])) : undefined}
         suggestions={
           demande.annonce
             ? phrasesColette({
@@ -146,7 +188,9 @@ export default async function PageConversation({
         }
       />
       <p className="text-xs text-encre-douce">
-        Cette conversation n&apos;est visible que par vous deux.
+        {enGroupe
+          ? `Visible seulement par ses participants : ${[...participants.values()].map((p) => "@" + p.pseudo).join(", ")}. Les coordonnées restent entre @${demande.demandeur.pseudo} et @${demande.destinataire.pseudo}.`
+          : "Cette conversation n'est visible que par vous deux."}
       </p>
     </div>
   );

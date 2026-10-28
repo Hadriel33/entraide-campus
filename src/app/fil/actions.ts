@@ -42,3 +42,11 @@ export async function supprimerCommentaire(commentaireId: string, cible: Cible, 
   await supabase.from("commentaires").delete().eq("id", commentaireId); // RLS : l'auteur ou un admin
   revalidatePath(chemin(cible, id));
 }
+
+// Soutenir un post-it (le faire monter) ou retirer son soutien. La base refuse : son propre post-it, un post-it caché, un doublon.
+export async function basculerSoutien(annonceId: string, dejaSoutenu: boolean) {
+  const { supabase, user } = await exigerSession();
+  if (dejaSoutenu) await supabase.from("soutiens").delete().eq("annonce_id", annonceId).eq("auteur_id", user.id);
+  else await supabase.from("soutiens").insert({ annonce_id: annonceId });
+  revalidatePath(`/annonces/${annonceId}`);
+}

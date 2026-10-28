@@ -21,6 +21,7 @@ import { inclinaison, teinte } from "@/lib/design/teintes";
 import { Avatar } from "@/components/ui/avatar";
 import { chargerSocial } from "@/lib/social/requetes";
 import { Reactions } from "@/components/social/reactions";
+import { BoutonSoutien } from "@/components/social/bouton-soutien";
 import { Commentaires } from "@/components/social/commentaires";
 import { Badge, BadgeCampus } from "@/components/ui/badge";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
@@ -37,6 +38,8 @@ import {
 import { appliquerCorrection, changerStatut, prolongerAnnonce, supprimerAnnonce } from "../actions";
 import { Colette } from "@/components/colette/colette";
 import { BadgeIA } from "@/components/ia/badge-ia";
+import { EquipePostit } from "@/components/annonces/equipe-postit";
+import { equipeAcceptee, libelleEquipe } from "@/lib/annonces/groupe";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -68,18 +71,21 @@ export default async function PageAnnonce({
 
   const { supabase, user } = await getSession();
   const estAuteur = user?.id === annonce.auteur_id;
+  // Post-it de groupe : les membres qui ont accepté font partie de l'équipe (modifier, répondre, pas de demande à soi-même).
+  const equipe = equipeAcceptee(annonce.membres);
+  const estEquipe = estAuteur || (!!user && (annonce.membres ?? []).some((m) => m.membre_id === user.id && m.statut === "accepte"));
   const prenom = annonce.auteur?.prenom ?? "l'auteur";
   // Résultat de la modération IA, montré à l'auteur seulement.
-  const { data: moderation } = estAuteur
+  const { data: moderation } = estEquipe
     ? await supabase.from("annonces").select("moderation, moderation_raisons, moderation_suggestion").eq("id", annonce.id).maybeSingle()
     : { data: null };
 
   // Ma demande sur cette annonce (s'il y en a une), et ce qui en découle.
-  const { data: demande } = estAuteur
+  const { data: demande } = estEquipe
     ? { data: null }
     : await supabase
         .from("demandes_contact")
-        .select("id, statut")
+        .select("id, statut, destinataire_id, destinataire:profils!demandes_contact_destinataire_id_fkey(prenom)")
         .eq("annonce_id", annonce.id)
         .eq("demandeur_id", user!.id)
         .maybeSingle();
@@ -89,10 +95,10 @@ export default async function PageAnnonce({
       ? await supabase
           .from("coordonnees")
           .select("telephone, email, reseau")
-          .eq("id", annonce.auteur_id)
+          .eq("id", demande.destinataire_id) // dans un groupe : celui qui a accepté, et lui seul
           .maybeSingle<Coordonnees>()
       : { data: null };
-  const { data: favori } = estAuteur
+  const { data: favori } = estEquipe
     ? { data: null }
     : await supabase
         .from("favoris")
@@ -101,6 +107,7 @@ export default async function PageAnnonce({
         .eq("annonce_id", annonce.id)
         .maybeSingle();
   const jours = joursRestants(annonce.expire_le);
+  const prenomContact = (demande?.destinataire as unknown as { prenom: string } | null)?.prenom ?? prenom;
   const { data: monAvis } =
     demande?.statut === "acceptee"
       ? await supabase
@@ -180,6 +187,17 @@ export default async function PageAnnonce({
           </div>
         </Link>
 
+        {equipe.length > 0 && (
+          <p className="relative -mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold">
+            <span className="text-encre-douce">avec</span>
+            {equipe.map((m) => (
+              <Link key={m.pseudo} href={`/profils/${m.pseudo}`} className="presse flex items-center gap-1.5 rounded-full bg-surface/60 py-0.5 pr-2.5 pl-0.5 hover:bg-surface">
+                <Avatar chemin={m.avatar_chemin} nom={m.pseudo} taille="sm" colette={m} />@{m.pseudo}
+              </Link>
+            ))}
+          </p>
+        )}
+
         <p className="font-serif text-lg leading-relaxed whitespace-pre-line">
           {annonce.description}
         </p>
@@ -188,54 +206,17 @@ export default async function PageAnnonce({
         </p>
       </div>
 
-      <dl className="divide-y divide-ligne rounded-carte border border-ligne bg-surface text-sm">
-        <div className="flex justify-between gap-4 px-4 py-3">
-          <dt className="text-encre-douce">Contrepartie</dt>
-          <dd className="font-medium">{CONTREPARTIES[annonce.contrepartie]}</dd>
+      {/* La barre sociale tout de suite sous le post-it : soutenir, réagir. */}
+      {social && user && (
+        <div className="-mt-3 flex flex-wrap items-center gap-3">
+          <BoutonSoutien grand annonceId={annonce.id} resume={social.soutiens.get(annonce.id) ?? { n: 0, moi: false }} proprietaire={estEquipe} />
+          <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estEquipe} />
         </div>
-        {annonce.quartier && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Quartier</dt>
-            <dd className="font-medium">{QUARTIERS[annonce.quartier]}</dd>
-          </div>
-        )}
-        {annonce.tram && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Tram</dt>
-            <dd>
-              <span className="rounded-ui bg-encre px-2 py-0.5 text-sm font-semibold text-surface">
-                Ligne {annonce.tram}
-              </span>
-            </dd>
-          </div>
-        )}
-        {annonce.lieu && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Lieu</dt>
-            <dd className="font-medium">{annonce.lieu}</dd>
-          </div>
-        )}
-        {estAuteur && annonce.statut === "publiee" && (
-          <div className="flex items-center justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Visibilité</dt>
-            <dd className="flex items-center gap-3 font-medium">
-              {jours === 0
-                ? "Expirée, invisible dans la liste"
-                : `Encore ${jours} jour${jours > 1 ? "s" : ""}`}
-              {jours <= 7 && (
-                <form action={prolongerAnnonce.bind(null, annonce.id)}>
-                  <Bouton variante="contour" className="min-h-8 px-2.5 text-sm">
-                    Prolonger
-                  </Bouton>
-                </form>
-              )}
-            </dd>
-          </div>
-        )}
-      </dl>
+      )}
+
 
       {/* IA n°2 : ce que Colette a remarqué, et sa proposition de correction (l'auteur décide). */}
-      {estAuteur && moderation?.moderation_suggestion && (
+      {estEquipe && moderation?.moderation_suggestion && (
         <section className="flex flex-col gap-4 rounded-carte border border-encre bg-surface p-5 shadow-[4px_4px_0_0_var(--color-lilas)]" aria-labelledby="correction">
           <div className="flex items-center gap-3">
             <Colette anim="reflechit" taille={70} className="shrink-0" />
@@ -274,7 +255,7 @@ export default async function PageAnnonce({
         </section>
       )}
 
-      {estAuteur && !moderation?.moderation_suggestion && moderation?.moderation === "a_verifier" && annonce.statut !== "masquee" && (
+      {estEquipe && !moderation?.moderation_suggestion && moderation?.moderation === "a_verifier" && annonce.statut !== "masquee" && (
         <div role="status" className="flex items-center gap-4 rounded-carte bg-postit-lilas p-4 text-sm">
           <Colette anim="reflechit" taille={70} className="shrink-0" />
           <p>
@@ -285,7 +266,7 @@ export default async function PageAnnonce({
         </div>
       )}
 
-      {estAuteur && annonce.statut === "masquee" && (
+      {estEquipe && annonce.statut === "masquee" && (
         <div role="status" className="flex items-center gap-4 rounded-carte bg-postit-lilas p-4 text-sm">
           <Colette anim="tampon" taille={80} className="shrink-0" />
           <p>
@@ -295,12 +276,14 @@ export default async function PageAnnonce({
         </div>
       )}
 
-      {estAuteur ? (
+      {user && <EquipePostit annonce={annonce} moi={user.id} estAuteur={estAuteur} />}
+
+      {estEquipe ? (
         <div className="flex flex-wrap gap-3 border-t border-ligne pt-6">
           <BoutonLien href={`/annonces/${annonce.id}/modifier`}>
             Modifier
           </BoutonLien>
-          {annonce.statut !== "masquee" && (
+          {estAuteur && annonce.statut !== "masquee" && (
             <form
               action={changerStatut.bind(
                 null,
@@ -313,9 +296,11 @@ export default async function PageAnnonce({
               </Bouton>
             </form>
           )}
-          <form action={supprimerAnnonce.bind(null, annonce.id)}>
-            <Bouton variante="danger">Supprimer</Bouton>
-          </form>
+          {estAuteur && (
+            <form action={supprimerAnnonce.bind(null, annonce.id)}>
+              <Bouton variante="danger">Supprimer</Bouton>
+            </form>
+          )}
         </div>
       ) : (
         <section
@@ -323,7 +308,7 @@ export default async function PageAnnonce({
           aria-labelledby="titre-contact"
         >
           <h2 id="titre-contact" className="font-semibold">
-            Contacter {prenom}
+            Contacter {equipe.length ? libelleEquipe(annonce.auteur?.pseudo ?? "", equipe.map((m) => m.pseudo)) : prenom}
           </h2>
 
           {!demande && (
@@ -367,15 +352,15 @@ export default async function PageAnnonce({
           {demande?.statut === "acceptee" && (
             <div className="flex flex-col gap-3">
               <p className="flex items-center gap-2 text-sm">
-                <Badge variante="ok">Acceptée</Badge> Tu peux contacter {prenom}{" "}
+                <Badge variante="ok">Acceptée</Badge> Tu peux contacter {prenomContact}{" "}
                 :
               </p>
-              <BlocCoordonnees c={coordonnees} prenom={prenom} />
+              <BlocCoordonnees c={coordonnees} prenom={prenomContact} />
               <BoutonLien
                 href={`/demandes/${demande.id}`}
                 className="self-start"
               >
-                Discuter avec {prenom}
+                {equipe.length ? "Discuter avec le groupe" : `Discuter avec ${prenomContact}`}
               </BoutonLien>
               {!monAvis && (
                 <FormulaireAvis
@@ -389,14 +374,60 @@ export default async function PageAnnonce({
         </section>
       )}
 
+      <dl className="divide-y divide-ligne rounded-carte border border-ligne bg-surface text-sm">
+        <div className="flex justify-between gap-4 px-4 py-3">
+          <dt className="text-encre-douce">Contrepartie</dt>
+          <dd className="font-medium">{CONTREPARTIES[annonce.contrepartie]}</dd>
+        </div>
+        {annonce.quartier && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Quartier</dt>
+            <dd className="font-medium">{QUARTIERS[annonce.quartier]}</dd>
+          </div>
+        )}
+        {annonce.tram && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Tram</dt>
+            <dd>
+              <span className="rounded-ui bg-encre px-2 py-0.5 text-sm font-semibold text-surface">
+                Ligne {annonce.tram}
+              </span>
+            </dd>
+          </div>
+        )}
+        {annonce.lieu && (
+          <div className="flex justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Lieu</dt>
+            <dd className="font-medium">{annonce.lieu}</dd>
+          </div>
+        )}
+        {estEquipe && annonce.statut === "publiee" && (
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <dt className="text-encre-douce">Visibilité</dt>
+            <dd className="flex items-center gap-3 font-medium">
+              {jours === 0
+                ? "Expirée, invisible dans la liste"
+                : `Encore ${jours} jour${jours > 1 ? "s" : ""}`}
+              {estAuteur && jours <= 7 && (
+                <form action={prolongerAnnonce.bind(null, annonce.id)}>
+                  <Bouton variante="contour" className="min-h-8 px-2.5 text-sm">
+                    Prolonger
+                  </Bouton>
+                </form>
+              )}
+            </dd>
+          </div>
+        )}
+      </dl>
+
       <div className="flex flex-wrap gap-2">
-        {!estAuteur && (
+        {!estEquipe && (
           <BoutonFavori annonceId={annonce.id} favori={!!favori} />
         )}
         <BoutonPartager titre={annonce.titre} />
       </div>
 
-      {!estAuteur && (
+      {!estEquipe && (
         <details className="text-sm">
           <summary className="cursor-pointer text-encre-douce hover:text-encre">
             Signaler cette annonce
@@ -437,8 +468,7 @@ export default async function PageAnnonce({
       )}
       {social && user && (
         <section id="commentaires" className="flex scroll-mt-6 flex-col gap-3 border-t border-ligne pt-6">
-          <h2 className="titre-charte text-section">Réactions et commentaires</h2>
-          <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estAuteur} />
+          <h2 className="titre-charte text-section">Commentaires</h2>
           <Commentaires
             cible="annonce"
             id={annonce.id}

@@ -16,6 +16,7 @@ import { Reactions } from "@/components/social/reactions";
 import { Commentaires } from "@/components/social/commentaires";
 import { MarquerFilVu } from "@/components/social/marquer-fil-vu";
 import { CompteurDiscussion } from "@/components/social/compteur-discussion";
+import { BoutonSoutien } from "@/components/social/bouton-soutien";
 import { PictoCategorie } from "@/components/annonces/picto-categorie";
 import { COOKIE_FIL, estNouveau } from "@/lib/social/revenir";
 
@@ -199,7 +200,10 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                   <strong className="text-lg leading-tight">{p.a.titre}</strong>
                   <span className="line-clamp-2 text-sm text-encre/75">{p.a.description}</span>
                 </Link>
-                <Reactions cible="annonce" id={p.a.id} resume={socialA.reactions.get(p.a.id)!} proprietaire={p.a.auteur_id === user.id} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <BoutonSoutien annonceId={p.a.id} resume={socialA.soutiens.get(p.a.id) ?? { n: 0, moi: false }} proprietaire={p.a.auteur_id === user.id || (p.a.membres ?? []).some((m) => m.membre_id === user.id && m.statut === "accepte")} />
+                  <Reactions cible="annonce" id={p.a.id} resume={socialA.reactions.get(p.a.id)!} proprietaire={p.a.auteur_id === user.id || (p.a.membres ?? []).some((m) => m.membre_id === user.id && m.statut === "accepte")} />
+                </div>
                 <Commentaires cible="annonce" id={p.a.id} liste={socialA.commentaires.get(p.a.id) ?? []} moi={user.id} estAdmin={estAdmin} />
               </li>
             ),

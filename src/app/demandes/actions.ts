@@ -42,16 +42,14 @@ export async function annulerDemande(demandeId: string, annonceId: string) {
   redirect(`/annonces/${annonceId}?ok=annulee`);
 }
 
-// Seul le destinataire peut répondre, une seule fois : garanti par la RLS et le trigger.
+// Répondre, une seule fois : le destinataire, ou n'importe qui de l'équipe d'un post-it de groupe.
+// La fonction en base (0029) vérifie l'équipe ; celui qui accepte devient le destinataire (seules SES coordonnées sont montrées).
 export async function repondreDemande(
   demandeId: string,
   reponse: "acceptee" | "refusee",
 ) {
   const { supabase } = await exigerSession();
-  await supabase
-    .from("demandes_contact")
-    .update({ statut: reponse })
-    .eq("id", demandeId);
+  await supabase.rpc("repondre_demande", { p_demande: demandeId, p_accepter: reponse === "acceptee" });
   revalidatePath("/demandes");
   revalidatePath("/", "layout");
   // Acceptée : la fenêtre de discussion s'ouvre directement.
@@ -67,32 +65,28 @@ export async function repondreDemande(
 // je ne peux répondre qu'aux demandes qui me sont adressées, et n'archiver que mes annonces.
 export async function choisirDemande(demandeId: string, fermer: boolean) {
   const { supabase, user } = await exigerSession();
+  // La RLS ne renvoie que les demandes que je peux lire (destinataire ou équipe du post-it).
   const { data: choisie } = await supabase
     .from("demandes_contact")
     .select("id, annonce_id")
     .eq("id", demandeId)
-    .eq("destinataire_id", user.id)
     .eq("statut", "en_attente")
     .maybeSingle();
   if (!choisie) redirect("/demandes");
 
-  await supabase
-    .from("demandes_contact")
-    .update({ statut: "acceptee" })
-    .eq("id", demandeId);
+  const { error } = await supabase.rpc("repondre_demande", { p_demande: demandeId, p_accepter: true });
+  if (error) redirect("/demandes");
   if (fermer) {
-    await supabase
+    const { data: autres } = await supabase
       .from("demandes_contact")
-      .update({ statut: "refusee" })
+      .select("id")
       .eq("annonce_id", choisie.annonce_id)
-      .eq("destinataire_id", user.id)
       .eq("statut", "en_attente")
-      .neq("id", demandeId);
-    await supabase
-      .from("annonces")
-      .update({ statut: "archivee" })
-      .eq("id", choisie.annonce_id)
-      .eq("auteur_id", user.id);
+      .neq("id", demandeId)
+      .neq("demandeur_id", user.id);
+    for (const d of autres ?? []) await supabase.rpc("repondre_demande", { p_demande: d.id, p_accepter: false });
+    // Archiver : le créateur ou un membre (RLS).
+    await supabase.from("annonces").update({ statut: "archivee" }).eq("id", choisie.annonce_id);
   }
   revalidatePath("/demandes");
   revalidatePath("/", "layout");

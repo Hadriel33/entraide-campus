@@ -55,10 +55,10 @@ export async function modifierAnnonce(id: string, _: EtatAnnonce, formData: Form
   if (!validation.ok || !validation.valeurs) return { erreurs: validation.erreurs, valeurs: champs };
 
   const supabase = await clientConnecte();
-  // La RLS ne laisse passer que l'auteur : 0 ligne modifiée = pas le droit (ou annonce disparue).
+  // La RLS ne laisse passer que l'auteur ou un membre du groupe : 0 ligne modifiée = pas le droit (ou annonce disparue).
   const { data, error } = await supabase.from("annonces").update(validation.valeurs).eq("id", id).select("id");
   if (error || !data?.length) {
-    return { message: "Modification impossible : cette annonce n'existe pas ou n'est pas la tienne.", valeurs: champs };
+    return { message: "Modification impossible : cette annonce n'existe pas, ou tu n'es pas dans son équipe.", valeurs: champs };
   }
 
   programmerModeration(id, validation.valeurs);

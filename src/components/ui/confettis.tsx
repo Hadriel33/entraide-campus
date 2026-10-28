@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 // Pluie de confettis aux couleurs de la charte quand il se passe quelque chose de bien.
 // Pur CSS : positions calculées à partir de l'index (pas d'aléatoire au rendu), et rien
 // ne s'affiche si l'utilisateur a demandé à réduire les animations.
-const MOMENTS = new Set(["acceptee", "publiee", "avis", "bienvenue"]);
+const MOMENTS = new Set(["acceptee", "publiee", "avis", "bienvenue", "groupe"]);
 const COULEURS = ["bg-bandeau", "bg-lilas", "bg-ciel", "bg-ocre", "bg-accent", "bg-encre"];
 const NOMBRE = 56;
 

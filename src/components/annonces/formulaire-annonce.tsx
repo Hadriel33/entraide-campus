@@ -148,6 +148,9 @@ export function FormulaireAnnonce({
         <BadgeIA numero={2} />
         Avant d&apos;être affiché, ton post-it est relu par Colette (arnaque, numéro laissé en clair). Si elle a un doute, elle te propose une correction.
       </p>
+      <p className="text-sm text-encre-douce">
+        À plusieurs ? Une fois publié, invite jusqu&apos;à 3 potes sur ton post-it depuis sa page : il devient un post-it de groupe.
+      </p>
       <div className="flex flex-wrap gap-3">
         <Bouton disabled={enCours}>{enCours ? "Enregistrement..." : libelle}</Bouton>
         <BoutonLien href={annulerVers} variante="discret">

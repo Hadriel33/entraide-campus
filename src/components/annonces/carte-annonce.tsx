@@ -13,6 +13,9 @@ import { inclinaison, teinte } from "@/lib/design/teintes";
 import { forme, type Forme } from "@/lib/design/formes";
 import { PictoCategorie } from "./picto-categorie";
 import { CompteurDiscussion } from "@/components/social/compteur-discussion";
+import { BoutonSoutien } from "@/components/social/bouton-soutien";
+import type { ResumeSoutien } from "@/lib/social/soutiens";
+import { equipeAcceptee, libelleEquipe } from "@/lib/annonces/groupe";
 
 // Ce que la forme raconte, écrit à la main en tête du post-it (les cours et compétences n'en ont pas besoin).
 const ETIQUETTE_FORME: Partial<Record<Forme, string>> = {
@@ -41,17 +44,23 @@ export function CarteAnnonce({
   afficherExpiration = false,
   match,
   nbCommentaires = 0,
+  soutien,
+  proprietaire = false,
 }: {
   annonce: Annonce;
   index?: number;
   afficherExpiration?: boolean;
   match?: { niveau: string; raisons: string[] };
   nbCommentaires?: number;
+  /** Soutiens du post-it (connecté seulement) ; le bouton est inactif sur mes propres post-its. */
+  soutien?: ResumeSoutien;
+  proprietaire?: boolean;
 }) {
   const jours = joursRestants(annonce.expire_le);
   const t = teinte(annonce.categorie);
   const cherche = annonce.type === "cherche";
   const f = forme(annonce.categorie);
+  const equipe = equipeAcceptee(annonce.membres);
 
   // En-tête : d'abord QUOI (pictogramme et catégorie, ce qu'on repère de loin), puis propose / cherche.
   const entete = (
@@ -84,6 +93,10 @@ export function CarteAnnonce({
         >
           <span>{annonce.titre}</span>
         </ViewTransition>
+        {/* Au survol, une flèche glisse : « ça s'ouvre ». */}
+        <span aria-hidden className="ml-1 inline-block -translate-x-1 opacity-0 transition-[opacity,translate] duration-200 group-hover:translate-x-0 group-hover:opacity-100">
+          →
+        </span>
       </Link>
     </h3>
   );
@@ -177,23 +190,37 @@ export function CarteAnnonce({
         </p>
       )}
 
-      <div className="mt-auto flex flex-wrap items-end justify-between gap-x-2 gap-y-1 pt-1">
+      {/* La barre sociale : soutenir (faire monter) et voir si ça discute. */}
+      {(soutien || nbCommentaires > 0) && (
+        <div className="mt-auto flex items-center gap-2.5 pt-1">
+          {soutien && <BoutonSoutien annonceId={annonce.id} resume={soutien} proprietaire={proprietaire} />}
+          <CompteurDiscussion n={nbCommentaires} />
+        </div>
+      )}
+      <div className={`${soutien || nbCommentaires > 0 ? "" : "mt-auto "}flex flex-wrap items-end justify-between gap-x-2 gap-y-1 pt-1`}>
         <span className="flex min-w-[7rem] flex-1 items-center gap-2 text-sm font-semibold">
-          <Avatar
-            chemin={annonce.auteur?.avatar_chemin}
-            nom={annonce.auteur?.pseudo ?? "?"}
-            taille="sm"
-            colette={annonce.auteur}
-          />
-          <span className="truncate">@{annonce.auteur?.pseudo}</span>
+          {/* Post-it de groupe : les visages de l'équipe s'empilent. */}
+          <span className="flex shrink-0">
+            <Avatar
+              chemin={annonce.auteur?.avatar_chemin}
+              nom={annonce.auteur?.pseudo ?? "?"}
+              taille="sm"
+              colette={annonce.auteur}
+            />
+            {equipe.map((m) => (
+              <span key={m.pseudo} className="-ml-2 rounded-full ring-2 ring-(--postit)">
+                <Avatar chemin={m.avatar_chemin} nom={m.pseudo} taille="sm" colette={m} />
+              </span>
+            ))}
+          </span>
+          <span className="truncate">{libelleEquipe(annonce.auteur?.pseudo ?? "", equipe.map((m) => m.pseudo))}</span>
         </span>
         <span className="flex shrink-0 flex-col items-end leading-none">
           {/* Annotation au feutre : la contrepartie, comme griffonnée sur le post-it. */}
           <span className="-rotate-3 font-main text-xl font-bold text-alerte">
             {ANNOTATION[annonce.contrepartie]}
           </span>
-          <span className="mt-1 flex items-center gap-2 text-[11px] text-encre/60">
-            <CompteurDiscussion n={nbCommentaires} />
+          <span className="mt-1 text-[11px] text-encre/60">
             {dateCourte(annonce.cree_le)}
           </span>
         </span>
