@@ -19,6 +19,7 @@ import { quartiersDu } from "@/lib/carte/mercator";
 import { TEINTES, inclinaison, teinte } from "@/lib/design/teintes";
 import { LigneAnnonce } from "@/components/annonces/ligne-annonce";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
+import { PictoCategorie } from "@/components/annonces/picto-categorie";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { EnDirect } from "../mur/en-direct";
 import { EtatVide } from "@/components/colette/etat-vide";
@@ -548,9 +549,11 @@ export default async function PageAnnonces({
                 >
                   {valeur && (
                     <span
-                      className={`size-2 rounded-full ${teinte(valeur).point}`}
+                      className={`flex size-5 items-center justify-center rounded-full ${teinte(valeur).point} text-encre`}
                       aria-hidden
-                    />
+                    >
+                      <PictoCategorie categorie={valeur} className="size-3" />
+                    </span>
                   )}
                   {label}
                   <span className="text-xs text-encre-douce group-aria-[current=page]/chip:text-surface/70">
@@ -574,6 +577,24 @@ export default async function PageAnnonces({
                   aria-hidden
                 />
                 {t.famille}
+              </span>
+            ))}
+          </p>
+          <p
+            className="flex flex-wrap items-center gap-x-3 gap-y-1"
+            aria-label="Légende des formes"
+          >
+            <span className="font-semibold">Les formes :</span>
+            {[
+              { c: "covoiturage", l: "covoit = billet" },
+              { c: "coloc", l: "coloc = petite annonce" },
+              { c: "materiel", l: "prêt = étiquette" },
+              { c: "shooting", l: "shooting = polaroid" },
+              { c: "binome", l: "binôme = duo" },
+            ].map((x) => (
+              <span key={x.c} className="flex items-center gap-1">
+                <PictoCategorie categorie={x.c} className="size-3.5" />
+                {x.l}
               </span>
             ))}
           </p>

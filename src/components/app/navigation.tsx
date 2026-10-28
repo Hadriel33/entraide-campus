@@ -8,7 +8,7 @@ import { useState } from "react";
 import { deconnecter } from "@/app/(auth)/actions";
 import { Cloche } from "./cloche";
 
-type Lien = { href: string; label: string; compteur?: number };
+type Lien = { href: string; label: string; icone: keyof typeof ICONES; compteur?: number };
 
 // La navigation rangée en deux groupes : ce qui se passe sur le campus, et mes affaires.
 function groupes(demandesEnAttente: number, estAdmin: boolean): { titre: string; liens: Lien[] }[] {
@@ -16,20 +16,20 @@ function groupes(demandesEnAttente: number, estAdmin: boolean): { titre: string;
     {
       titre: "Le campus",
       liens: [
-        { href: "/bureau", label: "Mon bureau" },
-        { href: "/fil", label: "Le fil" },
-        { href: "/annonces", label: "Le tableau" },
-        { href: "/carte", label: "La carte" },
-        { href: "/classement", label: "Classement" },
+        { href: "/bureau", label: "Mon bureau", icone: "bureau" },
+        { href: "/fil", label: "Le fil", icone: "fil" },
+        { href: "/annonces", label: "Le tableau", icone: "annonces" },
+        { href: "/carte", label: "La carte", icone: "carte" },
+        { href: "/classement", label: "Classement", icone: "classement" },
       ],
     },
     {
       titre: "Mes affaires",
       liens: [
-        { href: "/demandes", label: "Demandes", compteur: demandesEnAttente },
-        { href: "/mes-annonces", label: "Mes annonces" },
-        { href: "/favoris", label: "Favoris" },
-        ...(estAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+        { href: "/demandes", label: "Demandes", icone: "demandes", compteur: demandesEnAttente },
+        { href: "/mes-annonces", label: "Mes annonces", icone: "mesAnnonces" },
+        { href: "/favoris", label: "Favoris", icone: "favoris" },
+        ...(estAdmin ? [{ href: "/admin", label: "Admin", icone: "admin" as const }] : []),
       ],
     },
   ];
@@ -123,7 +123,7 @@ export function BarreLaterale({
   return (
     <>
       {/* Bureau : barre latérale */}
-      <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-5 border-r border-ligne bg-surface px-3.5 py-5 md:flex">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-6 overflow-y-auto border-r border-ligne bg-surface px-4 py-5 md:flex">
         <div className="flex items-center justify-between gap-1">
           <Link
             href="/bureau"
@@ -135,22 +135,25 @@ export function BarreLaterale({
         </div>
         <Link
           href="/annonces/nouvelle"
-          className="presse flex items-center justify-center gap-2 rounded-ui bg-encre px-3 py-2.5 font-semibold text-surface hover:bg-encre/85"
+          className="presse flex items-center justify-center gap-2 rounded-ui bg-encre px-3 py-3 text-base font-semibold text-surface shadow-[3px_3px_0_0_var(--color-bandeau)] hover:bg-encre/85"
         >
           <Icone d={ICONES.plus} className="size-5" />
           Publier un post-it
         </Link>
-        <nav className="flex flex-col gap-4" aria-label="Navigation principale">
+        {/* Deux groupes nettement séparés : le titre du groupe en petites capitales, les liens en gros avec
+            leur icône, la page en cours sur fond jaune (repérable du premier coup d'œil). */}
+        <nav className="flex flex-col gap-7" aria-label="Navigation principale">
           {menu.map((g) => (
-            <div key={g.titre} className="flex flex-col gap-0.5">
-              <p className="px-2.5 pb-1 text-[11px] font-semibold tracking-wider text-encre-douce uppercase">{g.titre}</p>
+            <div key={g.titre} className="flex flex-col gap-1">
+              <p className="mb-1.5 border-b border-ligne px-3 pb-2 text-xs font-bold tracking-[0.14em] text-encre-douce uppercase">{g.titre}</p>
               {g.liens.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
                   aria-current={actif(l.href) ? "page" : undefined}
-                  className="presse flex items-center rounded-ui px-2.5 py-2 font-medium text-encre-douce hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-papier-fonce aria-[current=page]:text-encre aria-[current=page]:shadow-[inset_3px_0_0_var(--color-accent)]"
+                  className="presse group/lien flex items-center gap-3 rounded-ui px-3 py-2.5 text-[0.95rem] font-semibold text-encre/75 hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-bandeau aria-[current=page]:text-encre aria-[current=page]:shadow-[3px_3px_0_0_var(--color-encre)]"
                 >
+                  <Icone d={ICONES[l.icone]} className="size-5 shrink-0 opacity-70 group-aria-[current=page]/lien:opacity-100" />
                   {l.label}
                   <Compteur n={l.compteur} />
                 </Link>
@@ -241,6 +244,13 @@ const ICONES = {
   classement:
     "M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3",
   menu: "M4 6h16M4 12h16M4 18h16",
+  carte: "M9 4 3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14",
+  mesAnnonces: "M5 3h14v12l-6 6H5zM13 21v-6h6M9 8h6M9 12h4",
+  favoris: "M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.6 4.5 7.1 4.5c2 0 3.6 1.1 4.9 2.8 1.3-1.7 2.9-2.8 4.9-2.8 3.5 0 5.7 3.5 4.4 6.8-1.8 4.6-9.3 9.2-9.3 9.2z",
+  admin: "M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z",
+  moi: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6",
+  crayon: "M4 20l4-1 11-11-3-3L5 16zM14 6l3 3",
+  reglages: "M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0M14 4v4M8 10v4M16 16v4",
 };
 
 function OngletsMobile({
@@ -265,25 +275,25 @@ function OngletsMobile({
     {
       titre: "Le campus",
       liens: [
-        { href: "/bureau", label: "Mon bureau" },
-        { href: "/classement", label: "Classement" },
-        { href: "/carte", label: "La carte" },
+        { href: "/bureau", label: "Mon bureau", icone: "bureau" as const },
+        { href: "/classement", label: "Classement", icone: "classement" as const },
+        { href: "/carte", label: "La carte", icone: "carte" as const },
       ],
     },
     {
       titre: "Mes affaires",
       liens: [
-        { href: "/mes-annonces", label: "Mes annonces" },
-        { href: "/favoris", label: "Favoris" },
-        ...(estAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+        { href: "/mes-annonces", label: "Mes annonces", icone: "mesAnnonces" as const },
+        { href: "/favoris", label: "Favoris", icone: "favoris" as const },
+        ...(estAdmin ? [{ href: "/admin", label: "Admin", icone: "admin" as const }] : []),
       ],
     },
     {
       titre: "Moi",
       liens: [
-        { href: `/profils/${pseudo}`, label: "Mon profil public" },
-        { href: "/compte", label: "Modifier mon profil" },
-        { href: "/reglages", label: "Réglages" },
+        { href: `/profils/${pseudo}`, label: "Mon profil public", icone: "moi" as const },
+        { href: "/compte", label: "Modifier mon profil", icone: "crayon" as const },
+        { href: "/reglages", label: "Réglages", icone: "reglages" as const },
       ],
     },
   ];
@@ -367,14 +377,15 @@ function OngletsMobile({
             </div>
             {plus.map((g) => (
               <div key={g.titre} className="flex flex-col">
-                <p className="px-3 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-encre-douce uppercase">{g.titre}</p>
+                <p className="mt-2 border-b border-ligne px-3 pb-1.5 text-xs font-bold tracking-[0.14em] text-encre-douce uppercase">{g.titre}</p>
                 {g.liens.map((l) => (
                   <Link
                     key={l.href}
                     href={l.href}
                     onClick={() => setOuvert(false)}
-                    className="presse rounded-ui px-3 py-2.5 font-medium hover:bg-papier-fonce"
+                    className="presse flex items-center gap-3 rounded-ui px-3 py-2.5 font-semibold hover:bg-papier-fonce"
                   >
+                    <Icone d={ICONES[l.icone]} className="size-5 shrink-0 opacity-70" />
                     {l.label}
                   </Link>
                 ))}

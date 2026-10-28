@@ -117,3 +117,19 @@ test("la bulle de Colette ouvre les salons du campus", async ({ page }) => {
   await expect(page.getByPlaceholder(/Écrire dans Général/)).toBeVisible();
   expect(erreurs).toEqual([]);
 });
+
+// Retour du prof : on reconnaît chaque type d'annonce au premier coup d'œil (forme + pictogramme).
+test("chaque post-it a la forme et le pictogramme de sa catégorie", async ({ page }) => {
+  const { forme } = await import("../src/lib/design/formes");
+  await page.goto("/annonces?campus=tous");
+  const postits = page.locator("article[data-forme]");
+  await expect(postits.first()).toBeVisible();
+  const vus = await postits.evaluateAll((els) =>
+    els.map((e) => ({ forme: e.getAttribute("data-forme"), categorie: e.getAttribute("data-categorie"), picto: !!e.querySelector("svg") })),
+  );
+  for (const v of vus) {
+    expect(v.forme, `catégorie ${v.categorie}`).toBe(forme(v.categorie ?? ""));
+    expect(v.picto, `pictogramme ${v.categorie}`).toBe(true);
+  }
+  expect(new Set(vus.map((v) => v.forme)).size, "plusieurs formes sur le tableau").toBeGreaterThanOrEqual(3);
+});

@@ -89,7 +89,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
           Publie un post-it ou accepte une demande : ça apparaîtra ici.
         </EtatVide>
       ) : (
-        <ol className="flex flex-col gap-5">
+        <ol className="flex flex-col gap-7">
           {posts.map((p, i) =>
             p.genre === "entraide" ? (
               <li
@@ -106,7 +106,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                     </span>
                   </span>
                   <div className="flex min-w-0 flex-col">
-                    <p>
+                    <p className="text-[0.95rem] leading-snug">
                       <Link href={`/profils/${p.e.aidant_pseudo}`} className="font-semibold hover:underline">
                         @{p.e.aidant_pseudo}
                       </Link>{" "}
@@ -122,7 +122,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                   </div>
                   <span className="ml-auto shrink-0 -rotate-3 font-main text-lg text-ok">entraide !</span>
                 </div>
-                <p className="rounded-ui bg-papier-fonce px-3 py-2 text-sm">« {p.e.titre} »</p>
+                <p className="rounded-ui border-l-4 border-ok bg-ok-fond px-4 py-2.5 text-base font-semibold">« {p.e.titre} »</p>
                 <Reactions
                   cible="entraide"
                   id={p.e.id}
@@ -140,7 +140,7 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                 <div className="flex items-center gap-3">
                   <Avatar chemin={p.a.auteur?.avatar_chemin} nom={p.a.auteur?.pseudo ?? "?"} colette={p.a.auteur} />
                   <div className="flex min-w-0 flex-col">
-                    <p>
+                    <p className="text-[0.95rem] leading-snug">
                       <Link href={`/profils/${p.a.auteur?.pseudo}`} className="font-semibold hover:underline">
                         @{p.a.auteur?.pseudo}
                       </Link>{" "}
