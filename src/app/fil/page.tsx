@@ -201,8 +201,8 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                   <span className="line-clamp-2 text-sm text-encre/75">{p.a.description}</span>
                 </Link>
                 <div className="flex flex-wrap items-center gap-2">
-                  <BoutonSoutien annonceId={p.a.id} resume={socialA.soutiens.get(p.a.id) ?? { n: 0, moi: false }} proprietaire={p.a.auteur_id === user.id} />
-                  <Reactions cible="annonce" id={p.a.id} resume={socialA.reactions.get(p.a.id)!} proprietaire={p.a.auteur_id === user.id} />
+                  <BoutonSoutien annonceId={p.a.id} resume={socialA.soutiens.get(p.a.id) ?? { n: 0, moi: false }} proprietaire={p.a.auteur_id === user.id || (p.a.membres ?? []).some((m) => m.membre_id === user.id && m.statut === "accepte")} />
+                  <Reactions cible="annonce" id={p.a.id} resume={socialA.reactions.get(p.a.id)!} proprietaire={p.a.auteur_id === user.id || (p.a.membres ?? []).some((m) => m.membre_id === user.id && m.statut === "accepte")} />
                 </div>
                 <Commentaires cible="annonce" id={p.a.id} liste={socialA.commentaires.get(p.a.id) ?? []} moi={user.id} estAdmin={estAdmin} />
               </li>

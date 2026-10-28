@@ -84,12 +84,24 @@ export default async function PageDemandes({
   const onglet =
     (await searchParams).onglet === "envoyees" ? "envoyees" : "recues";
 
-  const colonne = onglet === "recues" ? "destinataire_id" : "demandeur_id";
-  const { data } = await supabase
-    .from("demandes_contact")
-    .select(SELECT)
-    .eq(colonne, user.id)
-    .order("cree_le", { ascending: false });
+  // Reçues : celles qui me sont adressées, et celles des post-its de groupe dont je fais partie (créateur ou membre).
+  const { data: mesGroupes } =
+    onglet === "recues"
+      ? await supabase.from("annonce_membres").select("annonce_id").eq("membre_id", user.id).eq("statut", "accepte")
+      : { data: [] };
+  const { data: mesCreations } =
+    onglet === "recues"
+      ? await supabase.from("annonce_membres").select("annonce_id, annonce:annonces!inner(auteur_id)").eq("annonce.auteur_id", user.id).eq("statut", "accepte")
+      : { data: [] };
+  const equipes = [...new Set([...(mesGroupes ?? []), ...(mesCreations ?? [])].map((g) => g.annonce_id))];
+  let requete = supabase.from("demandes_contact").select(SELECT).order("cree_le", { ascending: false });
+  requete =
+    onglet === "envoyees"
+      ? requete.eq("demandeur_id", user.id)
+      : equipes.length
+        ? requete.or(`destinataire_id.eq.${user.id},annonce_id.in.(${equipes.join(",")})`).neq("demandeur_id", user.id)
+        : requete.eq("destinataire_id", user.id);
+  const { data } = await requete;
   const demandes = (data ?? []) as unknown as Demande[];
 
   // Coordonnées des personnes avec qui l'accord existe (la RLS ne renvoie que celles-là).
@@ -318,7 +330,19 @@ export default async function PageDemandes({
           </div>
         )}
 
-        {d.statut === "acceptee" && (
+        {/* Post-it de groupe : un autre membre a accepté. Ses coordonnées et celles du demandeur restent entre eux
+            (règle d'or n°1) ; moi, je rejoins la discussion du groupe. */}
+        {d.statut === "acceptee" && onglet === "recues" && d.destinataire && d.destinataire.id !== user.id && (
+          <>
+            <p className="text-sm">
+              Acceptée par <strong>@{d.destinataire.pseudo}</strong> pour le groupe.
+            </p>
+            <BoutonLien href={`/demandes/${d.id}`} className="self-start">
+              Discuter avec le groupe
+            </BoutonLien>
+          </>
+        )}
+        {d.statut === "acceptee" && !(onglet === "recues" && d.destinataire && d.destinataire.id !== user.id) && (
           <>
             <BlocCoordonnees
               c={coordonneesDe.get(autre.id) ?? null}

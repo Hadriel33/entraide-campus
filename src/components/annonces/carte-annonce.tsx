@@ -15,6 +15,7 @@ import { PictoCategorie } from "./picto-categorie";
 import { CompteurDiscussion } from "@/components/social/compteur-discussion";
 import { BoutonSoutien } from "@/components/social/bouton-soutien";
 import type { ResumeSoutien } from "@/lib/social/soutiens";
+import { equipeAcceptee, libelleEquipe } from "@/lib/annonces/groupe";
 
 // Ce que la forme raconte, écrit à la main en tête du post-it (les cours et compétences n'en ont pas besoin).
 const ETIQUETTE_FORME: Partial<Record<Forme, string>> = {
@@ -59,6 +60,7 @@ export function CarteAnnonce({
   const t = teinte(annonce.categorie);
   const cherche = annonce.type === "cherche";
   const f = forme(annonce.categorie);
+  const equipe = equipeAcceptee(annonce.membres);
 
   // En-tête : d'abord QUOI (pictogramme et catégorie, ce qu'on repère de loin), puis propose / cherche.
   const entete = (
@@ -193,13 +195,21 @@ export function CarteAnnonce({
       )}
       <div className={`${soutien || nbCommentaires > 0 ? "" : "mt-auto "}flex flex-wrap items-end justify-between gap-x-2 gap-y-1 pt-1`}>
         <span className="flex min-w-[7rem] flex-1 items-center gap-2 text-sm font-semibold">
-          <Avatar
-            chemin={annonce.auteur?.avatar_chemin}
-            nom={annonce.auteur?.pseudo ?? "?"}
-            taille="sm"
-            colette={annonce.auteur}
-          />
-          <span className="truncate">@{annonce.auteur?.pseudo}</span>
+          {/* Post-it de groupe : les visages de l'équipe s'empilent. */}
+          <span className="flex shrink-0">
+            <Avatar
+              chemin={annonce.auteur?.avatar_chemin}
+              nom={annonce.auteur?.pseudo ?? "?"}
+              taille="sm"
+              colette={annonce.auteur}
+            />
+            {equipe.map((m) => (
+              <span key={m.pseudo} className="-ml-2 rounded-full ring-2 ring-(--postit)">
+                <Avatar chemin={m.avatar_chemin} nom={m.pseudo} taille="sm" colette={m} />
+              </span>
+            ))}
+          </span>
+          <span className="truncate">{libelleEquipe(annonce.auteur?.pseudo ?? "", equipe.map((m) => m.pseudo))}</span>
         </span>
         <span className="flex shrink-0 flex-col items-end leading-none">
           {/* Annotation au feutre : la contrepartie, comme griffonnée sur le post-it. */}

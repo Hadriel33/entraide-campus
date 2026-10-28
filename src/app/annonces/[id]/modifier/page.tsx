@@ -20,8 +20,9 @@ export default async function PageModifierAnnonce({ params }: PageProps<"/annonc
     .eq("id", id)
     .maybeSingle();
 
-  // Pas l'auteur : on répond comme si l'annonce n'existait pas. La RLS bloquerait de toute façon l'écriture.
-  if (!annonce || annonce.auteur_id !== user?.id) notFound();
+  // Ni l'auteur ni un membre du groupe : on répond comme si l'annonce n'existait pas. La RLS bloquerait de toute façon l'écriture.
+  const estMembre = annonce && user && annonce.auteur_id !== user.id ? (await supabase.rpc("est_membre_annonce", { annonce: annonce.id })).data === true : false;
+  if (!annonce || (annonce.auteur_id !== user?.id && !estMembre)) notFound();
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-8">

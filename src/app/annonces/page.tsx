@@ -778,7 +778,7 @@ export default async function PageAnnonces({
               match={matchs.get(a.id)}
               nbCommentaires={nbCommentaires.get(a.id) ?? 0}
               soutien={user ? (soutiens.get(a.id) ?? { n: 0, moi: false }) : undefined}
-              proprietaire={a.auteur_id === user?.id}
+              proprietaire={a.auteur_id === user?.id || (a.membres ?? []).some((m) => m.membre_id === user?.id && m.statut === "accepte")}
             />
           ))}
         </div>

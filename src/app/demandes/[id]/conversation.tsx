@@ -31,11 +31,14 @@ export function Conversation({
   initiaux,
   prenomAutre,
   suggestions = [],
+  noms,
 }: {
   demandeId: string;
   moi: string;
   initiaux: Message[];
   prenomAutre: string;
+  /** Discussion de groupe : le pseudo de chaque participant, affiché au-dessus de ses messages. */
+  noms?: Record<string, string>;
   suggestions?: Suggestion[];
 }) {
   const [messages, setMessages] = useState<Message[]>(initiaux);
@@ -132,6 +135,7 @@ export function Conversation({
               key={m.id}
               className={`pop flex max-w-[80%] flex-col gap-0.5 ${deMoi ? "self-end items-end" : "self-start items-start"}`}
             >
+              {noms && !deMoi && <span className="px-1 text-xs font-bold text-encre-douce">@{noms[m.auteur_id] ?? "?"}</span>}
               {sticker ? (
                 <p
                   className="flex flex-col items-center"
