@@ -25,6 +25,7 @@ export function FormulaireAnnonce({
   annulerVers,
   campus = "Bordeaux",
   photoActuelle,
+  avecEquipe = false,
 }: {
   action: Action;
   initial?: Record<string, string>;
@@ -33,6 +34,8 @@ export function FormulaireAnnonce({
   campus?: string;
   /** URL de la photo actuelle (modification d'un post-it). */
   photoActuelle?: string | null;
+  /** Publication : on peut inviter ses potes tout de suite (post-it de groupe). */
+  avecEquipe?: boolean;
 }) {
   const [etat, envoyer, enCours] = useActionState<EtatAnnonce, FormData>(action, {});
   const v = etat.valeurs ?? initial;
@@ -154,9 +157,16 @@ export function FormulaireAnnonce({
         <BadgeIA numero={2} />
         Avant d&apos;être affiché, ton post-it est relu par Colette (arnaque, numéro laissé en clair). Si elle a un doute, elle te propose une correction.
       </p>
-      <p className="text-sm text-encre-douce">
-        À plusieurs ? Une fois publié, invite jusqu&apos;à 3 potes sur ton post-it depuis sa page : il devient un post-it de groupe.
-      </p>
+      {avecEquipe ? (
+        <Champ
+          label="À plusieurs ? Invite tes potes (facultatif)"
+          name="equipe"
+          defaultValue={v.equipe ?? ""}
+          aide="Jusqu'à 3 pseudos, par exemple @lea @sam.photo. Chacun reçoit une invitation et apparaît sur le post-it quand il a dit oui."
+        />
+      ) : (
+        <p className="text-sm text-encre-douce">L&apos;équipe du post-it (inviter, retirer) se gère depuis sa page.</p>
+      )}
       <div className="flex flex-wrap gap-3">
         <Bouton disabled={enCours}>{enCours ? "Enregistrement..." : libelle}</Bouton>
         <BoutonLien href={annulerVers} variante="discret">

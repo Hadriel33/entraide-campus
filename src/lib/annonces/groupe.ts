@@ -25,3 +25,14 @@ export function libelleEquipe(createur: string, membres: string[]) {
   if (membres.length === 1) return `@${createur} et @${membres[0]}`;
   return `@${createur} et ${membres.length} potes`;
 }
+
+// Le champ « À plusieurs ? » du formulaire de publication : jusqu'à 3 potes, sans doublon ni moi-même.
+export function pseudosAInviter(texte: string, moi?: string): string[] {
+  const vus: string[] = [];
+  for (const brut of texte.split(/[\s,;]+/)) {
+    const p = validerPseudoInvite(brut);
+    if (p && p !== moi && !vus.includes(p)) vus.push(p);
+    if (vus.length === MAX_MEMBRES) break;
+  }
+  return vus;
+}
