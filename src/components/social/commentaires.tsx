@@ -45,7 +45,10 @@ export function Commentaires({
                   <Link href={`/profils/${c.auteur?.pseudo}`} className="font-semibold hover:underline">
                     @{c.auteur?.pseudo}
                   </Link>
-                  <span className="text-xs text-encre-douce">{ilYa(c.cree_le)}</span>
+                  <time dateTime={c.cree_le} suppressHydrationWarning className="text-xs text-encre-douce">
+                    {/* « il y a 1 min » peut changer entre le rendu serveur et le navigateur : écart attendu, sans risque */}
+                    {ilYa(c.cree_le)}
+                  </time>
                   {(c.auteur_id === moi || estAdmin) && (
                     <button
                       type="button"

@@ -10,3 +10,15 @@ export function ilYa(iso: string, maintenant = new Date()) {
 export function ilYaJours(n: number, maintenant = new Date()) {
   return new Date(maintenant.getTime() - n * 86400000).toISOString();
 }
+
+// Date et heure d'un message, toujours à l'heure de Paris (le serveur est en UTC) :
+// le serveur et le navigateur écrivent la même chose, pas d'écart à l'hydratation.
+export function heureCampus(iso: string) {
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Paris",
+  }).format(new Date(iso));
+}

@@ -79,7 +79,8 @@ export function CarteAnnonce({
     </div>
   );
   const titre = (
-    <h3 className="text-lg leading-tight font-bold text-balance">
+    // Au survol, une flèche glisse (décor CSS : hors du texte du titre, ignorée par les lecteurs d'écran).
+    <h3 className="text-lg leading-tight font-bold text-balance after:ml-1 after:inline-block after:-translate-x-1 after:opacity-0 after:transition-[opacity,translate] after:duration-200 after:content-['→'] group-hover:after:translate-x-0 group-hover:after:opacity-100">
       {/* Le lien couvre tout le post-it (pseudo-élément), le texte reste sélectionnable. */}
       <Link
         href={`/annonces/${annonce.id}`}
@@ -93,10 +94,6 @@ export function CarteAnnonce({
         >
           <span>{annonce.titre}</span>
         </ViewTransition>
-        {/* Au survol, une flèche glisse : « ça s'ouvre ». */}
-        <span aria-hidden className="ml-1 inline-block -translate-x-1 opacity-0 transition-[opacity,translate] duration-200 group-hover:translate-x-0 group-hover:opacity-100">
-          →
-        </span>
       </Link>
     </h3>
   );
