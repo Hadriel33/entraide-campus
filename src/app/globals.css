@@ -497,6 +497,10 @@ article[data-annonce]::before {
    réflexion, débordée. Tout s'arrête si l'utilisateur a demandé à réduire les animations. */
 .colette .col-flotte { animation: col-flotte 2.4s ease-in-out infinite; }
 @keyframes col-flotte { 50% { translate: 0 -6px; } }
+.colette .col-danse { animation: col-danse 0.9s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes col-danse { 0%, 100% { rotate: -7deg; translate: 0 0; } 50% { rotate: 7deg; translate: 0 -6px; } }
+.colette .col-ballon { animation: col-ballon 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 0% 100%; }
+@keyframes col-ballon { 50% { rotate: 6deg; translate: 0 -3px; } }
 .colette .col-flamme { animation: col-flamme 1.3s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
 @keyframes col-flamme { 50% { scale: 0.92 1.08; } }
 .colette .col-yeux { animation: col-clin 3.4s infinite; transform-box: fill-box; transform-origin: center; }

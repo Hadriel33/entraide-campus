@@ -24,7 +24,7 @@ const kalam = Kalam({ subsets: ["latin"], weight: ["400", "700"], variable: "--f
 
 export const metadata: Metadata = {
   title: { default: "Post-it campus", template: "%s · Post-it campus" },
-  description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants de ton campus ESP.",
+  description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants de ton campus.",
   metadataBase: new URL("https://entraide-campus.vercel.app"),
   openGraph: { siteName: "Post-it campus", locale: "fr_FR", type: "website" },
 };

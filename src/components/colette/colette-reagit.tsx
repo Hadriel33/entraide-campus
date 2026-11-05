@@ -29,7 +29,7 @@ export function ColetteReagit() {
   if (!moment) return null;
   return (
     <div key={moment.n} role="status" className="reagit pointer-events-none fixed bottom-24 left-4 z-50 flex items-end gap-1.5 md:bottom-6 md:left-[17.5rem]">
-      <Colette humeur={HUMEUR_GESTE[moment.geste]} anim="saute" saison={false} taille={58} />
+      <Colette humeur={HUMEUR_GESTE[moment.geste]} anim={moment.geste === "reaction" ? "danse" : "saute"} saison={false} taille={58} />
       <span className="mb-8 rounded-carte border border-encre bg-surface px-3 py-1.5 font-main text-lg leading-none shadow-[2px_2px_0_0_var(--color-bandeau)]">
         {phraseReaction(moment.geste, moment.n)}
       </span>

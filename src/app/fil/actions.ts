@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { exigerSession } from "@/lib/session";
 import { REACTIONS, type TypeReaction } from "@/lib/social/social";
 import { detecterCoordonnees } from "@/lib/ia/regles";
+import { contenuSticker, stickerDe } from "@/lib/messages/stickers";
 
 type Cible = "annonce" | "entraide";
 
@@ -26,7 +27,8 @@ export type EtatCommentaire = { erreur?: string; ok?: number };
 export async function commenter(_: EtatCommentaire, formData: FormData): Promise<EtatCommentaire> {
   const cible = formData.get("cible") === "entraide" ? "entraide" : "annonce";
   const id = String(formData.get("id") ?? "");
-  const contenu = String(formData.get("contenu") ?? "").trim();
+  const sticker = String(formData.get("sticker") ?? "");
+  const contenu = stickerDe(contenuSticker(sticker)) ? contenuSticker(sticker) : String(formData.get("contenu") ?? "").trim();
   if (!contenu) return { erreur: "Écris quelque chose." };
   if (contenu.length > 300) return { erreur: "300 caractères maximum." };
   if (detecterCoordonnees(contenu)) return { erreur: "Pas de numéro ni d'email en commentaire : passe par « Demander le contact »." };
