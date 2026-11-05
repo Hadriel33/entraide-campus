@@ -40,3 +40,26 @@ describe("IA n°2 : Colette relit aussi la photo", () => {
     expect(c[1]).toMatchObject({ type: "image" });
   });
 });
+
+describe("photo réduite dans le navigateur avant l'envoi (les photos de téléphone font 3 à 6 Mo)", () => {
+  it("ramène le plus grand côté à 1600 px en gardant les proportions", async () => {
+    const { dimensionsReduites } = await import("@/lib/annonces/photo");
+    expect(dimensionsReduites(4032, 3024)).toEqual({ largeur: 1600, hauteur: 1200 });
+    expect(dimensionsReduites(3024, 4032)).toEqual({ largeur: 1200, hauteur: 1600 });
+  });
+  it("ne grossit jamais une petite image", async () => {
+    const { dimensionsReduites } = await import("@/lib/annonces/photo");
+    expect(dimensionsReduites(800, 600)).toEqual({ largeur: 800, hauteur: 600 });
+  });
+});
+
+describe("intervenir à distance (visio)", () => {
+  it("« À distance (visio) » est un lieu valide, sans tram ni punaise sur la carte", async () => {
+    const { QUARTIERS, validerAnnonce } = await import("@/lib/annonces/validation");
+    const { pointDuQuartier } = await import("@/lib/carte/mercator");
+    expect(QUARTIERS.a_distance).toBe("À distance (visio)");
+    const r = validerAnnonce({ type: "propose", categorie: "dev", titre: "Je débloque ton code en visio", description: "Une heure en partage d'écran, tu repars avec un code qui marche.", contrepartie: "gratuit", lieu: "", quartier: "a_distance", tram: "" });
+    expect(r.ok).toBe(true);
+    expect(pointDuQuartier("a_distance")).toBeNull();
+  });
+});

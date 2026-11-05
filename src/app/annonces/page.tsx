@@ -415,6 +415,7 @@ export default async function PageAnnonces({
                   </optgroup>
                 ))}
                 <option value="hors_bordeaux">{QUARTIERS.hors_bordeaux}</option>
+                <option value="a_distance">{QUARTIERS.a_distance}</option>
               </select>
             </label>
             {(campus === null || campus === "Bordeaux") && (

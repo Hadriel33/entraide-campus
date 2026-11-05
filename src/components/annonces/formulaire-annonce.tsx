@@ -38,7 +38,7 @@ export function FormulaireAnnonce({
   const v = etat.valeurs ?? initial;
   const e = etat.erreurs ?? {};
   // Les quartiers de MON campus (et « Ailleurs ») ; on garde celui de l'annonce si elle vient d'ailleurs.
-  const quartiers = [...new Set([...quartiersDu(campus), "hors_bordeaux", ...(v.quartier ? [v.quartier] : [])])].filter(
+  const quartiers = [...new Set(["a_distance", ...quartiersDu(campus), "hors_bordeaux", ...(v.quartier ? [v.quartier] : [])])].filter(
     (q) => q in QUARTIERS,
   ) as (keyof typeof QUARTIERS)[];
   const avecTram = campus === "Bordeaux";
