@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { heureCampus } from "@/lib/temps";
 import { Bouton } from "@/components/ui/bouton";
 import { Colette } from "@/components/colette/colette";
 import { STICKERS, contenuSticker, stickerDe } from "@/lib/messages/stickers";
@@ -14,14 +15,7 @@ export type Message = {
   cree_le: string;
 };
 
-function heure(iso: string) {
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(iso));
-}
+const heure = heureCampus; // à l'heure de Paris, identique serveur et navigateur
 
 // Conversation en direct. La sécurité est en base : la RLS ne renvoie (et Realtime ne diffuse) que les
 // messages des conversations dont je suis participant, et le trigger refuse toute autre écriture.
