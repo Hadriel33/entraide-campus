@@ -8,6 +8,7 @@ import { programmerModeration } from "@/lib/ia/moderation";
 import { redigerAnnonce } from "@/lib/ia/modele";
 import type { Brouillon } from "@/lib/ia/regles";
 import { cheminPhotoAnnonce, urlPhotoAnnonce, validerPhotoAnnonce } from "@/lib/annonces/photo";
+import { pseudosAInviter } from "@/lib/annonces/groupe";
 
 export type EtatAnnonce = {
   erreurs?: Partial<Record<string, string>>;
@@ -16,6 +17,7 @@ export type EtatAnnonce = {
 };
 
 const CHAMPS = ["type", "categorie", "titre", "description", "contrepartie", "lieu", "quartier", "tram"] as const;
+// (« equipe », la liste des potes à inviter, est lue à part : elle ne va pas dans la table des annonces.)
 
 function lireChamps(formData: FormData) {
   return Object.fromEntries(CHAMPS.map((c) => [c, String(formData.get(c) ?? "")])) as Record<(typeof CHAMPS)[number], string>;
@@ -70,6 +72,14 @@ export async function creerAnnonce(_: EtatAnnonce, formData: FormData): Promise<
     if (error?.code === "P0429") return { message: error.message, valeurs: champs }; // limite anti-spam
     console.error("Création d'annonce", error);
     return { message: "L'annonce n'a pas pu être publiée. Réessaie.", valeurs: champs };
+  }
+
+  // Post-it de groupe dès la publication : les potes indiqués sont invités (la base vérifie : 3 au plus,
+  // seul le créateur invite). Un pseudo inconnu est simplement ignoré ; l'équipe se gère ensuite depuis la page.
+  const equipe = pseudosAInviter(String(formData.get("equipe") ?? ""));
+  if (equipe.length) {
+    const { data: invites } = await supabase.from("profils").select("id").in("pseudo", equipe);
+    for (const p of invites ?? []) if (p.id !== user.id) await supabase.from("annonce_membres").insert({ annonce_id: data.id, membre_id: p.id });
   }
 
   programmerModeration(data.id, { ...validation.valeurs, photoUrl: urlPhotoAnnonce(photo.chemin) });

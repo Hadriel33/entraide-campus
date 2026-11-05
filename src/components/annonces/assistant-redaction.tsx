@@ -51,7 +51,7 @@ export function AssistantRedaction({ action, initial, campus }: { action: Action
       </form>
 
       {/* key : le formulaire se remplit à nouveau à chaque brouillon */}
-      <FormulaireAnnonce key={JSON.stringify(etat.brouillon ?? {})} action={action} libelle="Publier l'annonce" annulerVers="/annonces" initial={valeurs} campus={campus} />
+      <FormulaireAnnonce key={JSON.stringify(etat.brouillon ?? {})} action={action} libelle="Publier l'annonce" annulerVers="/annonces" initial={valeurs} campus={campus} avecEquipe />
     </div>
   );
 }

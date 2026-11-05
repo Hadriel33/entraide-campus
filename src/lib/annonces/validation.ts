@@ -96,6 +96,7 @@ export const QUARTIERS = {
   lille_lambersart: "Lambersart",
   // Commun à tous les campus (clé historique, gardée pour les annonces existantes)
   hors_bordeaux: "Ailleurs, hors de la ville",
+  a_distance: "À distance (visio)", // migration 0032 : un coup de main en visio, sans se déplacer
 } as const;
 
 export const TRAMS = ["A", "B", "C", "D"] as const;

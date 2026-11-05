@@ -20,3 +20,11 @@ export function urlPhotoAnnonce(chemin: string | null | undefined) {
   if (!chemin) return null;
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/annonces/${chemin}`;
 }
+
+// Réduction dans le navigateur avant l'envoi : le plus grand côté à 1600 px (une photo de téléphone de 5 Mo
+// descend autour de 300 Ko). Jamais d'agrandissement.
+export const COTE_MAX = 1600;
+export function dimensionsReduites(largeur: number, hauteur: number, max = COTE_MAX) {
+  const r = Math.min(1, max / Math.max(largeur, hauteur));
+  return { largeur: Math.round(largeur * r), hauteur: Math.round(hauteur * r) };
+}

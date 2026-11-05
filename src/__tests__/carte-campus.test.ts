@@ -35,8 +35,8 @@ describe("une carte par campus", () => {
         expect(QUARTIERS[q as keyof typeof QUARTIERS], q).toBeTruthy();
       }
     }
-    // Plus « Ailleurs », commun à tous les campus.
-    expect(Object.keys(QUARTIERS).sort()).toEqual([...vus, "hors_bordeaux"].sort());
+    // Plus « Ailleurs » et « À distance (visio) », communs à tous les campus.
+    expect(Object.keys(QUARTIERS).sort()).toEqual([...vus, "hors_bordeaux", "a_distance"].sort());
   });
   // Leçon du parcours Playwright (02/10) : deux punaises trop proches, et l'une devient impossible à cliquer.
   it("deux punaises d'une même carte ne se chevauchent pas", () => {

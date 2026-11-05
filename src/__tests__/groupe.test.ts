@@ -31,3 +31,16 @@ describe("post-its de groupe", () => {
     expect(libelleEquipe("sam", ["lea", "tom"])).toBe("@sam et 2 potes");
   });
 });
+
+describe("inviter ses potes dès la publication", () => {
+  it("lit jusqu'à 3 pseudos, avec ou sans @, séparés par des espaces ou des virgules", async () => {
+    const { pseudosAInviter } = await import("@/lib/annonces/groupe");
+    expect(pseudosAInviter("@lea_23, sam.photo  @Tom")).toEqual(["lea_23", "sam.photo", "tom"]);
+  });
+  it("ignore les doublons, les pseudos impossibles et moi-même, et s'arrête à 3", async () => {
+    const { pseudosAInviter } = await import("@/lib/annonces/groupe");
+    expect(pseudosAInviter("@lea @lea @a moi.meme", "moi.meme")).toEqual(["lea"]);
+    expect(pseudosAInviter("@aaa @bbb @ccc @ddd")).toEqual(["aaa", "bbb", "ccc"]);
+    expect(pseudosAInviter("")).toEqual([]);
+  });
+});

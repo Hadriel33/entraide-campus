@@ -57,7 +57,7 @@ export default async function PageCarte({ searchParams }: PageProps<"/carte">) {
       .eq("statut", "publiee")
       .gt("expire_le", maintenant)
       .eq("auteur.campus", campus)
-      .or("quartier.is.null,quartier.eq.hors_bordeaux"),
+      .or("quartier.is.null,quartier.eq.hors_bordeaux,quartier.eq.a_distance"),
   ]);
   const annonces = (data ?? []) as Mini[];
   const parQuartier = annonces.reduce<Record<string, Mini[]>>((acc, a) => {
@@ -286,7 +286,7 @@ export default async function PageCarte({ searchParams }: PageProps<"/carte">) {
               href={lienQuartier("hors_bordeaux")}
               className="rounded-ui bg-postit-gris px-2.5 py-1 text-xs font-semibold text-encre hover:underline"
             >
-              Ailleurs ou sans lieu : {ailleurs}
+              Ailleurs, à distance ou sans lieu : {ailleurs}
             </Link>
           ) : (
             <span />
