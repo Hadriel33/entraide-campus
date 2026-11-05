@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
@@ -39,6 +40,7 @@ import { appliquerCorrection, changerStatut, prolongerAnnonce, supprimerAnnonce 
 import { Colette } from "@/components/colette/colette";
 import { BadgeIA } from "@/components/ia/badge-ia";
 import { EquipePostit } from "@/components/annonces/equipe-postit";
+import { urlPhotoAnnonce } from "@/lib/annonces/photo";
 import { equipeAcceptee, libelleEquipe } from "@/lib/annonces/groupe";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -169,6 +171,11 @@ export default async function PageAnnonce({
             {annonce.titre}
           </h1>
         </ViewTransition>
+        {annonce.photo_chemin && (
+          <div className="relative aspect-[4/3] overflow-hidden rounded-ui border border-encre/15">
+            <Image src={urlPhotoAnnonce(annonce.photo_chemin)!} alt={`Photo du post-it « ${annonce.titre} »`} fill priority sizes="(min-width: 768px) 640px, 100vw" className="object-cover" />
+          </div>
+        )}
 
         <Link
           href={`/profils/${annonce.auteur?.pseudo}`}

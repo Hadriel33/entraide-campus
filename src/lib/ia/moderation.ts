@@ -4,7 +4,7 @@ import { clientServeur } from "@/lib/supabase/admin";
 import { modererAnnonce } from "./modele";
 import { deciderModeration, proposerCorrection } from "./regles";
 
-type Texte = { titre: string; description: string; lieu: string | null };
+type Texte = { titre: string; description: string; lieu: string | null; photoUrl?: string | null };
 
 // Lance la modération IA APRÈS la réponse (l'étudiant n'attend pas).
 // « refus probable » : l'annonce est masquée en attendant la décision d'un admin humain.

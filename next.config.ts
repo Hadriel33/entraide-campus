@@ -18,7 +18,10 @@ const ENTETES = [
 const nextConfig: NextConfig = {
   images: {
     // Seules les photos de profil du bucket public « avatars » sont autorisées.
-    remotePatterns: [new URL(`${supabase.origin}/storage/v1/object/public/avatars/**`)],
+    remotePatterns: [
+      new URL(`${supabase.origin}/storage/v1/object/public/avatars/**`),
+      new URL(`${supabase.origin}/storage/v1/object/public/annonces/**`), // photos des post-its (0031)
+    ],
   },
   experimental: {
     serverActions: {

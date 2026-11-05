@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { Champ } from "@/components/ui/champ";
 import { BadgeIA } from "@/components/ia/badge-ia";
+import { ChampPhoto } from "./champ-photo";
 import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES } from "@/lib/annonces/validation";
 import { quartiersDu } from "@/lib/carte/mercator";
 import type { EtatAnnonce } from "@/app/annonces/actions";
@@ -23,12 +24,15 @@ export function FormulaireAnnonce({
   libelle,
   annulerVers,
   campus = "Bordeaux",
+  photoActuelle,
 }: {
   action: Action;
   initial?: Record<string, string>;
   libelle: string;
   annulerVers: string;
   campus?: string;
+  /** URL de la photo actuelle (modification d'un post-it). */
+  photoActuelle?: string | null;
 }) {
   const [etat, envoyer, enCours] = useActionState<EtatAnnonce, FormData>(action, {});
   const v = etat.valeurs ?? initial;
@@ -136,6 +140,8 @@ export function FormulaireAnnonce({
         </label>
         )}
       </div>
+
+      <ChampPhoto actuelle={photoActuelle} erreur={e.photo} />
 
       <Champ label="Précision sur le lieu (facultatif)" name="lieu" erreur={e.lieu} aide="Exemple : arrêt Porte de Bourgogne, studio photo du campus" defaultValue={v.lieu ?? ""} />
 

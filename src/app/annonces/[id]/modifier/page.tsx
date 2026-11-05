@@ -5,6 +5,7 @@ import { FormulaireAnnonce } from "@/components/annonces/formulaire-annonce";
 import { TitrePage } from "@/components/ui/titre-page";
 import { modifierAnnonce } from "../../actions";
 import { getSession } from "@/lib/session";
+import { urlPhotoAnnonce } from "@/lib/annonces/photo";
 
 export const metadata: Metadata = { title: "Modifier l'annonce" };
 
@@ -16,7 +17,7 @@ export default async function PageModifierAnnonce({ params }: PageProps<"/annonc
   } = await supabase.auth.getUser();
   const { data: annonce } = await supabase
     .from("annonces")
-    .select("id, auteur_id, type, categorie, titre, description, contrepartie, lieu, quartier, tram")
+    .select("id, auteur_id, type, categorie, titre, description, contrepartie, lieu, quartier, tram, photo_chemin")
     .eq("id", id)
     .maybeSingle();
 
@@ -33,6 +34,7 @@ export default async function PageModifierAnnonce({ params }: PageProps<"/annonc
         libelle="Enregistrer"
         annulerVers={`/annonces/${annonce.id}`}
         campus={(await getSession()).profil?.campus}
+        photoActuelle={urlPhotoAnnonce(annonce.photo_chemin)}
       />
     </div>
   );

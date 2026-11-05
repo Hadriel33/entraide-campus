@@ -73,3 +73,54 @@ test("publier une annonce, la voir sur le tableau, puis la supprimer", async ({
     if (adresse) await supprimer(page, adresse).catch(() => {});
   }
 });
+
+// Un post-it AVEC photo (prêt de matériel) : la photo s'affiche sur sa page et sur le tableau, et quand on
+// supprime le post-it, le fichier part aussi du bucket (RGPD : rien ne traîne).
+test("publier un prêt de matériel avec photo, la voir, puis tout supprimer", async ({ page }) => {
+  const erreurs = surveillerErreurs(page);
+  const titre = `${PREFIXE} photo ${Date.now()}`;
+  let adresse: string | null = null;
+
+  try {
+    await page.goto("/annonces/nouvelle");
+    const formulaire = page.locator("form:has([name='titre'])");
+    await formulaire.locator("input[name='type'][value='propose']").check();
+    await formulaire.locator("select[name='categorie']").selectOption("materiel");
+    await formulaire.locator("select[name='contrepartie']").selectOption("gratuit");
+    await formulaire.locator("input[name='titre']").fill(titre);
+    await formulaire
+      .locator("textarea[name='description']")
+      .fill("Je prête mon appareil photo pour un week-end. Post-it du robot de test, supprimé dans les secondes qui suivent.");
+    await formulaire.locator("input[name='photo']").setInputFiles("e2e/fixtures/appareil-photo.png");
+    // L'aperçu s'affiche avant même l'envoi.
+    await expect(formulaire.getByAltText("Aperçu de la photo")).toBeVisible();
+    await formulaire.getByRole("button", { name: "Publier l'annonce" }).click();
+
+    await expect(page).toHaveURL(/\/annonces\/[0-9a-f-]{36}\?ok=publiee/, { timeout: 30_000 });
+    adresse = page.url().split("?")[0];
+    const photo = page.getByAltText(`Photo du post-it « ${titre} »`);
+    await expect(photo, "la photo n'apparaît pas sur la page du post-it").toBeVisible();
+
+    // L'adresse publique du fichier (derrière l'optimiseur d'images de Next).
+    const src = decodeURIComponent((await photo.getAttribute("src")) ?? "");
+    const fichier = /https:\/\/[^&]+\/storage\/v1\/object\/public\/annonces\/[^&]+/.exec(src)?.[0];
+    expect(fichier, "la photo ne vient pas du bucket « annonces »").toBeTruthy();
+    expect((await page.request.get(fichier!)).status()).toBe(200);
+
+    // Sur le tableau : le post-it porte sa photo.
+    await page.goto("/annonces?campus=tous");
+    const carte = page.locator("article").filter({ hasText: titre });
+    await expect(carte).toBeVisible();
+    await expect(carte.locator("img").first()).toBeVisible();
+
+    await supprimer(page, adresse);
+    adresse = null;
+    // Le fichier a disparu du bucket.
+    // (paramètre anti-cache : on interroge le stockage, pas une copie gardée en cache)
+    await expect.poll(async () => (await page.request.get(`${fichier}?apres=${Date.now()}`)).status(), { timeout: 15_000 }).not.toBe(200);
+
+    expect(erreurs).toEqual([]);
+  } finally {
+    if (adresse) await supprimer(page, adresse).catch(() => {});
+  }
+});
