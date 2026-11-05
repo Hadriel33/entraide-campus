@@ -11,7 +11,9 @@ import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { TableauImpact } from "./impact";
 import { SanteIA } from "./sante-ia";
+import { MOTIFS_SIGNALEMENT } from "@/lib/social/signalement";
 import {
+  traiterSignalementMessage,
   changerRole,
   changerCampus,
   creerClasse,
@@ -112,6 +114,27 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
       .order("cree_le", { ascending: false })
       .limit(50),
   ]);
+  // Commentaires et messages de salon signalés, avec la copie gardée par la base.
+  const { data: brutsMessages } =
+    onglet === "moderation"
+      ? await supabase
+          .from("signalements_messages")
+          .select(
+            "id, cible_type, motif, contenu_signale, cree_le, auteur:profils!signalements_messages_auteur_id_fkey(pseudo), signale:profils!signalements_messages_auteur_signale_id_fkey(pseudo)",
+          )
+          .eq("statut", "ouvert")
+          .order("cree_le", { ascending: false })
+          .limit(50)
+      : { data: [] };
+  const messagesSignales = (brutsMessages ?? []) as unknown as {
+    id: string;
+    cible_type: string;
+    motif: string;
+    contenu_signale: string;
+    cree_le: string;
+    auteur: { pseudo: string } | null;
+    signale: { pseudo: string } | null;
+  }[];
   const file = ((aModerer ?? []) as unknown as AModerer[]).sort(
     (a, b) =>
       ["refus_probable", "a_verifier", "en_attente"].indexOf(a.moderation) -
@@ -347,6 +370,37 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
               <p className="text-sm text-encre-douce">
                 Aucun signalement ouvert. Tout est calme.
               </p>
+            )}
+          </section>
+
+          {/* Commentaires et messages de salon signalés (0031) : l'admin lit la copie gardée, supprime ou classe. */}
+          <section className="flex flex-col gap-3">
+            <h2 className="text-lg font-semibold">Commentaires et messages signalés</h2>
+            {messagesSignales.length ? (
+              <ul className="flex flex-col gap-2.5">
+                {messagesSignales.map((sig) => (
+                  <li key={sig.id} className="apparition flex flex-col gap-2 rounded-carte border border-ligne bg-surface p-4">
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <Badge variante="besoin">{MOTIFS_SIGNALEMENT[sig.motif as keyof typeof MOTIFS_SIGNALEMENT] ?? sig.motif}</Badge>
+                      <span className="text-encre-douce">
+                        {sig.cible_type === "commentaire" ? "Commentaire" : "Message de salon"} de @{sig.signale?.pseudo ?? "?"}, signalé par @
+                        {sig.auteur?.pseudo} · {dateCourte(sig.cree_le)}
+                      </span>
+                    </div>
+                    <p className="rounded-ui bg-papier-fonce px-3 py-2 font-serif text-sm">« {sig.contenu_signale} »</p>
+                    <div className="flex flex-wrap gap-2">
+                      <form action={traiterSignalementMessage.bind(null, sig.id, true)}>
+                        <Bouton variante="danger">Supprimer le message</Bouton>
+                      </form>
+                      <form action={traiterSignalementMessage.bind(null, sig.id, false)}>
+                        <Bouton variante="contour">Classer sans suite</Bouton>
+                      </form>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-encre-douce">Aucun commentaire ni message signalé.</p>
             )}
           </section>
 

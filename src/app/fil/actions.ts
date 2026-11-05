@@ -5,6 +5,7 @@ import { exigerSession } from "@/lib/session";
 import { REACTIONS, type TypeReaction } from "@/lib/social/social";
 import { detecterCoordonnees } from "@/lib/ia/regles";
 import { contenuSticker, stickerDe } from "@/lib/messages/stickers";
+import { validerSignalementMessage } from "@/lib/social/signalement";
 
 type Cible = "annonce" | "entraide";
 
@@ -51,4 +52,15 @@ export async function basculerSoutien(annonceId: string, dejaSoutenu: boolean) {
   if (dejaSoutenu) await supabase.from("soutiens").delete().eq("annonce_id", annonceId).eq("auteur_id", user.id);
   else await supabase.from("soutiens").insert({ annonce_id: annonceId });
   revalidatePath(`/annonces/${annonceId}`);
+}
+
+// Signaler un commentaire ou un message de salon. La base vérifie : je peux le lire, ce n'est pas le mien,
+// pas de doublon, pas plus de 20 par jour ; elle garde une copie pour l'admin.
+export async function signalerMessage(cible: string, id: string, motif: string): Promise<{ ok: boolean; message: string }> {
+  const v = validerSignalementMessage({ cible, id, motif });
+  if (!v) return { ok: false, message: "Choisis un motif." };
+  const { supabase } = await exigerSession();
+  const { error } = await supabase.from("signalements_messages").insert({ cible_type: v.cible, cible_id: v.id, motif: v.motif });
+  if (error && error.code !== "23505") return { ok: false, message: error.code === "P0429" ? error.message : "Signalement impossible. Réessaie." };
+  return { ok: true, message: "Merci, l'équipe de modération va regarder." };
 }

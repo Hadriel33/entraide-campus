@@ -9,6 +9,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { decouperMentions } from "@/lib/social/mentions";
 import { stickerDe } from "@/lib/messages/stickers";
 import { ChoixSticker, StickerAffiche } from "./stickers-colette";
+import { SignalerMessage } from "./signaler-message";
 import { ilYa } from "@/lib/temps";
 
 // Commentaires sous un post : les 2 derniers visibles, le reste dépliable, et un champ pour répondre.
@@ -56,6 +57,7 @@ export function Commentaires({
                     {/* « il y a 1 min » peut changer entre le rendu serveur et le navigateur : écart attendu, sans risque */}
                     {ilYa(c.cree_le)}
                   </time>
+                  {c.auteur_id !== moi && <SignalerMessage cible="commentaire" id={c.id} />}
                   {(c.auteur_id === moi || estAdmin) && (
                     <button
                       type="button"

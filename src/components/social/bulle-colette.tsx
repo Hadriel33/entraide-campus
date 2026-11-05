@@ -8,6 +8,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { ilYa } from "@/lib/temps";
 import { contenuSticker, stickerDe } from "@/lib/messages/stickers";
 import { ChoixSticker, StickerAffiche } from "./stickers-colette";
+import { SignalerMessage } from "./signaler-message";
 
 type Personne = { pseudo: string; avatar_chemin: string | null; colette_couleur?: string };
 type Conversation = { id: string; repondu_le: string | null; annonce: { titre: string } | null; demandeur: Personne | null; destinataire: Personne | null; demandeur_id: string };
@@ -100,7 +101,10 @@ function ChatSalon({ salon, moi, retour }: { salon: Salon; moi: string; retour: 
               <div className={`flex max-w-[80%] flex-col rounded-carte px-3 py-1.5 text-sm ${mien ? "bg-encre text-surface" : "bg-papier-fonce"}`}>
                 {!mien && <span className="text-xs font-semibold">@{m.auteur?.pseudo}</span>}
                 {stickerDe(m.contenu) ? <StickerAffiche contenu={m.contenu} taille={52} /> : <span className="break-words">{m.contenu}</span>}
-                <span className={`text-[10px] ${mien ? "text-surface/60" : "text-encre-douce"}`}>{ilYa(m.cree_le)}</span>
+                <span className={`flex items-center gap-2 text-[10px] ${mien ? "text-surface/60" : "text-encre-douce"}`}>
+                  {ilYa(m.cree_le)}
+                  {!mien && <SignalerMessage cible="salon" id={m.id} />}
+                </span>
               </div>
             </li>
           );

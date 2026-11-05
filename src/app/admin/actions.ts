@@ -191,3 +191,15 @@ export async function verifierIA(): Promise<EtatIA> {
       : { ok: false, ms: p.ms, detail: `pas de réponse du modèle : ${causes.matching ?? "cause inconnue"}` },
   };
 }
+
+// Commentaire ou message de salon signalé : le supprimer (la RLS laisse l'admin le faire), puis classer.
+export async function traiterSignalementMessage(id: string, supprimer: boolean) {
+  const { supabase } = await exigerAdmin();
+  if (supprimer) {
+    const { data: s } = await supabase.from("signalements_messages").select("cible_type, cible_id").eq("id", id).maybeSingle();
+    if (s) await supabase.from(s.cible_type === "commentaire" ? "commentaires" : "salon_messages").delete().eq("id", s.cible_id);
+  }
+  await supabase.from("signalements_messages").update({ statut: "traite" }).eq("id", id);
+  revalidatePath("/admin");
+  redirect("/admin?onglet=moderation&ok=moderation");
+}
