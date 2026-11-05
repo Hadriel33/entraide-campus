@@ -9,6 +9,7 @@ import { Toast } from "@/components/ui/toast";
 import { Palette } from "@/components/app/palette";
 import { Confettis } from "@/components/ui/confettis";
 import { TutoColette } from "@/components/colette/tuto";
+import { ColetteReagit } from "@/components/colette/colette-reagit";
 import { BulleColette } from "@/components/social/bulle-colette";
 import { SCRIPT_THEME } from "@/components/app/theme";
 import "./globals.css";
@@ -74,6 +75,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <div className="flex min-h-dvh flex-col md:flex-row">
             <Palette />
             <TutoColette />
+            <ColetteReagit />
             <BarreLaterale
               pseudo={profil.pseudo}
               campus={profil.campus}

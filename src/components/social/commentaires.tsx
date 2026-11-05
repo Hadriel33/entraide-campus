@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { faireReagirColette } from "@/lib/colette/reactions";
 import Link from "next/link";
 import { commenter, supprimerCommentaire, type EtatCommentaire } from "@/app/fil/actions";
 import type { Commentaire } from "@/lib/social/requetes";
@@ -26,6 +27,10 @@ export function Commentaires({
 }) {
   const [tout, setTout] = useState(ouvert);
   const [etat, envoyer, enCours] = useActionState<EtatCommentaire, FormData>(commenter, {});
+  // Commentaire bien parti : Colette le salue une seconde.
+  useEffect(() => {
+    if (etat.ok) faireReagirColette("commentaire");
+  }, [etat.ok]);
   const visibles = tout ? liste : liste.slice(-2);
 
   return (

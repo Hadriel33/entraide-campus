@@ -102,6 +102,7 @@ export function CarteAnnonce({
     <article
       data-forme={f}
       data-categorie={annonce.categorie}
+      data-annonce={annonce.id}
       className={`group colle postit ${t.papier} forme-${f} flex min-h-56 flex-col gap-3 p-5 ${f === "etiquette" ? "pt-11" : "pt-6"}`}
       style={
         {

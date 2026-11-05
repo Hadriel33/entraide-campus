@@ -3,6 +3,7 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { basculerReaction } from "@/app/fil/actions";
 import { REACTIONS, type ResumeReactions, type TypeReaction } from "@/lib/social/social";
+import { faireReagirColette } from "@/lib/colette/reactions";
 
 // Pictogrammes dessinés (pas d'emoji : règle du test front-portable).
 const ICONES: Record<TypeReaction, string> = {
@@ -45,7 +46,10 @@ export function Reactions({
             title={proprietaire ? "Les autres réagissent à tes posts" : r.label}
             onClick={() =>
               demarrer(async () => {
-                if (!e.moi) setEnvol({ type: r.type, cle: Date.now() });
+                if (!e.moi) {
+                  setEnvol({ type: r.type, cle: Date.now() });
+                  faireReagirColette("reaction");
+                }
                 basculer(r.type);
                 await basculerReaction(cible, id, r.type, resume[r.type].moi);
               })

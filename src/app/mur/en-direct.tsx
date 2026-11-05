@@ -4,19 +4,25 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Colette } from "@/components/colette/colette";
+import { idsSurs } from "@/lib/annonces/arrivees";
 
 // Écoute les annonces en temps réel (la RLS filtre ce que chacun reçoit) et relance
 // la lecture côté serveur : le contenu de l'événement n'est jamais affiché tel quel.
 export function EnDirect() {
   const router = useRouter();
   const [arrivees, setArrivees] = useState(0);
+  // Les post-its arrivés depuis que je regarde : ils glissent en place avec « Nouveau » (règle CSS ci-dessous).
+  const [nouveaux, setNouveaux] = useState<string[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
     const canal = supabase
       .channel(`mur-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "annonces" }, (charge) => {
-        if (charge.eventType === "INSERT") setArrivees((n) => n + 1);
+        if (charge.eventType === "INSERT") {
+          setArrivees((n) => n + 1);
+          setNouveaux((l) => idsSurs([...l, (charge.new as { id?: unknown }).id]).slice(-20));
+        }
         router.refresh();
       })
       .subscribe();
@@ -25,8 +31,13 @@ export function EnDirect() {
     };
   }, [router]);
 
+  const regles = nouveaux
+    .map((id) => `article[data-annonce="${id}"]{animation:arrive-direct 900ms cubic-bezier(.2,.8,.3,1) both}article[data-annonce="${id}"]::before{content:"Nouveau"}`)
+    .join("");
+
   return (
     <p className="flex items-center gap-2 text-sm font-semibold" role="status">
+      {regles && <style>{regles}</style>}
       <span className="relative flex size-3" aria-hidden>
         <span className="absolute inset-0 animate-ping rounded-full bg-accent opacity-60" />
         <span className="relative size-3 rounded-full bg-accent" />
