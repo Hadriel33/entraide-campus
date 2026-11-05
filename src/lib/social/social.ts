@@ -8,6 +8,14 @@ export const REACTIONS = [
   { type: "mdr", label: "Mdr" },
 ] as const;
 export type TypeReaction = (typeof REACTIONS)[number]["type"];
+
+// Les « emoji » de l'appli : une tête de Colette par réaction (dessinée, jamais d'emoji : règle front-portable).
+export const COLETTE_REACTION: Record<TypeReaction, { humeur: "fiere" | "contente" | "rit"; accessoire: "aucun" | "flamme" | "lunettes_coeur" }> = {
+  bravo: { humeur: "fiere", accessoire: "aucun" },
+  feu: { humeur: "contente", accessoire: "flamme" },
+  merci: { humeur: "contente", accessoire: "lunettes_coeur" },
+  mdr: { humeur: "rit", accessoire: "aucun" },
+};
 export type ResumeReactions = Record<TypeReaction, { n: number; moi: boolean }>;
 
 const vide = (): ResumeReactions => ({

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { notFound } from "next/navigation";
@@ -39,6 +40,7 @@ import { appliquerCorrection, changerStatut, prolongerAnnonce, supprimerAnnonce 
 import { Colette } from "@/components/colette/colette";
 import { BadgeIA } from "@/components/ia/badge-ia";
 import { EquipePostit } from "@/components/annonces/equipe-postit";
+import { urlPhotoAnnonce } from "@/lib/annonces/photo";
 import { equipeAcceptee, libelleEquipe } from "@/lib/annonces/groupe";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -63,8 +65,11 @@ export async function generateMetadata({
 
 export default async function PageAnnonce({
   params,
+  searchParams,
 }: PageProps<"/annonces/[id]">) {
   const { id } = await params;
+  // Juste publié : le post-it tombe sur le tableau et la punaise s'enfonce.
+  const vientDePublier = (await searchParams).ok === "publiee";
   // La RLS ne renvoie rien si l'annonce n'est pas visible pour moi : même réponse qu'une annonce inexistante.
   const annonce = await lireAnnonce(id);
   if (!annonce) notFound();
@@ -132,14 +137,14 @@ export default async function PageAnnonce({
       </Link>
       {/* L'annonce en grand post-it, décollé du mur. */}
       <div
-        className={`postit ${teinte(annonce.categorie).papier} flex flex-col gap-5 p-6 pt-8 sm:p-8 sm:pt-10`}
+        className={`postit ${teinte(annonce.categorie).papier} ${vientDePublier ? "atterrit" : ""} flex flex-col gap-5 p-6 pt-8 sm:p-8 sm:pt-10`}
         style={
           {
             "--rot": `${inclinaison(annonce.id) / 3}deg`,
           } as React.CSSProperties
         }
       >
-        <span className="scotch" aria-hidden />
+        {vientDePublier ? <span className="punaise-enfonce" aria-hidden /> : <span className="scotch" aria-hidden />}
         <div className="flex flex-wrap items-center gap-2">
           <span
             className={`titre-charte rounded-[3px] px-1.5 pt-0.5 text-base ${annonce.type === "cherche" ? "bg-encre text-surface" : "border-[1.5px] border-encre"}`}
@@ -166,6 +171,11 @@ export default async function PageAnnonce({
             {annonce.titre}
           </h1>
         </ViewTransition>
+        {annonce.photo_chemin && (
+          <div className="relative aspect-[4/3] overflow-hidden rounded-ui border border-encre/15">
+            <Image src={urlPhotoAnnonce(annonce.photo_chemin)!} alt={`Photo du post-it « ${annonce.titre} »`} fill priority sizes="(min-width: 768px) 640px, 100vw" className="object-cover" />
+          </div>
+        )}
 
         <Link
           href={`/profils/${annonce.auteur?.pseudo}`}

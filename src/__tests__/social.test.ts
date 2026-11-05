@@ -42,3 +42,12 @@ describe("salons", () => {
     expect(nomSalon("classe:c1", "M1 Data")).toBe("M1 Data");
   });
 });
+
+describe("les « emoji » Colette des réactions", () => {
+  it("chaque réaction a sa propre Colette (humeur ou tenue), toutes différentes", async () => {
+    const { COLETTE_REACTION } = await import("@/lib/social/social");
+    const looks = REACTIONS.map((r) => JSON.stringify(COLETTE_REACTION[r.type]));
+    expect(new Set(looks).size).toBe(REACTIONS.length);
+    expect(COLETTE_REACTION.mdr.humeur).toBe("rit");
+  });
+});

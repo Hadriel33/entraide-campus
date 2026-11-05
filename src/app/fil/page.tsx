@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import { exigerSession } from "@/lib/session";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
@@ -19,6 +20,7 @@ import { CompteurDiscussion } from "@/components/social/compteur-discussion";
 import { BoutonSoutien } from "@/components/social/bouton-soutien";
 import { PictoCategorie } from "@/components/annonces/picto-categorie";
 import { COOKIE_FIL, estNouveau } from "@/lib/social/revenir";
+import { urlPhotoAnnonce } from "@/lib/annonces/photo";
 
 export const metadata: Metadata = { title: "Le fil" };
 
@@ -197,6 +199,11 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                       {CATEGORIES[p.a.categorie]}
                     </span>
                   </span>
+                  {p.a.photo_chemin && (
+                    <span className="relative my-1 block aspect-[16/9] overflow-hidden rounded-[3px]">
+                      <Image src={urlPhotoAnnonce(p.a.photo_chemin)!} alt="" fill sizes="(min-width: 640px) 600px, 100vw" className="object-cover" />
+                    </span>
+                  )}
                   <strong className="text-lg leading-tight">{p.a.titre}</strong>
                   <span className="line-clamp-2 text-sm text-encre/75">{p.a.description}</span>
                 </Link>

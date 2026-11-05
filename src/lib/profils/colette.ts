@@ -26,6 +26,10 @@ export const ACCESSOIRES_COLETTE: Record<string, Objet> = {
   diplome: { nom: "Diplôme", condition: (s) => s.aides_donnees >= 10, aide: "Aide 10 personnes" },
   // Migration 0027 : des pièces qui récompensent la participation et le retour chaque semaine.
   fleur: { nom: "Fleur" },
+  // Migration 0030 : des tenues libres, pour personnaliser sans ajouter de points à gagner (retour du prof).
+  bob: { nom: "Bob de festival" },
+  bandana: { nom: "Bandana" },
+  ballon: { nom: "Ballon" },
   micro: { nom: "Micro", condition: (s) => (s.commentaires ?? 0) >= 3, aide: "Écris 3 commentaires" },
   lunettes_coeur: { nom: "Lunettes cœur", condition: (s) => (s.reactions_recues ?? 0) >= 5, aide: "Reçois 5 réactions" },
   flamme: { nom: "Flamme", condition: (s) => (s.serie ?? 0) >= 3, aide: "Participe 3 semaines d'affilée" },

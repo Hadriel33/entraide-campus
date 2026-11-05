@@ -9,6 +9,7 @@ import { Toast } from "@/components/ui/toast";
 import { Palette } from "@/components/app/palette";
 import { Confettis } from "@/components/ui/confettis";
 import { TutoColette } from "@/components/colette/tuto";
+import { ColetteReagit } from "@/components/colette/colette-reagit";
 import { BulleColette } from "@/components/social/bulle-colette";
 import { SCRIPT_THEME } from "@/components/app/theme";
 import "./globals.css";
@@ -23,7 +24,7 @@ const kalam = Kalam({ subsets: ["latin"], weight: ["400", "700"], variable: "--f
 
 export const metadata: Metadata = {
   title: { default: "Post-it campus", template: "%s · Post-it campus" },
-  description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants de ton campus ESP.",
+  description: "Propose ce que tu sais faire, trouve ce dont tu as besoin, entre étudiants de ton campus.",
   metadataBase: new URL("https://entraide-campus.vercel.app"),
   openGraph: { siteName: "Post-it campus", locale: "fr_FR", type: "website" },
 };
@@ -74,6 +75,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <div className="flex min-h-dvh flex-col md:flex-row">
             <Palette />
             <TutoColette />
+            <ColetteReagit />
             <BarreLaterale
               pseudo={profil.pseudo}
               campus={profil.campus}

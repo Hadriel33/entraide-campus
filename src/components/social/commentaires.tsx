@@ -1,11 +1,15 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { faireReagirColette } from "@/lib/colette/reactions";
 import Link from "next/link";
 import { commenter, supprimerCommentaire, type EtatCommentaire } from "@/app/fil/actions";
 import type { Commentaire } from "@/lib/social/requetes";
 import { Avatar } from "@/components/ui/avatar";
 import { decouperMentions } from "@/lib/social/mentions";
+import { stickerDe } from "@/lib/messages/stickers";
+import { ChoixSticker, StickerAffiche } from "./stickers-colette";
+import { SignalerMessage } from "./signaler-message";
 import { ilYa } from "@/lib/temps";
 
 // Commentaires sous un post : les 2 derniers visibles, le reste dépliable, et un champ pour répondre.
@@ -26,6 +30,10 @@ export function Commentaires({
 }) {
   const [tout, setTout] = useState(ouvert);
   const [etat, envoyer, enCours] = useActionState<EtatCommentaire, FormData>(commenter, {});
+  // Commentaire bien parti : Colette le salue une seconde.
+  useEffect(() => {
+    if (etat.ok) faireReagirColette("commentaire");
+  }, [etat.ok]);
   const visibles = tout ? liste : liste.slice(-2);
 
   return (
@@ -49,6 +57,7 @@ export function Commentaires({
                     {/* « il y a 1 min » peut changer entre le rendu serveur et le navigateur : écart attendu, sans risque */}
                     {ilYa(c.cree_le)}
                   </time>
+                  {c.auteur_id !== moi && <SignalerMessage cible="commentaire" id={c.id} />}
                   {(c.auteur_id === moi || estAdmin) && (
                     <button
                       type="button"
@@ -59,6 +68,9 @@ export function Commentaires({
                     </button>
                   )}
                 </span>
+                {stickerDe(c.contenu) ? (
+                  <StickerAffiche contenu={c.contenu} taille={56} />
+                ) : (
                 <span className="break-words">
                   {decouperMentions(c.contenu).map((m, i) =>
                     "pseudo" in m ? (
@@ -70,6 +82,7 @@ export function Commentaires({
                     ),
                   )}
                 </span>
+                )}
               </div>
             </li>
           ))}
@@ -89,6 +102,7 @@ export function Commentaires({
           placeholder="Écrire un commentaire… (@pseudo pour prévenir quelqu’un)"
           className="min-h-10 min-w-0 flex-1 rounded-full border border-ligne-forte bg-surface px-4 text-sm outline-none focus:border-encre"
         />
+        <ChoixSticker enFormulaire />
         <button disabled={enCours} className="presse min-h-10 rounded-full bg-encre px-4 text-sm font-semibold text-surface disabled:opacity-60">
           {enCours ? "..." : "Envoyer"}
         </button>

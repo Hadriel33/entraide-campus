@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { exigerSession } from "@/lib/session";
 import { REACTIONS, type TypeReaction } from "@/lib/social/social";
 import { detecterCoordonnees } from "@/lib/ia/regles";
+import { contenuSticker, stickerDe } from "@/lib/messages/stickers";
+import { validerSignalementMessage } from "@/lib/social/signalement";
 
 type Cible = "annonce" | "entraide";
 
@@ -26,7 +28,8 @@ export type EtatCommentaire = { erreur?: string; ok?: number };
 export async function commenter(_: EtatCommentaire, formData: FormData): Promise<EtatCommentaire> {
   const cible = formData.get("cible") === "entraide" ? "entraide" : "annonce";
   const id = String(formData.get("id") ?? "");
-  const contenu = String(formData.get("contenu") ?? "").trim();
+  const sticker = String(formData.get("sticker") ?? "");
+  const contenu = stickerDe(contenuSticker(sticker)) ? contenuSticker(sticker) : String(formData.get("contenu") ?? "").trim();
   if (!contenu) return { erreur: "Écris quelque chose." };
   if (contenu.length > 300) return { erreur: "300 caractères maximum." };
   if (detecterCoordonnees(contenu)) return { erreur: "Pas de numéro ni d'email en commentaire : passe par « Demander le contact »." };
@@ -49,4 +52,15 @@ export async function basculerSoutien(annonceId: string, dejaSoutenu: boolean) {
   if (dejaSoutenu) await supabase.from("soutiens").delete().eq("annonce_id", annonceId).eq("auteur_id", user.id);
   else await supabase.from("soutiens").insert({ annonce_id: annonceId });
   revalidatePath(`/annonces/${annonceId}`);
+}
+
+// Signaler un commentaire ou un message de salon. La base vérifie : je peux le lire, ce n'est pas le mien,
+// pas de doublon, pas plus de 20 par jour ; elle garde une copie pour l'admin.
+export async function signalerMessage(cible: string, id: string, motif: string): Promise<{ ok: boolean; message: string }> {
+  const v = validerSignalementMessage({ cible, id, motif });
+  if (!v) return { ok: false, message: "Choisis un motif." };
+  const { supabase } = await exigerSession();
+  const { error } = await supabase.from("signalements_messages").insert({ cible_type: v.cible, cible_id: v.id, motif: v.motif });
+  if (error && error.code !== "23505") return { ok: false, message: error.code === "P0429" ? error.message : "Signalement impossible. Réessaie." };
+  return { ok: true, message: "Merci, l'équipe de modération va regarder." };
 }

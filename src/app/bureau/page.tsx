@@ -22,6 +22,8 @@ import {
 } from "@/components/colette/colette";
 import { Badges } from "@/components/profil/badges";
 import { CarteDefi } from "@/components/profil/carte-defi";
+import { TenueGagnee } from "@/components/colette/tenue-gagnee";
+import { piecesGagnees } from "@/lib/colette/recompenses";
 import { CarteSerie } from "@/components/profil/carte-serie";
 import { FilCampus } from "@/components/campus/fil";
 import { messageColette } from "@/lib/gamification/message-colette";
@@ -247,6 +249,15 @@ export default async function PageBureau() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-10">
+      {/* Une pièce de Colette vient d'être gagnée : on la fête une fois. */}
+      <TenueGagnee
+        moi={user.id}
+        pieces={piecesGagnees((stats as Stats | null) ?? null)}
+        couleur={profil.colette_couleur}
+        humeur={profil.colette_humeur}
+        accessoire={profil.colette_accessoire}
+        motif={profil.colette_motif}
+      />
       <header className="flex flex-wrap items-end justify-between gap-6">
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex items-end gap-2">

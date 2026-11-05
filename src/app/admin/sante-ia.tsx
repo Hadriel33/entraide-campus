@@ -12,9 +12,9 @@ export function SanteIA() {
     ? [
         {
           nom: "Connexion au modèle (passerelle Vercel, Gemini 2.5 Flash)",
-          ok: etat.moderation.ok || etat.matching.ok,
+          ok: etat.moderation.ok || etat.photo.ok || etat.matching.ok,
           detail:
-            etat.moderation.ok || etat.matching.ok
+            etat.moderation.ok || etat.photo.ok || etat.matching.ok
               ? "le modèle répond"
               : "aucune réponse : jeton OIDC ou passerelle",
         },
@@ -22,6 +22,11 @@ export function SanteIA() {
           nom: "IA n°2, relecture d'une annonce piégée",
           ok: etat.moderation.ok,
           detail: `${etat.moderation.detail} (${etat.moderation.ms} ms)`,
+        },
+        {
+          nom: "IA n°2, relecture d'une photo piégée",
+          ok: etat.photo.ok,
+          detail: `${etat.photo.detail} (${etat.photo.ms} ms)`,
         },
         {
           nom: "IA n°2, écriture du verdict en base",

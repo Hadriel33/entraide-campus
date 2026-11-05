@@ -7,6 +7,7 @@ import { validerAnnonce } from "@/lib/annonces/validation";
 import { programmerModeration } from "@/lib/ia/moderation";
 import { redigerAnnonce } from "@/lib/ia/modele";
 import type { Brouillon } from "@/lib/ia/regles";
+import { cheminPhotoAnnonce, urlPhotoAnnonce, validerPhotoAnnonce } from "@/lib/annonces/photo";
 
 export type EtatAnnonce = {
   erreurs?: Partial<Record<string, string>>;
@@ -22,12 +23,32 @@ function lireChamps(formData: FormData) {
 
 // Identité toujours vérifiée côté serveur, jamais lue dans le formulaire.
 async function clientConnecte() {
+  return (await session()).supabase;
+}
+async function session() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/connexion");
-  return supabase;
+  return { supabase, user };
+}
+
+// La photo du formulaire (facultative) : validée ici, puis rangée dans MON dossier du bucket « annonces »
+// (le bucket et la base vérifient aussi). Renvoie le chemin, null s'il n'y en a pas, ou une erreur.
+async function envoyerPhoto(supabase: Awaited<ReturnType<typeof createClient>>, uid: string, formData: FormData) {
+  const brut = formData.get("photo");
+  const fichier = brut instanceof File ? brut : null;
+  const v = validerPhotoAnnonce(fichier);
+  if (!v.ok) return { erreur: v.erreur };
+  if (!v.photo || !fichier) return { chemin: null };
+  const chemin = cheminPhotoAnnonce(uid, fichier.type, crypto.randomUUID());
+  const { error } = await supabase.storage.from("annonces").upload(chemin, fichier, { contentType: fichier.type });
+  if (error) {
+    console.error("Envoi de la photo", error);
+    return { erreur: "La photo n'a pas pu être envoyée. Réessaie." };
+  }
+  return { chemin };
 }
 
 export async function creerAnnonce(_: EtatAnnonce, formData: FormData): Promise<EtatAnnonce> {
@@ -35,16 +56,23 @@ export async function creerAnnonce(_: EtatAnnonce, formData: FormData): Promise<
   const validation = validerAnnonce(champs);
   if (!validation.ok || !validation.valeurs) return { erreurs: validation.erreurs, valeurs: champs };
 
-  const supabase = await clientConnecte();
+  const { supabase, user } = await session();
+  const photo = await envoyerPhoto(supabase, user.id, formData);
+  if ("erreur" in photo) return { erreurs: { photo: photo.erreur }, valeurs: champs };
   // auteur_id n'est pas envoyé : la base le remplit avec auth.uid(), et la RLS refuse tout autre auteur.
-  const { data, error } = await supabase.from("annonces").insert(validation.valeurs).select("id").single();
+  const { data, error } = await supabase
+    .from("annonces")
+    .insert({ ...validation.valeurs, ...(photo.chemin ? { photo_chemin: photo.chemin } : {}) })
+    .select("id")
+    .single();
   if (error || !data) {
+    if (photo.chemin) await supabase.storage.from("annonces").remove([photo.chemin]);
     if (error?.code === "P0429") return { message: error.message, valeurs: champs }; // limite anti-spam
     console.error("Création d'annonce", error);
     return { message: "L'annonce n'a pas pu être publiée. Réessaie.", valeurs: champs };
   }
 
-  programmerModeration(data.id, validation.valeurs);
+  programmerModeration(data.id, { ...validation.valeurs, photoUrl: urlPhotoAnnonce(photo.chemin) });
   revalidatePath("/annonces");
   redirect(`/annonces/${data.id}?ok=publiee`);
 }
@@ -54,14 +82,27 @@ export async function modifierAnnonce(id: string, _: EtatAnnonce, formData: Form
   const validation = validerAnnonce(champs);
   if (!validation.ok || !validation.valeurs) return { erreurs: validation.erreurs, valeurs: champs };
 
-  const supabase = await clientConnecte();
+  const { supabase, user } = await session();
+  const { data: avant } = await supabase.from("annonces").select("photo_chemin").eq("id", id).maybeSingle();
+  const photo = await envoyerPhoto(supabase, user.id, formData);
+  if ("erreur" in photo) return { erreurs: { photo: photo.erreur }, valeurs: champs };
+  // Nouvelle photo, photo retirée, ou on garde l'ancienne.
+  const retirer = formData.get("retirer_photo") === "oui";
+  const finale = photo.chemin ?? (retirer ? null : (avant?.photo_chemin ?? null));
   // La RLS ne laisse passer que l'auteur ou un membre du groupe : 0 ligne modifiée = pas le droit (ou annonce disparue).
-  const { data, error } = await supabase.from("annonces").update(validation.valeurs).eq("id", id).select("id");
+  const { data, error } = await supabase
+    .from("annonces")
+    .update({ ...validation.valeurs, photo_chemin: finale })
+    .eq("id", id)
+    .select("id");
   if (error || !data?.length) {
+    if (photo.chemin) await supabase.storage.from("annonces").remove([photo.chemin]);
     return { message: "Modification impossible : cette annonce n'existe pas, ou tu n'es pas dans son équipe.", valeurs: champs };
   }
+  // L'ancienne photo part (le bucket ne laisse supprimer que dans son propre dossier : sinon elle reste, sans lien).
+  if (avant?.photo_chemin && avant.photo_chemin !== finale) await supabase.storage.from("annonces").remove([avant.photo_chemin]);
 
-  programmerModeration(id, validation.valeurs);
+  programmerModeration(id, { ...validation.valeurs, photoUrl: urlPhotoAnnonce(finale) });
   revalidatePath("/annonces");
   redirect(`/annonces/${id}?ok=modifiee`);
 }
@@ -76,7 +117,10 @@ export async function changerStatut(id: string, statut: "publiee" | "archivee") 
 
 export async function supprimerAnnonce(id: string) {
   const supabase = await clientConnecte();
-  await supabase.from("annonces").delete().eq("id", id);
+  const { data: avant } = await supabase.from("annonces").select("photo_chemin").eq("id", id).maybeSingle();
+  const { data: supprimee } = await supabase.from("annonces").delete().eq("id", id).select("id");
+  // Sa photo part avec lui (RGPD : rien ne traîne dans le bucket).
+  if (supprimee?.length && avant?.photo_chemin) await supabase.storage.from("annonces").remove([avant.photo_chemin]);
   revalidatePath("/annonces");
   revalidatePath("/mes-annonces");
   redirect("/mes-annonces?ok=supprimee");

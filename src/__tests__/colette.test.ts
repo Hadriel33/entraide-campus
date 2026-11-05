@@ -68,3 +68,12 @@ describe("nouvelles pièces : on les gagne en revenant et en participant (migrat
     }
   });
 });
+
+describe("tenues libres (migration 0030) : de quoi personnaliser, sans rien de plus à gagner", () => {
+  it("le bob, le bandana et le ballon sont libres pour tout le monde", () => {
+    for (const p of ["bob", "bandana", "ballon"]) {
+      expect(ACCESSOIRES_COLETTE[p], p).toBeDefined();
+      expect(estDebloque(ACCESSOIRES_COLETTE[p], vide), p).toBe(true);
+    }
+  });
+});

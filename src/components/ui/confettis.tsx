@@ -12,9 +12,13 @@ const NOMBRE = 56;
 export function Confettis() {
   const code = useSearchParams().get("ok");
   if (!code || !MOMENTS.has(code)) return null;
+  return <PluieConfettis key={code} />;
+}
 
+// La pluie seule, pour d'autres grands moments (une tenue gagnée...).
+export function PluieConfettis({ z = "z-40" }: { z?: string }) {
   return (
-    <div key={code} className="pointer-events-none fixed inset-0 z-40 overflow-hidden motion-reduce:hidden" aria-hidden>
+    <div className={`pointer-events-none fixed inset-0 ${z} overflow-hidden motion-reduce:hidden`} aria-hidden>
       {Array.from({ length: NOMBRE }, (_, i) => {
         const x = (i * 37) % 100;
         const large = i % 3 === 0;

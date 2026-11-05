@@ -224,3 +224,15 @@ export function resumerErreur(erreur: unknown): string {
     .trim();
   return texte.length > 160 ? `${texte.slice(0, 157)}...` : texte || "erreur inconnue";
 }
+
+// IA n°2 : ce qu'on envoie au modèle. Avec une photo, elle est jointe et le texte le signale (balise <photo>).
+export type PartieModeration = { type: "text"; text: string } | { type: "image"; image: URL };
+
+export function contenuModeration(annonce: { titre: string; description: string; lieu: string | null }, photoUrl: string | null): PartieModeration[] {
+  const texte = `<annonce>\nTitre : ${annonce.titre}\nDescription : ${annonce.description}\nLieu : ${annonce.lieu ?? "non précisé"}\n</annonce>`;
+  if (!photoUrl) return [{ type: "text", text: texte }];
+  return [
+    { type: "text", text: `${texte}\n<photo>La photo du post-it est jointe : relis-la avec les mêmes règles.</photo>` },
+    { type: "image", image: new URL(photoUrl) },
+  ];
+}

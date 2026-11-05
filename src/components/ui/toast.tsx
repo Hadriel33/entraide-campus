@@ -48,7 +48,7 @@ const REACTION: Record<string, AnimColette> = {
   avis: "saute",
   bienvenue: "coucou",
   colette: "saute",
-  groupe: "saute",
+  groupe: "danse",
   classe: "saute",
   demande: "accroche",
   limite: "debordee",

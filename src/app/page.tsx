@@ -26,7 +26,7 @@ export default async function Home() {
 
   return (
     <div className="-mx-4 flex flex-col overflow-x-clip">
-      {/* Affiche : les verbes de la charte ESP sur bandeaux, et le mur en vrac à côté. */}
+      {/* Affiche : les verbes de la charte sur bandeaux, et le mur en vrac à côté. */}
       <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pt-10 pb-20 lg:grid-cols-[1.15fr_1fr]">
         <div className="flex flex-col gap-7">
           <h1 className="flex flex-col items-start gap-2 whitespace-nowrap">
@@ -39,7 +39,7 @@ export default async function Home() {
             </span>
           </h1>
           <p className="max-w-xl font-serif text-xl leading-snug text-encre/80 sm:text-[1.4rem]">
-            Le tableau d&apos;affichage des étudiants de l&apos;ESP, campus par campus. Un shooting, un coup de main sur ton code, une coloc, un covoit : tout
+            Le tableau d&apos;affichage des étudiants, campus par campus. Un shooting, un coup de main sur ton code, une coloc, un covoit : tout
             s&apos;échange ici.
           </p>
           <div className="flex flex-wrap gap-3">

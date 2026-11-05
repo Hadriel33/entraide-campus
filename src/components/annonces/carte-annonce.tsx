@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import {
@@ -12,6 +13,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { inclinaison, teinte } from "@/lib/design/teintes";
 import { forme, type Forme } from "@/lib/design/formes";
 import { PictoCategorie } from "./picto-categorie";
+import { urlPhotoAnnonce } from "@/lib/annonces/photo";
 import { CompteurDiscussion } from "@/components/social/compteur-discussion";
 import { BoutonSoutien } from "@/components/social/bouton-soutien";
 import type { ResumeSoutien } from "@/lib/social/soutiens";
@@ -61,6 +63,13 @@ export function CarteAnnonce({
   const cherche = annonce.type === "cherche";
   const f = forme(annonce.categorie);
   const equipe = equipeAcceptee(annonce.membres);
+  const photo = urlPhotoAnnonce(annonce.photo_chemin);
+  // La photo du post-it (0031) : vignette sous l'en-tête ; dans le polaroid, elle remplit le cadre.
+  const vignette = photo && (
+    <div className={`relative overflow-hidden rounded-[3px] ${f === "polaroid" ? "-mx-1 aspect-square" : "aspect-[4/3]"}`}>
+      <Image src={photo} alt="" fill sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" className="object-cover" />
+    </div>
+  );
 
   // En-tête : d'abord QUOI (pictogramme et catégorie, ce qu'on repère de loin), puis propose / cherche.
   const entete = (
@@ -102,6 +111,7 @@ export function CarteAnnonce({
     <article
       data-forme={f}
       data-categorie={annonce.categorie}
+      data-annonce={annonce.id}
       className={`group colle postit ${t.papier} forme-${f} flex min-h-56 flex-col gap-3 p-5 ${f === "etiquette" ? "pt-11" : "pt-6"}`}
       style={
         {
@@ -118,10 +128,18 @@ export function CarteAnnonce({
       {f === "polaroid" ? (
         // Polaroid : le type, la catégorie et le titre dans la « photo », le reste sur le cadre blanc.
         <>
-          <div className={`polaroid-photo ${t.papier} bg-(--postit)`}>
-            {entete}
-            {titre}
-          </div>
+          {photo ? (
+            <>
+              {vignette}
+              {entete}
+              {titre}
+            </>
+          ) : (
+            <div className={`polaroid-photo ${t.papier} bg-(--postit)`}>
+              {entete}
+              {titre}
+            </div>
+          )}
           <span className="-mt-1 -rotate-1 self-center font-main text-base leading-none text-encre/70">{ETIQUETTE_FORME.polaroid}</span>
         </>
       ) : f === "billet" ? (
@@ -136,6 +154,8 @@ export function CarteAnnonce({
           {entete}
         </>
       )}
+
+      {f !== "polaroid" && vignette}
 
       {/* Tri « Pour moi » : pourquoi ce post-it te correspond (compétences du CV, catégories). */}
       {match && (

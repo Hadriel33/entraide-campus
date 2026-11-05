@@ -310,7 +310,7 @@ export default async function PageAnnonces({
             </span>
           </h1>
           <p className="mt-2 max-w-xl -rotate-1 font-main text-xl leading-snug text-encre-douce">
-            {campus ? `Campus de ${campus}` : "Les 6 campus ESP"}. Les coordonnées s&apos;échangent seulement
+            {campus ? `Campus de ${campus}` : "Les 6 campus"}. Les coordonnées s&apos;échangent seulement
             après accord.
           </p>
         </div>

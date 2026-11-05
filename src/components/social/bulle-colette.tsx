@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/client";
 import { salonsDe, type Salon } from "@/lib/social/social";
 import { Avatar } from "@/components/ui/avatar";
 import { ilYa } from "@/lib/temps";
+import { contenuSticker, stickerDe } from "@/lib/messages/stickers";
+import { ChoixSticker, StickerAffiche } from "./stickers-colette";
+import { SignalerMessage } from "./signaler-message";
 
 type Personne = { pseudo: string; avatar_chemin: string | null; colette_couleur?: string };
 type Conversation = { id: string; repondu_le: string | null; annonce: { titre: string } | null; demandeur: Personne | null; destinataire: Personne | null; demandeur_id: string };
@@ -64,7 +67,10 @@ function ChatSalon({ salon, moi, retour }: { salon: Salon; moi: string; retour: 
 
   async function envoyer(e: React.FormEvent) {
     e.preventDefault();
-    const contenu = texte.trim();
+    await poster(texte.trim(), true);
+  }
+
+  async function poster(contenu: string, depuisLeTexte: boolean) {
     if (!contenu) return;
     setErreur(null);
     const { data, error } = await createClient().from("salon_messages").insert({ salon: salon.id, contenu }).select(SELECT).single();
@@ -73,7 +79,7 @@ function ChatSalon({ salon, moi, retour }: { salon: Salon; moi: string; retour: 
       setErreur(error.code === "22023" || error.code === "P0429" ? error.message : "Message impossible. Réessaie.");
       return;
     }
-    setTexte("");
+    if (depuisLeTexte) setTexte("");
     setMessages((l) => (l.some((x) => x.id === data.id) ? l : [...l, data as unknown as MessageSalon]));
   }
 
@@ -94,8 +100,11 @@ function ChatSalon({ salon, moi, retour }: { salon: Salon; moi: string; retour: 
               {!mien && <Avatar chemin={m.auteur?.avatar_chemin} nom={m.auteur?.pseudo ?? "?"} taille="sm" colette={m.auteur ?? undefined} />}
               <div className={`flex max-w-[80%] flex-col rounded-carte px-3 py-1.5 text-sm ${mien ? "bg-encre text-surface" : "bg-papier-fonce"}`}>
                 {!mien && <span className="text-xs font-semibold">@{m.auteur?.pseudo}</span>}
-                <span className="break-words">{m.contenu}</span>
-                <span className={`text-[10px] ${mien ? "text-surface/60" : "text-encre-douce"}`}>{ilYa(m.cree_le)}</span>
+                {stickerDe(m.contenu) ? <StickerAffiche contenu={m.contenu} taille={52} /> : <span className="break-words">{m.contenu}</span>}
+                <span className={`flex items-center gap-2 text-[10px] ${mien ? "text-surface/60" : "text-encre-douce"}`}>
+                  {ilYa(m.cree_le)}
+                  {!mien && <SignalerMessage cible="salon" id={m.id} />}
+                </span>
               </div>
             </li>
           );
@@ -119,6 +128,7 @@ function ChatSalon({ salon, moi, retour }: { salon: Salon; moi: string; retour: 
           placeholder={`Écrire dans ${salon.nom}...`}
           className="min-h-10 min-w-0 flex-1 rounded-full border border-ligne-forte bg-surface px-4 text-sm outline-none focus:border-encre"
         />
+        <ChoixSticker onChoisir={(code) => poster(contenuSticker(code), false)} />
         <button className="presse min-h-10 rounded-full bg-encre px-4 text-sm font-semibold text-surface">Envoyer</button>
       </form>
     </div>

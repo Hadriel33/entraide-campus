@@ -17,6 +17,7 @@ import {
   TRAMS,
 } from "@/lib/annonces/validation";
 import {
+  contenuModeration,
   nettoyerBrouillon,
   nettoyerCompetences,
   nettoyerMatchs,
@@ -76,6 +77,7 @@ export async function modererAnnonce(
     titre: string;
     description: string;
     lieu: string | null;
+    photoUrl?: string | null; // la photo du post-it, relue avec le texte (0031)
   },
   surErreur?: (erreur: unknown) => void,
 ): Promise<ReponseModeration | null> {
@@ -92,8 +94,8 @@ export async function modererAnnonce(
             .nullable(),
         }),
       }),
-      prompt: `<annonce>\nTitre : ${annonce.titre}\nDescription : ${annonce.description}\nLieu : ${annonce.lieu ?? "non précisé"}\n</annonce>`,
-      abortSignal: AbortSignal.timeout(15_000),
+      messages: [{ role: "user", content: contenuModeration(annonce, annonce.photoUrl ?? null) }],
+      abortSignal: AbortSignal.timeout(annonce.photoUrl ? 25_000 : 15_000),
       maxRetries: 1,
       providerOptions: SECOURS,
     });

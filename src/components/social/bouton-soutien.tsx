@@ -3,6 +3,7 @@
 import { useOptimistic, useState, useTransition } from "react";
 import { basculerSoutien } from "@/app/fil/actions";
 import type { ResumeSoutien } from "@/lib/social/soutiens";
+import { faireReagirColette } from "@/lib/colette/reactions";
 
 // « Je soutiens » : la flèche bondit, un « +1 » s'envole, le compteur saute. Optimiste : l'écran répond tout de suite,
 // la base tranche ensuite (pas sur son propre post-it, un seul soutien par personne).
@@ -31,7 +32,10 @@ export function BoutonSoutien({
       title={proprietaire ? "Les autres soutiennent ton post-it pour le faire monter" : "Fais monter ce post-it"}
       onClick={() =>
         demarrer(async () => {
-          if (!affiche.moi) setElan(Date.now());
+          if (!affiche.moi) {
+            setElan(Date.now());
+            faireReagirColette("soutien");
+          }
           basculer(null);
           await basculerSoutien(annonceId, resume.moi);
         })

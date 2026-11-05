@@ -10,6 +10,8 @@ import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
+import { TenueGagnee } from "@/components/colette/tenue-gagnee";
+import { piecesGagnees } from "@/lib/colette/recompenses";
 import { AtelierColette } from "./atelier-colette";
 import { choisirClasse, proposerClasse } from "./actions";
 import { Bouton } from "@/components/ui/bouton";
@@ -29,6 +31,14 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+      <TenueGagnee
+        moi={user.id}
+        pieces={piecesGagnees((stats as Stats | null) ?? null)}
+        couleur={profil.colette_couleur}
+        humeur={profil.colette_humeur}
+        accessoire={profil.colette_accessoire}
+        motif={profil.colette_motif}
+      />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <TitrePage
           accroche={

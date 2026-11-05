@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { notFound, redirect } from "next/navigation";
 import { exigerSession } from "@/lib/session";
@@ -111,6 +112,7 @@ export async function validerClasse(id: string) {
 export type EtatIA = {
   cleServeur: boolean;
   moderation: { ok: boolean; ms: number; detail: string };
+  photo: { ok: boolean; ms: number; detail: string };
   matching: { ok: boolean; ms: number; detail: string };
 } | null;
 
@@ -124,7 +126,7 @@ export async function verifierIA(): Promise<EtatIA> {
     return { r, ms: Date.now() - t0 };
   };
   // L'un après l'autre : deux appels simultanés peuvent toucher la limite de l'offre gratuite.
-  const causes: { moderation?: string; matching?: string } = {};
+  const causes: { moderation?: string; photo?: string; matching?: string } = {};
   const m = await chrono(() =>
     modererAnnonce(
       {
@@ -133,6 +135,19 @@ export async function verifierIA(): Promise<EtatIA> {
         lieu: null,
       },
       (e) => (causes.moderation = resumerErreur(e)),
+    ),
+  );
+  // La photo piégée : un texte parfaitement normal, mais un numéro de téléphone écrit sur la photo.
+  const hote = (await headers()).get("host");
+  const ph = await chrono(() =>
+    modererAnnonce(
+      {
+        titre: "Je prête ma perceuse",
+        description: "Perceuse disponible le week-end, pour vos petits travaux de déménagement.",
+        lieu: null,
+        photoUrl: `${hote?.startsWith("localhost") ? "http" : "https"}://${hote}/ia-test/photo-telephone.png`,
+      },
+      (e) => (causes.photo = resumerErreur(e)),
     ),
   );
   const p = await chrono(() =>
@@ -160,6 +175,13 @@ export async function verifierIA(): Promise<EtatIA> {
           detail: `verdict « ${m.r.statut} » sur une annonce avec un numéro`,
         }
       : { ok: false, ms: m.ms, detail: `pas de réponse du modèle : ${causes.moderation ?? "cause inconnue"}` },
+    photo: ph.r
+      ? {
+          ok: ph.r.statut !== "ok",
+          ms: ph.ms,
+          detail: `verdict « ${ph.r.statut} » sur un texte normal avec un numéro écrit sur la photo${ph.r.raisons[0] ? ` : ${ph.r.raisons[0]}` : ""}`,
+        }
+      : { ok: false, ms: ph.ms, detail: `pas de réponse du modèle : ${causes.photo ?? "cause inconnue"}` },
     matching: p.r
       ? {
           ok: (p.r.get("test")?.pertinence ?? 0) >= 2,
@@ -168,4 +190,16 @@ export async function verifierIA(): Promise<EtatIA> {
         }
       : { ok: false, ms: p.ms, detail: `pas de réponse du modèle : ${causes.matching ?? "cause inconnue"}` },
   };
+}
+
+// Commentaire ou message de salon signalé : le supprimer (la RLS laisse l'admin le faire), puis classer.
+export async function traiterSignalementMessage(id: string, supprimer: boolean) {
+  const { supabase } = await exigerAdmin();
+  if (supprimer) {
+    const { data: s } = await supabase.from("signalements_messages").select("cible_type, cible_id").eq("id", id).maybeSingle();
+    if (s) await supabase.from(s.cible_type === "commentaire" ? "commentaires" : "salon_messages").delete().eq("id", s.cible_id);
+  }
+  await supabase.from("signalements_messages").update({ statut: "traite" }).eq("id", id);
+  revalidatePath("/admin");
+  redirect("/admin?onglet=moderation&ok=moderation");
 }

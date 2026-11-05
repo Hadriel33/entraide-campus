@@ -5,7 +5,7 @@ import { saisonDu } from "@/lib/design/saisons";
 // Les couleurs viennent des jetons du thème (test front-portable) : aucune couleur en dur ici.
 
 export type CouleurColette = "jaune" | "lilas" | "ciel" | "ocre";
-export type Humeur = "contente" | "surprise" | "fiere" | "decue" | "fachee" | "concentree" | "dort";
+export type Humeur = "contente" | "surprise" | "fiere" | "decue" | "fachee" | "concentree" | "dort" | "rit";
 export type Accessoire =
   | "aucun"
   | "photo"
@@ -27,6 +27,9 @@ export type Accessoire =
   | "micro"
   | "lunettes_coeur"
   | "flamme"
+  | "bob"
+  | "bandana"
+  | "ballon"
   // Tenue de la guide (le tuto) : on la reconnaît, ce n'est pas ta Colette
   | "guide"
   // Tenues de saison (portées par la mascotte, pas choisissables en avatar)
@@ -34,7 +37,7 @@ export type Accessoire =
   | "sorciere"
   | "cafe";
 export type Motif = "uni" | "ligne" | "pois" | "quadrille" | "dore" | "mariniere" | "etoiles";
-export type AnimColette = "flotte" | "coucou" | "lit" | "tampon" | "accroche" | "saute" | "dort" | "cherche" | "reflechit" | "debordee";
+export type AnimColette = "danse" | "flotte" | "coucou" | "lit" | "tampon" | "accroche" | "saute" | "dort" | "cherche" | "reflechit" | "debordee";
 
 const PAPIER: Record<CouleurColette, [string, string]> = {
   jaune: ["var(--color-postit-jaune)", "var(--color-coin-jaune)"],
@@ -101,6 +104,13 @@ function Yeux({ h, anim }: { h: Humeur; anim?: AnimColette }) {
           <path d="M58 80 Q66 70 74 80 M92 80 Q100 70 108 80" stroke={K} strokeWidth="3.5" fill="none" strokeLinecap="round" />
         </g>
       );
+    case "rit":
+      return (
+        <g>
+          <path d="M57 74 L73 80 L57 86 M109 74 L93 80 L109 86" stroke={K} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M52 88 q-3 6 0 9 q3 -3 0 -9 z M114 88 q-3 6 0 9 q3 -3 0 -9 z" fill="var(--color-ciel)" stroke={K} strokeWidth="1.2" />
+        </g>
+      );
     case "decue":
       return (
         <g className="col-yeux">
@@ -139,6 +149,13 @@ function Bouche({ h, anim }: { h: Humeur; anim?: AnimColette }) {
       return <ellipse cx="83" cy="103" rx="5" ry="6.5" fill={K} />;
     case "fiere":
       return <path d="M68 94 Q83 116 98 94 Z" fill={K} />;
+    case "rit":
+      return (
+        <g>
+          <path d="M64 92 Q83 124 102 92 Z" fill={K} />
+          <path d="M74 106 Q83 114 92 106 Q83 110 74 106 Z" fill={ROUGE} />
+        </g>
+      );
     case "decue":
       return <path d="M72 106 Q83 96 94 106" stroke={K} strokeWidth="3.5" fill="none" strokeLinecap="round" />;
     case "fachee":
@@ -330,6 +347,32 @@ function AccessoireDevant({ a }: { a: Accessoire }) {
         <g className="col-flamme" stroke={K} strokeWidth="2" strokeLinejoin="round">
           <path d="M83 -8 C98 6 100 18 92 30 C93 22 88 17 86 13 C84 21 76 21 78 30 C66 19 72 4 83 -8 Z" fill={ROUGE} />
           <path d="M84 8 C90 16 90 22 86 28 C84 24 80 24 80 28 C77 22 80 14 84 8 Z" fill="var(--color-bandeau)" stroke="none" />
+        </g>
+      );
+    case "bob":
+      return (
+        <g stroke={K} strokeWidth="2.5" strokeLinejoin="round">
+          <path d="M42 30 Q44 4 83 4 Q122 4 124 30 Z" fill="var(--color-ocre)" />
+          <path d="M26 32 Q83 20 140 32 Q83 46 26 32 Z" fill="var(--color-coin-ocre)" />
+          <path d="M48 22 Q83 16 118 22" fill="none" strokeWidth="1.5" strokeDasharray="4 4" />
+        </g>
+      );
+    case "bandana":
+      return (
+        <g stroke={K} strokeWidth="2" strokeLinejoin="round">
+          <path d="M32 112 Q83 128 134 112 L83 152 Z" fill={ROUGE} />
+          <circle cx="70" cy="124" r="2.5" fill={BLANC} stroke="none" />
+          <circle cx="96" cy="124" r="2.5" fill={BLANC} stroke="none" />
+          <circle cx="83" cy="138" r="2.5" fill={BLANC} stroke="none" />
+        </g>
+      );
+    case "ballon":
+      return (
+        <g className="col-ballon">
+          <path d="M152 116 Q144 92 158 64" stroke={K} strokeWidth="1.5" fill="none" />
+          <ellipse cx="160" cy="44" rx="15" ry="18" fill="var(--color-ciel)" stroke={K} strokeWidth="2.5" />
+          <path d="M156 62 L164 62 L160 67 Z" fill={K} />
+          <path d="M152 36 Q154 30 160 29" stroke={BLANC} strokeWidth="2.5" fill="none" strokeLinecap="round" />
         </g>
       );
     case "guide":
@@ -562,8 +605,8 @@ export function Colette({
   if (deSaison) accessoire = deSaison.tenue;
   const [fond, coin] = PAPIER[couleur];
   const joue = couleur === "lilas" ? "var(--color-ocre)" : "var(--color-lilas)";
-  const cachePunaise = ["diplome", "noel", "couronne", "casque", "sorciere", "guide"].includes(accessoire);
-  const corps = anim === "flotte" || anim === "coucou" ? "col-flotte" : anim === "saute" ? "col-saute" : anim === "dort" ? "col-respire" : anim === "cherche" ? "col-cherche" : anim === "debordee" ? "col-tremble" : anim === "reflechit" ? "col-penche" : "";
+  const cachePunaise = ["diplome", "noel", "couronne", "casque", "sorciere", "guide", "bob"].includes(accessoire);
+  const corps = anim === "danse" ? "col-danse" : anim === "flotte" || anim === "coucou" ? "col-flotte" : anim === "saute" ? "col-saute" : anim === "dort" ? "col-respire" : anim === "cherche" ? "col-cherche" : anim === "debordee" ? "col-tremble" : anim === "reflechit" ? "col-penche" : "";
 
   return (
     <svg
