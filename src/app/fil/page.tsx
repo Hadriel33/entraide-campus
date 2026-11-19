@@ -21,6 +21,7 @@ import { BoutonSoutien } from "@/components/social/bouton-soutien";
 import { PictoCategorie } from "@/components/annonces/picto-categorie";
 import { COOKIE_FIL, estNouveau } from "@/lib/social/revenir";
 import { urlPhotoAnnonce } from "@/lib/annonces/photo";
+import { equipeAcceptee } from "@/lib/annonces/groupe";
 
 export const metadata: Metadata = { title: "Le fil" };
 
@@ -171,8 +172,17 @@ export default async function PageFil({ searchParams }: PageProps<"/fil">) {
                     <p className="text-[0.95rem] leading-snug">
                       <Link href={`/profils/${p.a.auteur?.pseudo}`} className="font-semibold hover:underline">
                         @{p.a.auteur?.pseudo}
-                      </Link>{" "}
-                      a punaisé un post-it
+                      </Link>
+                      {/* Post-it de groupe : toute l'équipe qui a dit oui */}
+                      {equipeAcceptee(p.a.membres).map((m, k, l) => (
+                        <span key={m.pseudo}>
+                          {k === l.length - 1 ? " et " : ", "}
+                          <Link href={`/profils/${m.pseudo}`} className="font-semibold hover:underline">
+                            @{m.pseudo}
+                          </Link>
+                        </span>
+                      ))}{" "}
+                      {equipeAcceptee(p.a.membres).length ? "ont punaisé un post-it" : "a punaisé un post-it"}
                     </p>
                     <p className="flex items-center gap-2 text-xs text-encre-douce">
                       {ilYa(p.a.cree_le)}

@@ -3,13 +3,15 @@ import { expect, type Page } from "@playwright/test";
 // Erreurs JavaScript de la page (un composant qui plante) : on les collecte pour échouer franchement.
 export function surveillerErreurs(page: Page) {
   const erreurs: string[] = [];
-  page.on("pageerror", (e) => erreurs.push(e.message));
+  // Chaque erreur porte la page affichée à ce moment-là : une erreur tardive se range sur la bonne page.
+  const ou = () => new URL(page.url()).pathname;
+  page.on("pageerror", (e) => erreurs.push(`${e.message} (sur ${ou()})`));
   page.on("console", (m) => {
     if (
       m.type() === "error" &&
       !/favicon|Failed to load resource|tile\.openstreetmap/i.test(m.text())
     )
-      erreurs.push(m.text());
+      erreurs.push(`${m.text()} (sur ${ou()})`);
   });
   return erreurs;
 }

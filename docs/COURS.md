@@ -1,7 +1,7 @@
 # Le cours en résumé : ce qui est attendu, séance par séance
 
 > Résumé écrit par nous à partir du PDF « COURS VIBE CODING — M2 DATA » (44 pages, reçu le 22/10). Le PDF lui-même n'est pas dans le dépôt : il est public. Hadriel le garde sur son ordinateur.
-> État au 22/10/2026 : ✅ fait et vérifié en ligne, 🟡 codé et en ligne mais pas encore vérifié à la main avec 2 comptes, ⬜ à faire.
+> État au 19/11/2026 : ✅ fait et vérifié en ligne, 🟡 codé et en ligne mais pas encore vérifié à la main avec 2 comptes, ⬜ à faire.
 
 ## Calendrier (le jeudi, 13h-15h)
 | Séance | Date | Thème | État |
@@ -9,8 +9,8 @@
 | S1 | 1er oct | Lancement, appli en ligne | ✅ |
 | S2 | 22 oct | Comptes et annonces | 🟡 |
 | S3 | 5 nov | Le palier 1 en entier | 🟡 (en avance) |
-| S4 | 19 nov | Les deux IA | 🟡 (en avance) |
-| S5 | 26 nov | La chasse aux failles | 🟡 (faite à blanc le 01/10) |
+| S4 | 19 nov | Les deux IA | 🟡 en ligne (4 IA, photo comprise) ; reste « Tester maintenant » |
+| S5 | 26 nov | La chasse aux failles | 🟡 dossier à jour (`docs/securite/FAILLES.md`), tests SQL à rejouer avant |
 | S6 | 17 déc, 15h15-17h15 | La démo finale | ⬜ |
 
 ## S2 · 22 octobre : comptes et annonces
@@ -44,11 +44,11 @@ Demande de contact, acceptation, coordonnées visibles ; les 3 règles d'or tien
 ## S4 · 19 novembre : les deux IA
 Livrable : le profil depuis le CV tourne en ligne, la deuxième IA existe, aucune clé d'API dans le code.
 Ce qu'un client vérifie : un besoin clair, un humain qui valide, un plan si ça rate, aucune clé visible (sinon 5 points en moins).
-État : 🟡 les deux IA sont en ligne (plus une IA n°3 bonus). La clé serveur a été ajoutée sur Vercel le 22/10 : reste à vérifier avec Admin › Impact › « Tester maintenant ».
+État au 19/11 : 🟡 les deux IA demandées sont en ligne (profil depuis le CV ; relecture des post-its, photo comprise) plus deux bonus (tri « Pour moi », Colette rédactrice), expliquées dans l'appli (page « Les IA de Colette »). Reste à cliquer Admin › « Tester maintenant » : 4 lignes vertes attendues, dont la photo piégée.
 
 ## S5 · 26 novembre : la chasse aux failles
 1re heure : attaquer l'appli d'un voisin (coordonnées sans accord, annonce d'un autre, conversation). 2e heure : réparer, puis trois semaines pour finir.
-État : 🟡 chasse faite à blanc (`docs/securite/`), à rejouer pour de vrai le 26/11.
+État : 🟡 chasse faite à blanc le 01/10 ; dossier mis à jour le 19/11 avec toutes les portes ajoutées depuis (salons, groupes, soutiens, photos, partage, signalements) et la liste des tests à rejouer (`docs/securite/FAILLES.md`).
 
 ## S6 · 17 décembre : la démo finale
 3 minutes en direct sur l'appli en ligne (pas de capture ni de vidéo), puis expliquer ses choix : le palier, les deux IA, ce qu'on ferait avec une séance de plus.
@@ -61,7 +61,7 @@ Conseils : annonces crédibles, deux comptes ouverts à l'avance, répéter 3 fo
 | En ligne dès la séance 1 | 10 % | ✅ en ligne le 01/10 |
 | Méthode (découper, cadrer l'IA, tester, réparer) | 30 % | `docs/JOURNAL.md`, `docs/METHODE.md`, `docs/etapes/`, tests Vitest et SQL, CI |
 | Parcours fonctionnel (palier 1 en ligne) | 20 % | 🟡 en ligne, recette à 2 comptes à faire |
-| Sécurité (règles d'or pendant la chasse) | 15 % | 🟡 tests SQL, à confirmer le 26/11 |
+| Sécurité (règles d'or pendant la chasse) | 15 % | 🟡 ~145 vérifications SQL, à confirmer le 26/11 |
 | IA (conception 15 %, implémentation 10 %) | 25 % | 🟡 `docs/IA-DEFENSE.md`, mesures dans `docs/ia/` |
 
 Si la démo ne tourne pas en ligne, le projet n'est pas noté. Une clé visible coûte 5 points.

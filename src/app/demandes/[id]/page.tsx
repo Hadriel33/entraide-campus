@@ -12,6 +12,7 @@ import { Colette } from "@/components/colette/colette";
 import type { Categorie } from "@/lib/annonces/validation";
 import { graineDe, phrasesColette } from "@/lib/messages/brise-glace";
 import { Conversation, type Message } from "./conversation";
+import { SELECT_MINI } from "@/components/annonces/mini-postit";
 
 export const metadata: Metadata = { title: "Conversation" };
 
@@ -82,7 +83,7 @@ export default async function PageConversation({
   const [{ data: messages }, { data: coordonnees }] = await Promise.all([
     supabase
       .from("messages")
-      .select("id, auteur_id, contenu, cree_le")
+      .select(`id, auteur_id, contenu, cree_le, ${SELECT_MINI}`)
       .eq("demande_id", id)
       .order("cree_le")
       .limit(200),
@@ -170,7 +171,7 @@ export default async function PageConversation({
       <Conversation
         demandeId={id}
         moi={user.id}
-        initiaux={(messages ?? []) as Message[]}
+        initiaux={(messages ?? []) as unknown as Message[]}
         prenomAutre={enGroupe ? "le groupe" : autre.prenom}
         noms={enGroupe ? Object.fromEntries([...participants.values()].map((p) => [p.id, p.pseudo])) : undefined}
         suggestions={

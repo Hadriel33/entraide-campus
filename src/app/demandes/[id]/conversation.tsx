@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { heureCampus } from "@/lib/temps";
+import { MiniPostit, SELECT_MINI, type MiniAnnonce } from "@/components/annonces/mini-postit";
 import { Bouton } from "@/components/ui/bouton";
 import { Colette } from "@/components/colette/colette";
 import { STICKERS, contenuSticker, stickerDe } from "@/lib/messages/stickers";
@@ -13,6 +14,8 @@ export type Message = {
   auteur_id: string;
   contenu: string;
   cree_le: string;
+  annonce_id?: string | null; // post-it partagé (0033)
+  annonce?: MiniAnnonce | null;
 };
 
 const heure = heureCampus; // à l'heure de Paris, identique serveur et navigateur
@@ -55,8 +58,13 @@ export function Conversation({
           table: "messages",
           filter: `demande_id=eq.${demandeId}`,
         },
-        (charge) => {
-          const m = charge.new as Message;
+        async (charge) => {
+          let m = charge.new as Message;
+          // Un post-it partagé : on relit le message avec son post-it (la RLS décide s'il est encore visible).
+          if (m.annonce_id) {
+            const { data } = await supabase.from("messages").select(`id, auteur_id, contenu, cree_le, ${SELECT_MINI}`).eq("id", m.id).maybeSingle();
+            if (data) m = data as unknown as Message;
+          }
           setMessages((liste) =>
             liste.some((x) => x.id === m.id) ? liste : [...liste, m],
           );
@@ -157,6 +165,7 @@ export function Conversation({
                   {m.contenu}
                 </p>
               )}
+              {m.annonce_id && <MiniPostit annonce={m.annonce ?? null} />}
               <span className="text-[11px] text-encre-douce">
                 {heure(m.cree_le)}
               </span>
