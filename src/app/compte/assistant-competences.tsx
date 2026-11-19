@@ -1,31 +1,45 @@
 "use client";
 import { BadgeIA } from "@/components/ia/badge-ia";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { Bouton } from "@/components/ui/bouton";
-import { analyserCV, enregistrerCompetences, type EtatCV } from "./actions";
+import { analyserCV, sauverCompetences, type EtatCV } from "./actions";
 import { Colette } from "@/components/colette/colette";
 
-// IA n°1 : l'IA propose, l'étudiant relit, corrige et valide. Rien n'est enregistré sans son clic.
+// IA n°1 : l'IA propose, l'étudiant garde ce qui est juste. Ses ajouts et retraits s'enregistrent tout seuls ;
+// les propositions de l'IA restent à part tant qu'il ne les a pas gardées (clic sur la proposition ou « Tout garder »).
 export function AssistantCompetences({ actuelles }: { actuelles: string[] }) {
   const [etat, analyser, analyseEnCours] = useActionState<EtatCV, FormData>(analyserCV, {});
   const [choisies, setChoisies] = useState<string[]>(actuelles);
   const [ajout, setAjout] = useState("");
   const [enregistrement, demarrer] = useTransition();
-  const [dejaVues, setDejaVues] = useState<string[] | undefined>(undefined);
+  const [statut, setStatut] = useState<"" | "ok" | "erreur">("");
+  const modifie = useRef(false);
 
-  // Nouvelles propositions de l'IA : on les ajoute (cochées) à la liste à relire.
-  if (etat.propositions && etat.propositions !== dejaVues) {
-    setDejaVues(etat.propositions);
-    setChoisies((c) => [...c, ...etat.propositions!.filter((p) => !c.some((x) => x.toLowerCase() === p.toLowerCase()))].slice(0, 15));
-  }
-  const propositionsIA = new Set((etat.propositions ?? []).map((p) => p.toLowerCase()));
-  const toutes = [...new Set([...choisies, ...(etat.propositions ?? [])])];
+  // Enregistrement automatique, 700 ms après la dernière modification faite par l'étudiant.
+  useEffect(() => {
+    if (!modifie.current) return;
+    const t = window.setTimeout(() => {
+      demarrer(async () => {
+        const r = await sauverCompetences(choisies);
+        setStatut(r.ok ? "ok" : "erreur");
+      });
+    }, 700);
+    return () => window.clearTimeout(t);
+  }, [choisies]);
 
-  const basculer = (c: string) => setChoisies((liste) => (liste.includes(c) ? liste.filter((x) => x !== c) : [...liste, c].slice(0, 15)));
+  const changer = (f: (liste: string[]) => string[]) => {
+    modifie.current = true;
+    setStatut("");
+    setChoisies((l) => f(l).slice(0, 15));
+  };
+  const memes = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
+  const propositions = (etat.propositions ?? []).filter((p) => !choisies.some((c) => memes(c, p)));
+  const retirer = (c: string) => changer((l) => l.filter((x) => x !== c));
+  const garder = (c: string) => changer((l) => (l.some((x) => memes(x, c)) ? l : [...l, c]));
   const ajouter = () => {
     const c = ajout.trim();
-    if (c.length >= 2 && c.length <= 40 && !choisies.some((x) => x.toLowerCase() === c.toLowerCase())) setChoisies((l) => [...l, c].slice(0, 15));
+    if (c.length >= 2 && c.length <= 40) garder(c);
     setAjout("");
   };
 
@@ -60,27 +74,45 @@ export function AssistantCompetences({ actuelles }: { actuelles: string[] }) {
       )}
       {etat.message && <p className="pop text-sm">{etat.message}</p>}
 
-      {toutes.length > 0 && (
-        <ul className="flex flex-wrap gap-2" aria-label="Compétences : clique pour garder ou retirer">
-          {toutes.map((c, i) => {
-            const garde = choisies.includes(c);
-            return (
-              <li key={c} className="apparition" style={{ "--i": i } as React.CSSProperties}>
-                <button
-                  type="button"
-                  onClick={() => basculer(c)}
-                  aria-pressed={garde}
-                  className={`presse flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm ${
-                    garde ? "border-encre bg-offre font-medium" : "border-dashed border-ligne-forte text-encre-douce line-through"
-                  }`}
-                >
-                  {c}
-                  {propositionsIA.has(c.toLowerCase()) && <span className="text-[10px] font-semibold uppercase text-encre-douce">IA</span>}
+      {/* Mes compétences, gardées : clic pour retirer. */}
+      {choisies.length > 0 && (
+        <ul className="flex flex-wrap gap-2" aria-label="Mes compétences : clique pour retirer">
+          {choisies.map((c, i) => (
+            <li key={c} className="apparition" style={{ "--i": i } as React.CSSProperties}>
+              <button
+                type="button"
+                onClick={() => retirer(c)}
+                title="Retirer"
+                className="presse flex items-center gap-1.5 rounded-full border-2 border-encre bg-offre px-3.5 py-1.5 text-sm font-semibold hover:bg-papier-fonce"
+              >
+                {c}
+                <span aria-hidden className="text-encre-douce">×</span>
+                <span className="sr-only">(retirer)</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Les propositions de l'IA attendent le clic de l'étudiant. */}
+      {propositions.length > 0 && (
+        <div className="pop flex flex-col gap-2 rounded-carte border border-dashed border-ligne-forte bg-surface p-3">
+          <p className="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold">
+            <span className="flex items-center gap-2"><BadgeIA numero={1} />Colette propose (clique pour garder)</span>
+            <button type="button" onClick={() => changer((l) => [...l, ...propositions])} className="text-sm font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+              Tout garder
+            </button>
+          </p>
+          <ul className="flex flex-wrap gap-2">
+            {propositions.map((c) => (
+              <li key={c}>
+                <button type="button" onClick={() => garder(c)} className="presse rounded-full border border-dashed border-ligne-forte px-3 py-1.5 text-sm text-encre-douce hover:border-encre hover:text-encre">
+                  + {c}
                 </button>
               </li>
-            );
-          })}
-        </ul>
+            ))}
+          </ul>
+        </div>
       )}
 
       <div className="flex flex-wrap gap-2">
@@ -103,12 +135,10 @@ export function AssistantCompetences({ actuelles }: { actuelles: string[] }) {
         </Bouton>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Bouton disabled={enregistrement} onClick={() => demarrer(() => enregistrerCompetences(choisies))}>
-          {enregistrement ? "Enregistrement..." : `Enregistrer ${choisies.length} compétence${choisies.length > 1 ? "s" : ""}`}
-        </Bouton>
-        <span className="text-xs text-encre-douce">{choisies.length} / 15</span>
-      </div>
+      <p className="text-xs text-encre-douce" aria-live="polite">
+        {choisies.length} / 15 ·{" "}
+        {enregistrement ? "Enregistrement..." : statut === "ok" ? "Enregistré automatiquement" : statut === "erreur" ? "Pas enregistré, réessaie" : "Enregistré automatiquement à chaque changement"}
+      </p>
     </div>
   );
 }
