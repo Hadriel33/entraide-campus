@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { ChampMention } from "./champ-mention";
 import { faireReagirColette } from "@/lib/colette/reactions";
 import Link from "next/link";
 import { commenter, supprimerCommentaire, type EtatCommentaire } from "@/app/fil/actions";
@@ -94,13 +95,12 @@ export function Commentaires({
         <label className="sr-only" htmlFor={`com-${id}`}>
           Ton commentaire
         </label>
-        <input
+        <ChampMention
           id={`com-${id}`}
           name="contenu"
           maxLength={300}
-          autoComplete="off"
-          placeholder="Écrire un commentaire… (@pseudo pour prévenir quelqu’un)"
-          className="min-h-10 min-w-0 flex-1 rounded-full border border-ligne-forte bg-surface px-4 text-sm outline-none focus:border-encre"
+          placeholder="Écrire un commentaire… (tape @ pour prévenir quelqu’un)"
+          className="min-h-10 w-full min-w-0 rounded-full border border-ligne-forte bg-surface px-4 text-sm outline-none focus:border-encre"
         />
         <ChoixSticker enFormulaire />
         <button disabled={enCours} className="presse min-h-10 rounded-full bg-encre px-4 text-sm font-semibold text-surface disabled:opacity-60">

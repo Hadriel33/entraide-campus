@@ -5,6 +5,7 @@ import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { Champ } from "@/components/ui/champ";
 import { BadgeIA } from "@/components/ia/badge-ia";
 import { ChampPhoto } from "./champ-photo";
+import { ChampMention } from "@/components/social/champ-mention";
 import { CATEGORIES, CONTREPARTIES, QUARTIERS, TRAMS, TYPES } from "@/lib/annonces/validation";
 import { quartiersDu } from "@/lib/carte/mercator";
 import type { EtatAnnonce } from "@/app/annonces/actions";
@@ -162,12 +163,11 @@ export function FormulaireAnnonce({
         Avant d&apos;être affiché, ton post-it est relu par Colette (arnaque, numéro laissé en clair). Si elle a un doute, elle te propose une correction.
       </p>
       {avecEquipe ? (
-        <Champ
-          label="À plusieurs ? Invite tes potes (facultatif)"
-          name="equipe"
-          defaultValue={v.equipe ?? ""}
-          aide="Jusqu'à 3 pseudos, par exemple @lea @sam.photo. Chacun reçoit une invitation et apparaît sur le post-it quand il a dit oui."
-        />
+        <label className="flex flex-col gap-1.5 text-sm font-semibold">
+          À plusieurs ? Invite tes potes (facultatif)
+          <ChampMention name="equipe" defaultValue={v.equipe ?? ""} placeholder="Tape @ pour chercher un pseudo" className={`${CLASSE_SAISIE} w-full`} />
+          <span className="text-xs font-normal text-encre-douce">Jusqu&apos;à 3 pseudos. Chacun reçoit une invitation et apparaît sur le post-it quand il a dit oui.</span>
+        </label>
       ) : (
         <p className="text-sm text-encre-douce">L&apos;équipe du post-it (inviter, retirer) se gère depuis sa page.</p>
       )}
