@@ -10,6 +10,15 @@ const base: AnnonceCandidate = {
 };
 
 describe("suggerer", () => {
+  it("ne propose pas deux fois le même titre (deux auteurs, même post-it)", () => {
+    const moi = { competences: ["Python"], categoriesProposees: [], categoriesCherchees: [] };
+    const a = { ...base, id: "a", categorie: "dev" as const, titre: "Aide Python pour mon mémoire", description: "Script Python." };
+    const b = { ...a, id: "b", titre: "  aide python pour mon MÉMOIRE " };
+    const c = { ...a, id: "c", titre: "Python pour un projet data" };
+    const s = suggerer(moi, [a, b, c]);
+    expect(s.map((x) => x.annonce.id)).toEqual(["a", "c"]);
+  });
+
   it("propose une demande qui correspond à une catégorie où je propose déjà quelque chose", () => {
     const s = suggerer(
       {

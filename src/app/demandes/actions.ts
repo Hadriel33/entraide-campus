@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { exigerSession } from "@/lib/session";
 import { validerAvis } from "@/lib/profils/validation";
+import { validerAvancement } from "@/lib/echanges/suivi";
 
 const MOTIFS = [
   "arnaque",
@@ -125,4 +126,34 @@ export async function signalerAnnonce(annonceId: string, formData: FormData) {
     details: texte(formData, "details", 300),
   });
   redirect(`/annonces/${annonceId}?ok=signalement`);
+}
+
+// Suivi d'une entraide (0034) : la base vérifie que c'est bien celui qui aide, vers l'avant, sans coordonnées.
+export async function avancerEntraide(demandeId: string, formData: FormData) {
+  const { supabase } = await exigerSession();
+  const { data: actuel } = await supabase.from("suivis_entraide").select("etape").eq("demande_id", demandeId).maybeSingle();
+  const v = validerAvancement({
+    actuelle: actuel?.etape ?? null,
+    etape: String(formData.get("etape") ?? ""),
+    mot: String(formData.get("mot") ?? ""),
+  });
+  const retour = String(formData.get("retour") ?? "") === "liste" ? "/demandes" : `/demandes/${demandeId}`;
+  if (!v) redirect(`${retour}?ok=suivi_refuse`);
+  const { error } = await supabase.rpc("avancer_entraide", { p_demande: demandeId, p_etape: v.etape, p_mot: v.mot });
+  if (error) {
+    console.error("Suivi d'entraide", error);
+    redirect(`${retour}?ok=suivi_refuse`);
+  }
+  revalidatePath("/demandes");
+  revalidatePath(`/demandes/${demandeId}`);
+  redirect(`${retour}?ok=${v.etape === "livre" ? "livre" : "suivi"}`);
+}
+
+export async function confirmerEntraide(demandeId: string, retour: "liste" | "discussion") {
+  const { supabase } = await exigerSession();
+  const { error } = await supabase.rpc("confirmer_entraide", { p_demande: demandeId });
+  if (error) console.error("Bien reçu", error);
+  revalidatePath("/demandes");
+  revalidatePath(`/demandes/${demandeId}`);
+  redirect(`${retour === "liste" ? "/demandes" : `/demandes/${demandeId}`}?ok=recu`);
 }

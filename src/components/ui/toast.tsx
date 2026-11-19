@@ -11,7 +11,7 @@ const MESSAGES: Record<string, string> = {
   archivee: "Annonce archivée.",
   republiee: "Annonce republiée.",
   supprimee: "Annonce supprimée.",
-  demande: "Demande envoyée. Tu seras prévenu de la réponse dans Demandes.",
+  demande: "Demande envoyée. Tu seras prévenu de la réponse dans Mes échanges.",
   annulee: "Demande annulée.",
   acceptee: "Demande acceptée : la discussion est ouverte, vos coordonnées sont visibles.",
   favori: "Ajoutée à tes favoris.",
@@ -38,6 +38,10 @@ const MESSAGES: Record<string, string> = {
   compte_supprime: "Ton compte et toutes tes données ont été supprimés.",
   mot_de_passe: "Mot de passe modifié.",
   lien_envoye: "Si un compte existe avec cet email, un lien vient de partir.",
+  suivi: "Suivi mis à jour : Colette prévient l'autre.",
+  livre: "C'est livré ! Colette sonne à la porte.",
+  recu: "Bien reçu : l'entraide est terminée. Un petit avis ?",
+  suivi_refuse: "Suivi non mis à jour : petit mot trop long ou avec des coordonnées.",
 };
 
 // Colette réagit aux grands moments (sinon le message s'affiche seul).
@@ -52,6 +56,9 @@ const REACTION: Record<string, AnimColette> = {
   classe: "saute",
   demande: "accroche",
   limite: "debordee",
+  suivi: "tampon",
+  livre: "danse",
+  recu: "saute",
 };
 
 export function Toast() {
