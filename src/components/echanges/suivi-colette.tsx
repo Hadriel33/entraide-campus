@@ -1,5 +1,5 @@
 import { Colette } from "@/components/colette/colette";
-import { Bouton } from "@/components/ui/bouton";
+import { BoutonEtape } from "./bouton-etape";
 import { avancerEntraide, confirmerEntraide } from "@/app/demandes/actions";
 import { ETAPES, MOT_MAX, RECU, etapesSuivantes, peutConfirmer, rang, type Etape } from "@/lib/echanges/suivi";
 
@@ -90,9 +90,9 @@ export function SuiviColette({
               const e = ETAPES.find((x) => x.code === code)!;
               const memeEtape = code === etape;
               return (
-                <Bouton key={code} name="etape" value={code} variante={code === suivantes.find((c) => c !== etape) ? "plein" : "contour"} className="text-sm">
+                <BoutonEtape key={code} code={code} variante={code === suivantes.find((c) => c !== etape) ? "plein" : "contour"} className="text-sm">
                   {memeEtape ? "Changer mon mot" : e.label}
-                </Bouton>
+                </BoutonEtape>
               );
             })}
           </div>
@@ -102,7 +102,9 @@ export function SuiviColette({
       {/* Celui qui reçoit : « Bien reçu » une fois livré, ce qui termine l'entraide (et appelle un avis). */}
       {peutConfirmer({ etape, aide }) && (
         <form action={confirmerEntraide.bind(null, demandeId, retour)}>
-          <Bouton className="w-full sm:w-auto">Bien reçu, merci !</Bouton>
+          <BoutonEtape variante="plein" className="w-full sm:w-auto">
+            Bien reçu, merci !
+          </BoutonEtape>
         </form>
       )}
     </section>
