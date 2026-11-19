@@ -17,7 +17,8 @@ import type { Stats } from "@/lib/gamification/progression";
 import { inclinaison } from "@/lib/design/teintes";
 import { EtatVide } from "@/components/colette/etat-vide";
 import { SuiviColette } from "@/components/echanges/suivi-colette";
-import { colonneEchange, jeSuisAide, type Etape } from "@/lib/echanges/suivi";
+import { colonneEchange, etapesDatees, jeSuisAide, type Etape } from "@/lib/echanges/suivi";
+import { jourCampus } from "@/lib/temps";
 
 export const metadata: Metadata = { title: "Mes échanges" };
 
@@ -293,6 +294,8 @@ export default async function PageDemandes({
     if (!d.annonce || !d.demandeur) return null;
     const s = suiviDe.get(d.id);
     return (
+      <>
+      {d.repondu_le && <p className="text-xs text-encre/70">Accepté le {jourCampus(d.repondu_le)}</p>}
       <SuiviColette
         demandeId={d.id}
         etape={s?.etape ?? null}
@@ -302,7 +305,9 @@ export default async function PageDemandes({
         retour="liste"
         compact
         avisDonne={avisDonnes.has(d.id)}
+        majLe={s?.maj_le ?? null}
       />
+      </>
     );
   }
 
@@ -486,7 +491,7 @@ export default async function PageDemandes({
       )}
 
       {/* Historique : une ligne par échange fini, pour retrouver qui, quoi, quand, et noter si ce n'est pas fait. */}
-      {historique.length > 0 && (
+      {demandes.length > 0 && (
         <section className="flex flex-col gap-4" aria-label="Historique">
           <h2 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 border-encre pb-2">
             <span className="titre-charte text-section whitespace-nowrap">Historique</span>
@@ -495,6 +500,11 @@ export default async function PageDemandes({
               {onglet === "recues" ? "ceux qui t'ont contacté" : "ceux que tu as contactés"}
             </span>
           </h2>
+          {historique.length === 0 && (
+            <p className="font-main text-lg text-encre-douce">
+              Rien pour l&apos;instant. Un échange arrive ici quand la personne aidée confirme « Bien reçu » (ou s&apos;il est refusé).
+            </p>
+          )}
           <ul className="flex flex-col gap-2">
             {historique.map((d) => {
               const autre = onglet === "recues" ? d.demandeur : d.destinataire;
@@ -516,13 +526,25 @@ export default async function PageDemandes({
                       </Link>
                     )}
                     {termine ? <Badge variante="ok">Bien reçu</Badge> : STATUTS.refusee}
-                    <span className="text-xs text-encre-douce">{dateCourte(dateFin(d))}</span>
+
                     {termine && (
                       <Link href={`/demandes/${d.id}`} className="text-sm font-semibold underline-offset-2 hover:underline">
                         Revoir la discussion
                       </Link>
                     )}
                   </div>
+                  {/* Le parcours daté : demandé, accepté (ou refusé), bien reçu. */}
+                  <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-encre-douce" aria-label="Étapes de l'échange">
+                    {etapesDatees({ statut: d.statut, creeLe: d.cree_le, reponduLe: d.repondu_le, etape: suiviDe.get(d.id)?.etape ?? null, suiviLe: suiviDe.get(d.id)?.maj_le ?? null }).map((e, k) => (
+                      <li key={e.label} className="flex items-center gap-2">
+                        {k > 0 && <span aria-hidden>·</span>}
+                        <span>
+                          {e.label}
+                          {e.date && <strong className="font-semibold text-encre"> le {e.date}</strong>}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
                   {termine && !avisDonnes.has(d.id) && <FormulaireAvis demandeId={d.id} retour="/demandes" prenom={autre.prenom} />}
                 </li>
               );

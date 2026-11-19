@@ -22,3 +22,8 @@ export function heureCampus(iso: string) {
     timeZone: "Europe/Paris",
   }).format(new Date(iso));
 }
+
+// Jour court (« 19 nov. »), à l'heure de Paris : même rendu côté serveur et navigateur.
+export function jourCampus(iso: string) {
+  return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", timeZone: "Europe/Paris" }).format(new Date(iso));
+}

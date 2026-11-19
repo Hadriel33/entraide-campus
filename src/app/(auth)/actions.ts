@@ -30,6 +30,9 @@ function messageErreur(code: string | undefined, message: string) {
     return "Les inscriptions sont fermées pour le moment. Réessaie plus tard.";
   if (code === "email_address_not_authorized") return "Cette adresse ne peut pas recevoir d'email de confirmation pour le moment.";
   if (code === "user_already_exists" || code === "email_exists") return "Un compte existe déjà avec cet email : connecte-toi.";
+  // Le mail de confirmation n'a pas pu partir (service d'envoi indisponible ou refusé) : on le dit clairement.
+  if (code === "unexpected_failure" && /smtp|mail|5\.7\.|unauthorized ip/i.test(message))
+    return "Le mail de confirmation n'a pas pu partir. Réessaie dans quelques minutes : ton compte n'a pas été créé.";
   console.error("Erreur Supabase Auth", code, message);
   return "Une erreur est survenue. Réessaie.";
 }
