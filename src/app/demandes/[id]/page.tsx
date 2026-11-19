@@ -181,6 +181,7 @@ export default async function PageConversation({
           aide={aide}
           prenomAutre={enGroupe ? "le groupe" : autre.prenom}
           retour="discussion"
+          lienAvis={`/demandes${user.id === demande.demandeur.id ? "?onglet=envoyees" : ""}#demande-${id}`}
         />
       )}
       <Conversation

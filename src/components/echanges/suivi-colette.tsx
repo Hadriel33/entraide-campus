@@ -1,5 +1,5 @@
 import { Colette } from "@/components/colette/colette";
-import { Bouton } from "@/components/ui/bouton";
+import { BoutonEtape } from "./bouton-etape";
 import { avancerEntraide, confirmerEntraide } from "@/app/demandes/actions";
 import { ETAPES, MOT_MAX, RECU, etapesSuivantes, peutConfirmer, rang, type Etape } from "@/lib/echanges/suivi";
 
@@ -14,6 +14,8 @@ export function SuiviColette({
   prenomAutre,
   retour,
   compact = false,
+  lienAvis,
+  avisDonne = false,
 }: {
   demandeId: string;
   etape: Etape | null;
@@ -24,6 +26,9 @@ export function SuiviColette({
   retour: "liste" | "discussion";
   /** Dans la liste « Mes échanges » : la ligne et le bouton principal seulement. */
   compact?: boolean;
+  /** Une fois terminé : où laisser son avis (la discussion renvoie vers la carte de « Mes échanges »). */
+  lienAvis?: string;
+  avisDonne?: boolean;
 }) {
   const r = rang(etape);
   const fini = etape === "recu";
@@ -31,6 +36,9 @@ export function SuiviColette({
   const look = fini ? RECU.colette : (courante?.colette ?? { anim: "dort" as const, humeur: "dort" as const, accessoire: "aucun" as const });
   // Position de Colette sur la ligne : au départ, puis sur chaque arrêt (le dernier = livré ou reçu).
   const position = fini ? 100 : r < 0 ? 0 : (r / (ETAPES.length - 1)) * 100;
+  // D'où elle part en marchant : l'étape d'avant (on la voit avancer à chaque ouverture et à chaque clic).
+  const depart = fini || r <= 0 ? position : ((r - 1) / (ETAPES.length - 1)) * 100;
+  const trajet = { "--depart": `${depart}%`, "--arrivee": `${position}%` } as React.CSSProperties;
   const bulle = mot ?? (fini ? RECU.phrase : courante?.phrase ?? (aide ? `Dis à ${prenomAutre} où tu en es.` : `${prenomAutre} te tiendra au courant ici.`));
   const suivantes = aide ? etapesSuivantes(etape) : [];
 
@@ -46,7 +54,7 @@ export function SuiviColette({
       {/* La ligne : Colette au-dessus de l'arrêt en cours, sa bulle à côté. */}
       <div className={`relative mx-4 ${compact ? "mt-14" : "mt-20"} mb-7`}>
         <div className="h-1 rounded-full bg-papier-fonce" aria-hidden>
-          <div className="h-1 rounded-full bg-encre transition-[width] duration-700" style={{ width: `${position}%` }} />
+          <div key={`barre-${etape}`} className="barre-remplit h-1 rounded-full bg-encre" style={{ width: `${position}%`, ...trajet }} />
         </div>
         <ol className="absolute inset-x-0 -top-1.5 flex justify-between" aria-label="Étapes">
           {ETAPES.map((e, i) => (
@@ -59,8 +67,9 @@ export function SuiviColette({
           ))}
         </ol>
         <div
-          className="absolute bottom-2 flex -translate-x-1/2 items-end transition-[left] duration-700"
-          style={{ left: `${position}%` }}
+          key={`colette-${etape}`}
+          className={`absolute bottom-2 flex -translate-x-1/2 items-end ${depart !== position ? "colette-marche" : ""}`}
+          style={{ left: `${position}%`, ...trajet }}
         >
           <Colette {...look} saison={false} taille={compact ? 52 : 72} titre={`Colette livreuse : ${fini ? RECU.label : (courante?.label ?? "au départ")}`} />
         </div>
@@ -90,19 +99,40 @@ export function SuiviColette({
               const e = ETAPES.find((x) => x.code === code)!;
               const memeEtape = code === etape;
               return (
-                <Bouton key={code} name="etape" value={code} variante={code === suivantes.find((c) => c !== etape) ? "plein" : "contour"} className="text-sm">
+                <BoutonEtape key={code} code={code} variante={code === suivantes.find((c) => c !== etape) ? "plein" : "contour"} className="text-sm">
                   {memeEtape ? "Changer mon mot" : e.label}
-                </Bouton>
+                </BoutonEtape>
               );
             })}
           </div>
         </form>
       )}
 
+      {/* Ce qui se passe ensuite, dit simplement (sinon on ne sait pas comment « fermer » l'échange). */}
+      {aide && etape === "livre" && (
+        <p className="text-sm text-encre-douce">Livré ! L&apos;échange se ferme quand {prenomAutre} confirme « Bien reçu ».</p>
+      )}
+      {!aide && !fini && etape !== "livre" && (
+        <p className="text-sm text-encre-douce">Quand ce sera livré, tu fermeras l&apos;échange ici avec « Bien reçu ».</p>
+      )}
+      {fini && avisDonne && <p className="text-sm font-semibold">Entraide terminée, merci pour ton avis.</p>}
+      {fini && !avisDonne && (
+        <p className="pop flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold">
+          Entraide terminée. Dernière étape : ton avis sur {prenomAutre}.
+          {lienAvis && (
+            <a href={lienAvis} className="rounded-ui bg-encre px-3 py-1.5 text-surface hover:bg-encre/85">
+              Laisser mon avis
+            </a>
+          )}
+        </p>
+      )}
+
       {/* Celui qui reçoit : « Bien reçu » une fois livré, ce qui termine l'entraide (et appelle un avis). */}
       {peutConfirmer({ etape, aide }) && (
         <form action={confirmerEntraide.bind(null, demandeId, retour)}>
-          <Bouton className="w-full sm:w-auto">Bien reçu, merci !</Bouton>
+          <BoutonEtape variante="plein" className="w-full sm:w-auto">
+            Bien reçu, merci !
+          </BoutonEtape>
         </form>
       )}
     </section>

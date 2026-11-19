@@ -33,13 +33,14 @@ type Demande = {
   statut: "en_attente" | "acceptee" | "refusee";
   message: string | null;
   cree_le: string;
+  repondu_le: string | null;
   annonce: { id: string; titre: string; type: "propose" | "cherche" } | null;
   demandeur: Personne | null;
   destinataire: Personne | null;
 };
 
 const PERSONNE = "id, prenom, pseudo, campus, avatar_chemin";
-const SELECT = `id, statut, message, cree_le, annonce:annonces(id, titre, type), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`;
+const SELECT = `id, statut, message, cree_le, repondu_le, annonce:annonces(id, titre, type), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`;
 
 const STATUTS = {
   en_attente: <Badge>En attente</Badge>,
@@ -134,11 +135,15 @@ export default async function PageDemandes({
   const avisDonnes = new Set((mesAvis ?? []).map((a) => a.demande_id));
   // Le suivi de chaque échange accepté (0034) : Colette livreuse, puis « Bien reçu ».
   const { data: suivis } = acceptees.length
-    ? await supabase.from("suivis_entraide").select("demande_id, etape, mot").in("demande_id", acceptees)
+    ? await supabase.from("suivis_entraide").select("demande_id, etape, mot, maj_le").in("demande_id", acceptees)
     : { data: [] };
-  const suiviDe = new Map((suivis ?? []).map((x) => [x.demande_id as string, { etape: x.etape as Etape, mot: x.mot as string | null }]));
+  const suiviDe = new Map((suivis ?? []).map((x) => [x.demande_id as string, { etape: x.etape as Etape, mot: x.mot as string | null, maj_le: x.maj_le as string }]));
   const colonne = (d: Demande) => colonneEchange({ statut: d.statut, etape: suiviDe.get(d.id)?.etape ?? null });
-  const terminees = demandes.filter((d) => colonne(d) === "termine");
+  // L'historique : les échanges terminés (« Bien reçu ») et les refusés, du plus récent au plus ancien.
+  const dateFin = (d: Demande) => (colonne(d) === "termine" ? suiviDe.get(d.id)?.maj_le : d.repondu_le) ?? d.cree_le;
+  const historique = demandes
+    .filter((d) => colonne(d) === "termine" || d.statut === "refusee")
+    .sort((a, b) => dateFin(b).localeCompare(dateFin(a)));
 
   // Plusieurs intéressés sur une même annonce : on les regroupe pour comparer (des faits, jamais de coordonnées).
   const { groupes, seules } = grouperParAnnonce(
@@ -296,6 +301,7 @@ export default async function PageDemandes({
         prenomAutre={prenomAutre}
         retour="liste"
         compact
+        avisDonne={avisDonnes.has(d.id)}
       />
     );
   }
@@ -378,12 +384,14 @@ export default async function PageDemandes({
               Discuter avec {autre.prenom}
             </BoutonLien>
             {suivi(d, autre.prenom)}
-            {!avisDonnes.has(d.id) && (
-              <FormulaireAvis
-                demandeId={d.id}
-                retour="/demandes"
-                prenom={autre.prenom}
-              />
+            {/* L'avis se donne surtout à la fin (dans l'Historique) ; ici, replié, pour un échange fini sans suivi. */}
+            {!avisDonnes.has(d.id) && colonne(d) !== "termine" && (
+              <details className="text-sm">
+                <summary className="w-fit cursor-pointer font-semibold text-encre-douce hover:text-encre">Déjà fini ? Laisser un avis</summary>
+                <div className="mt-2">
+                  <FormulaireAvis demandeId={d.id} retour="/demandes" prenom={autre.prenom} />
+                </div>
+              </details>
             )}
           </>
         )}
@@ -402,10 +410,10 @@ export default async function PageDemandes({
         aria-label="Échanges reçus ou envoyés"
       >
         {[
-          { valeur: "recues", label: "Reçues", href: "/demandes" },
+          { valeur: "recues", label: "Reçus", href: "/demandes" },
           {
             valeur: "envoyees",
-            label: "Envoyées",
+            label: "Envoyés",
             href: "/demandes?onglet=envoyees",
           },
         ].map((o) => (
@@ -477,31 +485,50 @@ export default async function PageDemandes({
         </div>
       )}
 
-      {terminees.length > 0 && (
-        <section className="flex flex-col gap-7" aria-label="Terminés">
+      {/* Historique : une ligne par échange fini, pour retrouver qui, quoi, quand, et noter si ce n'est pas fait. */}
+      {historique.length > 0 && (
+        <section className="flex flex-col gap-4" aria-label="Historique">
           <h2 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 border-encre pb-2">
-            <span className="titre-charte text-section whitespace-nowrap">Terminés</span>
-            <span className="titre-charte rounded-[3px] bg-encre px-1.5 pt-0.5 text-sm text-surface">{terminees.length}</span>
-            <span className="ml-auto -rotate-2 font-main text-lg text-encre-douce">bien reçu, merci</span>
+            <span className="titre-charte text-section whitespace-nowrap">Historique</span>
+            <span className="titre-charte rounded-[3px] bg-encre px-1.5 pt-0.5 text-sm text-surface">{historique.length}</span>
+            <span className="ml-auto -rotate-2 font-main text-lg text-encre-douce">
+              {onglet === "recues" ? "ceux qui t'ont contacté" : "ceux que tu as contactés"}
+            </span>
           </h2>
-          <div className="grid items-start gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {terminees.map((d, i) => carte(d, i, "papier-lilas"))}
-          </div>
+          <ul className="flex flex-col gap-2">
+            {historique.map((d) => {
+              const autre = onglet === "recues" ? d.demandeur : d.destinataire;
+              if (!autre) return null;
+              const termine = colonne(d) === "termine";
+              return (
+                <li
+                  key={d.id}
+                  id={`demande-${d.id}`}
+                  className="flex scroll-mt-24 flex-col gap-3 rounded-carte border border-ligne bg-surface px-4 py-3 target:border-encre target:shadow-[3px_3px_0_0_var(--color-bandeau)]"
+                >
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <Link href={`/profils/${autre.pseudo}`} className="flex items-center gap-2 font-semibold hover:underline">
+                      <Avatar chemin={autre.avatar_chemin} nom={autre.pseudo} taille="sm" />@{autre.pseudo}
+                    </Link>
+                    {d.annonce && (
+                      <Link href={`/annonces/${d.annonce.id}`} className="min-w-0 flex-1 truncate text-sm text-encre-douce hover:text-encre hover:underline">
+                        {d.annonce.titre}
+                      </Link>
+                    )}
+                    {termine ? <Badge variante="ok">Bien reçu</Badge> : STATUTS.refusee}
+                    <span className="text-xs text-encre-douce">{dateCourte(dateFin(d))}</span>
+                    {termine && (
+                      <Link href={`/demandes/${d.id}`} className="text-sm font-semibold underline-offset-2 hover:underline">
+                        Revoir la discussion
+                      </Link>
+                    )}
+                  </div>
+                  {termine && !avisDonnes.has(d.id) && <FormulaireAvis demandeId={d.id} retour="/demandes" prenom={autre.prenom} />}
+                </li>
+              );
+            })}
+          </ul>
         </section>
-      )}
-
-      {demandes.some((d) => d.statut === "refusee") && (
-        <details className="group/refus">
-          <summary className="w-fit cursor-pointer list-none text-sm font-semibold text-encre-douce hover:text-encre [&::-webkit-details-marker]:hidden">
-            Voir les demandes refusées (
-            {demandes.filter((d) => d.statut === "refusee").length})
-          </summary>
-          <div className="mt-8 grid gap-8 opacity-75 sm:grid-cols-2 lg:grid-cols-3">
-            {demandes
-              .filter((d) => d.statut === "refusee")
-              .map((d, i) => carte(d, i, "papier-gris"))}
-          </div>
-        </details>
       )}
     </div>
   );

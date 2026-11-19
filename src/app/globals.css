@@ -427,6 +427,29 @@ article[data-annonce]::before {
   animation: reagit 1.8s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
+/* Colette livreuse : elle marche de l'étape d'avant jusqu'à l'étape en cours (petits pas), la barre se
+   remplit derrière elle. --depart et --arrivee sont posées par le composant. */
+@keyframes colette-marche {
+  from { left: var(--depart); }
+  to { left: var(--arrivee); }
+}
+@keyframes colette-pas {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  25% { translate: 0 -7px; rotate: -4deg; }
+  75% { translate: 0 -7px; rotate: 4deg; }
+}
+@keyframes barre-remplit {
+  from { width: var(--depart); }
+  to { width: var(--arrivee); }
+}
+@utility colette-marche {
+  animation: colette-marche 1.8s cubic-bezier(0.45, 0, 0.25, 1) 0.3s both;
+  & > * { animation: colette-pas 0.45s ease-in-out 0.3s 4; }
+}
+@utility barre-remplit {
+  animation: barre-remplit 1.8s cubic-bezier(0.45, 0, 0.25, 1) 0.3s both;
+}
+
 /* La flèche de « Je soutiens » : elle s'écrase, bondit et retombe. */
 @keyframes bond {
   0% { transform: translateY(0) scale(1, 1); }
