@@ -94,7 +94,7 @@ export default async function PageConversation({
       .select("telephone, email, reseau")
       .eq("id", autre.id)
       .maybeSingle<Coordonnees>(),
-    supabase.from("suivis_entraide").select("etape, mot").eq("demande_id", id).maybeSingle<{ etape: Etape; mot: string | null }>(),
+    supabase.from("suivis_entraide").select("etape, mot, maj_le").eq("demande_id", id).maybeSingle<{ etape: Etape; mot: string | null; maj_le: string }>(),
   ]);
   const aide = demande.annonce ? jeSuisAide({ type: demande.annonce.type as "propose" | "cherche", demandeurId: demande.demandeur.id, moi: user.id }) : false;
 
@@ -178,6 +178,7 @@ export default async function PageConversation({
           demandeId={id}
           etape={suivi?.etape ?? null}
           mot={suivi?.mot ?? null}
+          majLe={suivi?.maj_le ?? null}
           aide={aide}
           prenomAutre={enGroupe ? "le groupe" : autre.prenom}
           retour="discussion"

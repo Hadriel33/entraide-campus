@@ -3,6 +3,7 @@
 // La base applique les mêmes règles (fonctions avancer_entraide et confirmer_entraide, migration 0034).
 import type { Accessoire, AnimColette, Humeur } from "@/components/colette/colette";
 import { detecterCoordonnees } from "@/lib/ia/regles";
+import { jourCampus } from "@/lib/temps";
 
 export type Etape = "parti" | "en_cours" | "presque" | "livre" | "recu";
 export const MOT_MAX = 80;
@@ -47,4 +48,20 @@ export function colonneEchange({ statut, etape }: { statut: "en_attente" | "acce
   if (statut === "en_attente") return "a_traiter";
   if (statut === "refusee") return "refusee";
   return etape === "recu" ? "termine" : "en_cours";
+}
+
+/** Le parcours daté d'un échange, pour l'Historique : demandé, accepté (ou refusé), bien reçu. */
+export function etapesDatees(e: {
+  statut: "en_attente" | "acceptee" | "refusee";
+  creeLe: string;
+  reponduLe: string | null;
+  etape: Etape | null;
+  suiviLe: string | null;
+}): { label: string; date: string | null }[] {
+  const jour = (iso: string | null) => (iso ? jourCampus(iso) : null);
+  const liste: { label: string; date: string | null }[] = [{ label: "Demandé", date: jour(e.creeLe) }];
+  if (e.statut === "refusee") liste.push({ label: "Refusé", date: jour(e.reponduLe) });
+  if (e.statut === "acceptee") liste.push({ label: "Accepté", date: jour(e.reponduLe) });
+  if (e.statut === "acceptee" && e.etape === "recu") liste.push({ label: "Bien reçu", date: jour(e.suiviLe) });
+  return liste;
 }

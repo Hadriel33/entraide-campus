@@ -1,5 +1,6 @@
 import { Colette } from "@/components/colette/colette";
 import { BoutonEtape } from "./bouton-etape";
+import { heureCampus } from "@/lib/temps";
 import { avancerEntraide, confirmerEntraide } from "@/app/demandes/actions";
 import { ETAPES, MOT_MAX, RECU, etapesSuivantes, peutConfirmer, rang, type Etape } from "@/lib/echanges/suivi";
 
@@ -17,6 +18,7 @@ export function SuiviColette({
   lienAvis,
   avisDonne = false,
   demo = false,
+  majLe = null,
 }: {
   demandeId: string;
   etape: Etape | null;
@@ -32,6 +34,8 @@ export function SuiviColette({
   avisDonne?: boolean;
   /** Page d'accueil : on montre la barre et Colette seulement (aucun bouton, aucune action). */
   demo?: boolean;
+  /** Date de la dernière étape (affichée « Dernière nouvelle : 19 nov., 14:05 »). */
+  majLe?: string | null;
 }) {
   const r = rang(etape);
   const fini = etape === "recu";
@@ -49,8 +53,9 @@ export function SuiviColette({
     <section aria-label="Suivi de l'entraide" className="@container flex flex-col gap-3 rounded-carte border border-ligne bg-surface/80 p-4">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="titre-charte text-base">Suivi de l&apos;entraide</h3>
-        <span className="text-xs font-semibold text-encre-douce">
+        <span className="flex flex-col items-end text-xs font-semibold text-encre-douce">
           {fini ? "Terminé" : courante ? courante.label : "Pas encore commencé"}
+          {majLe && <span className="font-normal">Dernière nouvelle : {heureCampus(majLe)}</span>}
         </span>
       </div>
 
