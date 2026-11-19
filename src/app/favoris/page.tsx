@@ -20,7 +20,7 @@ export default async function PageFavoris() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-      <TitrePage accroche="Les annonces que tu as gardées de côté. Elles ne sont visibles que par toi.">Favoris</TitrePage>
+      <TitrePage accroche="Les post-its que tu as gardés de côté. Ils ne sont visibles que par toi.">Favoris</TitrePage>
       {annonces.length ? (
         <div className="grid gap-x-6 gap-y-9 pt-3 sm:grid-cols-2 lg:grid-cols-3">
           {annonces.map((a, i) => (
@@ -37,7 +37,7 @@ export default async function PageFavoris() {
             </BoutonLien>
           }
         >
-          Sur une annonce, clique sur le cœur pour la retrouver ici.
+          Sur un post-it, clique sur le cœur pour le retrouver ici.
         </EtatVide>
       )}
     </div>

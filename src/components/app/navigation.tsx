@@ -27,7 +27,7 @@ function groupes(demandesEnAttente: number, estAdmin: boolean): { titre: string;
       titre: "Mes affaires",
       liens: [
         { href: "/demandes", label: "Mes échanges", icone: "demandes", compteur: demandesEnAttente },
-        { href: "/mes-annonces", label: "Mes annonces", icone: "mesAnnonces" },
+        { href: "/mes-annonces", label: "Mes post-its", icone: "mesAnnonces" },
         { href: "/favoris", label: "Favoris", icone: "favoris" },
         ...(estAdmin ? [{ href: "/admin", label: "Admin", icone: "admin" as const }] : []),
       ],
@@ -288,7 +288,7 @@ function OngletsMobile({
     {
       titre: "Mes affaires",
       liens: [
-        { href: "/mes-annonces", label: "Mes annonces", icone: "mesAnnonces" as const },
+        { href: "/mes-annonces", label: "Mes post-its", icone: "mesAnnonces" as const },
         { href: "/favoris", label: "Favoris", icone: "favoris" as const },
         ...(estAdmin ? [{ href: "/admin", label: "Admin", icone: "admin" as const }] : []),
       ],
@@ -328,7 +328,7 @@ function OngletsMobile({
         </Link>
         <Link
           href="/annonces/nouvelle"
-          aria-label="Publier une annonce"
+          aria-label="Publier un post-it"
           className="presse flex flex-1 items-center justify-center"
         >
           <span className="-mt-5 flex size-13 items-center justify-center rounded-full bg-encre text-surface shadow-lg ring-4 ring-papier">

@@ -69,7 +69,7 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
         ]}
       />
 
-      <Section id="photo" titre="Qui je suis" aide="Ce que les autres étudiants voient sur ton profil et tes annonces.">
+      <Section id="photo" titre="Qui je suis" aide="Ce que les autres étudiants voient sur ton profil et tes post-its.">
         <FormulairePhoto apercu={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" colette={profil} />} />
         <div className="border-t border-ligne pt-4">
           <FormulaireIdentite pseudo={profil.pseudo} prenom={profil.prenom} bio={profil.bio ?? ""} />

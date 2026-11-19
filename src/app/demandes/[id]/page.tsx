@@ -100,10 +100,8 @@ export default async function PageConversation({
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
-      <Link
-        href="/demandes"
-        className="text-sm text-encre-douce hover:text-encre"
-      >
+      <Link href="/demandes" className="group/retour inline-flex w-fit items-center gap-1.5 text-sm font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+        <span aria-hidden className="transition-transform group-hover/retour:-translate-x-1">←</span>
         Retour à mes échanges
       </Link>
       {ok === "choisi" && (
@@ -117,7 +115,7 @@ export default async function PageConversation({
             saison={false}
             className="shrink-0"
           />
-          C&apos;est fait : les autres intéressés sont prévenus, et ton annonce
+          C&apos;est fait : les autres intéressés sont prévenus, et ton post-it
           a quitté le tableau. Dis bonjour à {autre.prenom} !
         </p>
       )}

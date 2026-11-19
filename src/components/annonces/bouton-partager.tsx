@@ -31,7 +31,7 @@ export function BoutonPartager({ titre }: { titre: string }) {
       <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13" />
       </svg>
-      <span aria-live="polite">{copie ? "Lien copié" : "Partager"}</span>
+      <span aria-live="polite">{copie ? "Lien copié" : "Envoyer le lien"}</span>
     </button>
   );
 }

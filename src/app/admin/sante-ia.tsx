@@ -19,7 +19,7 @@ export function SanteIA() {
               : "aucune réponse : jeton OIDC ou passerelle",
         },
         {
-          nom: "IA n°2, relecture d'une annonce piégée",
+          nom: "IA n°2, relecture d'un post-it piégé",
           ok: etat.moderation.ok,
           detail: `${etat.moderation.detail} (${etat.moderation.ms} ms)`,
         },
@@ -33,7 +33,7 @@ export function SanteIA() {
           ok: etat.cleServeur,
           detail: etat.cleServeur
             ? "clé serveur présente"
-            : "SUPABASE_SECRET_KEY absente de Vercel : les annonces restent « en attente »",
+            : "SUPABASE_SECRET_KEY absente de Vercel : les post-its restent « en attente »",
         },
         {
           nom: "IA n°3, « Pour moi » intelligent",

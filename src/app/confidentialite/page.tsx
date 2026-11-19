@@ -38,7 +38,7 @@ export default function PageConfidentialite() {
             personnes dont tu acceptes la demande, ou qui acceptent la tienne.
           </li>
           <li>
-            <strong>Ton activité</strong> : annonces, demandes de contact, messages, avis et signalements.
+            <strong>Ton activité</strong> : post-its, demandes de contact, messages, avis et signalements.
           </li>
         </ul>
         <p>Aucune donnée n&apos;est vendue ni utilisée pour de la publicité. Il n&apos;y a ni pisteur publicitaire, ni cookie de mesure d&apos;audience.</p>
@@ -51,7 +51,7 @@ export default function PageConfidentialite() {
           valides chaque compétence avant qu&apos;elle apparaisse sur ton profil.
         </p>
         <p>
-          <strong>Tes annonces</strong> sont relues par une IA de modération (arnaques, contenus inappropriés, coordonnées
+          <strong>Tes post-its</strong> sont relus par une IA de modération (arnaques, contenus inappropriés, coordonnées
           écrites dans le texte). Elle ne supprime rien : un modérateur humain prend toujours la décision.
         </p>
       </Bloc>
@@ -71,7 +71,7 @@ export default function PageConfidentialite() {
         <p>
           Tu peux à tout moment <strong>modifier</strong> tes informations dans « Mon profil » et <strong>supprimer ton compte</strong>{" "}
           (en bas de « Mon profil »). La suppression efface immédiatement et définitivement ton profil, tes coordonnées, ta photo,
-          tes annonces, tes demandes, tes messages et tes avis.
+          tes post-its, tes demandes, tes messages et tes avis.
         </p>
         <p>Cookies : uniquement ceux nécessaires pour rester connecté. Aucun cookie optionnel, donc pas de bandeau.</p>
       </Bloc>

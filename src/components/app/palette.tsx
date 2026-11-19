@@ -9,7 +9,7 @@ const PAGES: Commande[] = [
   { label: "Le tableau", aide: "Toutes les annonces du campus", href: "/annonces" },
   {
     label: "La carte",
-    aide: "Les annonces par quartier et ligne de tram",
+    aide: "Les post-its par quartier et ligne de tram",
     href: "/carte",
   },
   {
@@ -18,7 +18,7 @@ const PAGES: Commande[] = [
     href: "/mur",
   },
   {
-    label: "Publier une annonce",
+    label: "Publier un post-it",
     aide: "Raccourci : n",
     href: "/annonces/nouvelle",
   },
@@ -29,7 +29,7 @@ const PAGES: Commande[] = [
     href: "/notifications",
   },
   {
-    label: "Mes annonces",
+    label: "Mes post-its",
     aide: "Publiées, archivées, prolonger",
     href: "/mes-annonces",
   },
@@ -99,7 +99,7 @@ export function Palette() {
       ? [
           {
             label: `Chercher « ${texte.trim()} »`,
-            aide: "Dans les annonces",
+            aide: "Dans les post-its",
             href: `/annonces?q=${encodeURIComponent(texte.trim())}`,
           },
           ...pages,
@@ -174,7 +174,7 @@ export function Palette() {
               aller(resultats[index].href);
           }}
           placeholder="Aller à une page ou chercher une annonce..."
-          aria-label="Aller à une page ou chercher une annonce"
+          aria-label="Aller à une page ou chercher un post-it"
           className="w-full border-b border-ligne px-4 py-3.5 text-base outline-none"
         />
         <ul className="max-h-80 overflow-y-auto p-1.5" role="listbox">

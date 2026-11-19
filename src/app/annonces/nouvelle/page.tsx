@@ -5,7 +5,7 @@ import { creerAnnonce } from "../actions";
 import { TYPES } from "@/lib/annonces/validation";
 import { exigerSession } from "@/lib/session";
 
-export const metadata: Metadata = { title: "Publier une annonce" };
+export const metadata: Metadata = { title: "Publier un post-it" };
 
 export default async function PageNouvelleAnnonce({ searchParams }: PageProps<"/annonces/nouvelle">) {
   const brut = await searchParams;
@@ -15,8 +15,8 @@ export default async function PageNouvelleAnnonce({ searchParams }: PageProps<"/
   if (typeof brut.titre === "string") initial.titre = brut.titre.slice(0, 80);
   return (
     <div className="flex w-full max-w-2xl flex-col gap-8">
-      <TitrePage accroche="Ce que tu sais faire, ou ce dont tu as besoin. Ton annonce est visible par les étudiants connectés.">
-        Publier une annonce
+      <TitrePage accroche="Ce que tu sais faire, ou ce dont tu as besoin. Ton post-it est visible par les étudiants connectés.">
+        Publier un post-it
       </TitrePage>
       <AssistantRedaction action={creerAnnonce} initial={initial} campus={profil.campus} />
     </div>

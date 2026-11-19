@@ -107,7 +107,7 @@ export async function TableauImpact({
   const e = s.entonnoir;
   const etapes = [
     { label: "Inscrits", n: e.inscrits },
-    { label: "Ont publié une annonce", n: e.ont_publie },
+    { label: "Ont publié un post-it", n: e.ont_publie },
     { label: "Ont demandé un contact", n: e.ont_demande },
     { label: "Ont été mis en relation", n: e.en_relation },
     { label: "Ont laissé un avis", n: e.ont_note },
@@ -207,7 +207,7 @@ export async function TableauImpact({
             </span>
           </p>
           {s.categories.length === 0 && (
-            <p className="text-sm text-encre-douce">Aucune annonce en cours.</p>
+            <p className="text-sm text-encre-douce">Aucun post-it en cours.</p>
           )}
           <ul className="flex flex-col gap-3">
             {s.categories.map((c) => (

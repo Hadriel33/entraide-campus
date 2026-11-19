@@ -104,7 +104,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
           {[
             { label: "personnes aidées", valeur: s.aides_donnees, teinte: "teinte-bandeau" },
             { label: "coups de main reçus", valeur: s.aides_recues, teinte: "teinte-lilas" },
-            { label: "annonces publiées", valeur: s.annonces, teinte: "teinte-ciel" },
+            { label: "post-its publiés", valeur: s.annonces, teinte: "teinte-ciel" },
             { label: "entraides avec une autre formation", valeur: s.croisements, teinte: "teinte-ocre" },
           ].map((t, i) => (
             <div key={t.label} className={`apparition couche-fixe ${t.teinte} flex flex-col-reverse rounded-carte border border-ligne bg-surface p-4`} style={{ "--i": i } as React.CSSProperties}>
@@ -126,7 +126,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
             ))}
           </div>
         ) : (
-          <p className="text-sm text-encre-douce">Aucune annonce en cours.</p>
+          <p className="text-sm text-encre-douce">Aucun post-it en cours.</p>
         )}
       </section>
 

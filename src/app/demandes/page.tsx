@@ -247,7 +247,7 @@ export default async function PageDemandes({
                       {g.demandes.length - 1 === 1
                         ? "L'autre personne intéressée sera prévenue"
                         : `Les ${g.demandes.length - 1} autres personnes intéressées seront prévenues`}{" "}
-                      que c&apos;est pris, et ton annonce quittera le tableau.
+                      que c&apos;est pris, et ton post-it quittera le tableau.
                       Ce n&apos;est pas annulable.
                     </p>
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -283,7 +283,7 @@ export default async function PageDemandes({
         </ul>
         <p className="text-xs text-encre-douce">
           « Je choisis » accepte cette personne, prévient les autres et retire
-          l&apos;annonce du tableau. « Accepter aussi » garde l&apos;annonce
+          le post-it du tableau. « Accepter aussi » garde le post-it
           ouverte (covoit ou coloc à plusieurs).
         </p>
       </article>
@@ -443,8 +443,8 @@ export default async function PageDemandes({
           }
         >
           {onglet === "recues"
-            ? "Quand quelqu'un voudra te contacter pour une de tes annonces, sa demande sera punaisée ici."
-            : "Trouve une annonce qui t'intéresse et clique sur « Demander le contact »."}
+            ? "Quand quelqu'un voudra te contacter pour un de tes post-its, sa demande sera punaisée ici."
+            : "Trouve un post-it qui t'intéresse et clique sur « Demander le contact »."}
         </EtatVide>
       )}
 

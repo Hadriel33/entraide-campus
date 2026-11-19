@@ -39,7 +39,7 @@ test("publier une annonce, la voir sur le tableau, puis la supprimer", async ({
       .fill(
         "Annonce publiée par le robot de test pour vérifier l'appli. Elle est supprimée dans les secondes qui suivent.",
       );
-    await formulaire.getByRole("button", { name: "Publier l'annonce" }).click();
+    await formulaire.getByRole("button", { name: "Publier le post-it" }).click();
 
     await expect(page).toHaveURL(/\/annonces\/[0-9a-f-]{36}\?ok=publiee/, {
       timeout: 20_000,
@@ -94,7 +94,7 @@ test("publier un prêt de matériel avec photo, la voir, puis tout supprimer", a
     await formulaire.locator("input[name='photo']").setInputFiles("e2e/fixtures/appareil-photo.png");
     // L'aperçu s'affiche avant même l'envoi.
     await expect(formulaire.getByAltText("Aperçu de la photo")).toBeVisible();
-    await formulaire.getByRole("button", { name: "Publier l'annonce" }).click();
+    await formulaire.getByRole("button", { name: "Publier le post-it" }).click();
 
     await expect(page).toHaveURL(/\/annonces\/[0-9a-f-]{36}\?ok=publiee/, { timeout: 30_000 });
     adresse = page.url().split("?")[0];
