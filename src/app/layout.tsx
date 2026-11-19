@@ -42,23 +42,17 @@ function PiedDePage() {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const { supabase, user, profil } = await getSession();
-  const { count: enAttente } = user
-    ? await supabase
-        .from("demandes_contact")
-        .select("id", { count: "exact", head: true })
-        .eq("destinataire_id", user.id)
-        .eq("statut", "en_attente")
-    : { count: 0 };
-  const { count: nonLues } = user
-    ? await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("lu", false)
-    : { count: 0 };
-  // La bulle de Colette : messages privés non lus, et le nom de ma classe pour son salon.
-  const [{ count: messagesNonLus }, { data: classe }] = user && profil
-    ? await Promise.all([
-        supabase.from("notifications").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("lu", false).eq("type", "message"),
-        profil.classe_id ? supabase.from("classes").select("id, nom").eq("id", profil.classe_id).maybeSingle() : Promise.resolve({ data: null }),
-      ])
-    : [{ count: 0 }, { data: null }];
+  // Les compteurs du menu et de la bulle de Colette, lus EN PARALLÈLE (avant : trois allers-retours à la suite,
+  // sur chaque page ; retour de test du 19/11 « c'est long les chargements »).
+  const [{ count: enAttente }, { count: nonLues }, { count: messagesNonLus }, { data: classe }] =
+    user && profil
+      ? await Promise.all([
+          supabase.from("demandes_contact").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("statut", "en_attente"),
+          supabase.from("notifications").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("lu", false),
+          supabase.from("notifications").select("id", { count: "exact", head: true }).eq("destinataire_id", user.id).eq("lu", false).eq("type", "message"),
+          profil.classe_id ? supabase.from("classes").select("id, nom").eq("id", profil.classe_id).maybeSingle() : Promise.resolve({ data: null }),
+        ])
+      : [{ count: 0 }, { count: 0 }, { count: 0 }, { data: null }];
 
   return (
     <html lang="fr" className={`${archivo.variable} ${dmSans.variable} ${sourceSerif.variable} ${kalam.variable} h-full antialiased`} suppressHydrationWarning>

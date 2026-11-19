@@ -85,6 +85,7 @@ export default async function PageBureau() {
     { data: profils },
     { data: classes },
     etat,
+    { data: monDefi },
   ] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
     supabase
@@ -108,7 +109,7 @@ export default async function PageBureau() {
       )
       .eq("statut", "acceptee")
       .order("repondu_le", { ascending: false })
-      .limit(3),
+      .limit(6),
     supabase
       .from("annonces")
       .select(SELECT_ANNONCE)
@@ -121,6 +122,7 @@ export default async function PageBureau() {
     supabase.from("profils").select("id, classe_id"),
     supabase.from("classes").select("id, nom, campus").eq("validee", true).eq("campus", profil.campus),
     lireEtatAccueil(supabase, profil),
+    supabase.rpc("mon_defi"),
   ]);
 
   const p = stats ? calculerProgression(stats as Stats) : null;
@@ -209,7 +211,6 @@ export default async function PageBureau() {
   const nbAttente = aFaire.length;
 
   // Ce que Colette dit cette semaine
-  const { data: monDefi } = await supabase.rpc("mon_defi");
   const defi = defiDeLaSemaine();
   const progressionDefi = (monDefi ?? {}) as {
     progression?: number;

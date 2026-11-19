@@ -87,20 +87,21 @@ body {
 }
 
 /* ============ Mode « tableau noir » ============
-   Le fond devient une ardoise verte, le texte de la craie. Les post-it, Colette et les bandeaux
-   restent des papiers clairs (on remet les jetons clairs à l'intérieur) : ils ressortent sur le tableau. */
+   Un vrai noir (anthracite), le texte en craie. Retour de test du 19/11 : l'ancienne ardoise verte ne faisait
+   pas « noir ». Les post-it, Colette et les bandeaux restent des papiers clairs (jetons clairs remis à
+   l'intérieur) : ils ressortent sur le tableau. */
 :root[data-theme="noir"] {
   color-scheme: dark;
-  --color-papier: #25322c;
-  --color-surface: #2f3e37;
-  --color-papier-fonce: #2a3832;
+  --color-papier: #141414;
+  --color-surface: #1f1f1f;
+  --color-papier-fonce: #2a2a2a;
   --color-encre: #f2f0e6;
-  --color-encre-douce: #c2c8bf;
-  --color-ligne: #435549;
-  --color-ligne-forte: #5c6f64;
+  --color-encre-douce: #b9b7ae;
+  --color-ligne: #333333;
+  --color-ligne-forte: #4a4a4a;
   --color-alerte: #ff9a8f;
   --color-ok: #9fe0b9;
-  --color-ok-fond: #2b4a3b;
+  --color-ok-fond: #1f3a2c;
 }
 :root[data-theme="noir"] body {
   background-image:
