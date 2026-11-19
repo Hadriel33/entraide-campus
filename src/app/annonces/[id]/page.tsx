@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ViewTransition } from "react";
+import { ViewTransition, cache } from "react";
 import { notFound } from "next/navigation";
 import { getSession } from "@/lib/session";
 import {
@@ -47,7 +47,8 @@ import { equipeAcceptee, libelleEquipe } from "@/lib/annonces/groupe";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-async function lireAnnonce(id: string) {
+// Lu une seule fois par requête (titre de l'onglet et page partagent le résultat).
+const lireAnnonce = cache(async (id: string) => {
   if (!UUID.test(id)) return null;
   const { supabase } = await getSession();
   const { data } = await supabase
@@ -56,7 +57,7 @@ async function lireAnnonce(id: string) {
     .eq("id", id)
     .maybeSingle();
   return data as unknown as Annonce | null;
-}
+});
 
 export async function generateMetadata({
   params,
@@ -84,64 +85,54 @@ export default async function PageAnnonce({
   const equipe = equipeAcceptee(annonce.membres);
   const estEquipe = estAuteur || (!!user && (annonce.membres ?? []).some((m) => m.membre_id === user.id && m.statut === "accepte"));
   const prenom = annonce.auteur?.prenom ?? "l'auteur";
-  // Résultat de la modération IA, montré à l'auteur seulement.
-  const { data: moderation } = estEquipe
-    ? await supabase.from("annonces").select("moderation, moderation_raisons, moderation_suggestion").eq("id", annonce.id).maybeSingle()
-    : { data: null };
-
-  // Ma demande sur cette annonce (s'il y en a une), et ce qui en découle.
-  const { data: demande } = estEquipe
-    ? { data: null }
-    : await supabase
-        .from("demandes_contact")
-        .select("id, statut, destinataire_id, destinataire:profils!demandes_contact_destinataire_id_fkey(prenom)")
-        .eq("annonce_id", annonce.id)
-        .eq("demandeur_id", user!.id)
-        .maybeSingle();
-  // Les coordonnées ne sont demandées QUE si la demande est acceptée ; sinon la RLS ne les renverrait de toute façon pas.
-  const { data: coordonnees } =
-    demande?.statut === "acceptee"
-      ? await supabase
-          .from("coordonnees")
-          .select("telephone, email, reseau")
-          .eq("id", demande.destinataire_id) // dans un groupe : celui qui a accepté, et lui seul
-          .maybeSingle<Coordonnees>()
-      : { data: null };
-  const { data: favori } = estEquipe
-    ? { data: null }
-    : await supabase
-        .from("favoris")
-        .select("annonce_id")
-        .eq("profil_id", user!.id)
-        .eq("annonce_id", annonce.id)
-        .maybeSingle();
-  const jours = joursRestants(annonce.expire_le);
-  const prenomContact = (demande?.destinataire as unknown as { prenom: string } | null)?.prenom ?? prenom;
-  const { data: monAvis } =
-    demande?.statut === "acceptee"
-      ? await supabase
-          .from("avis")
-          .select("id")
-          .eq("demande_id", demande.id)
-          .eq("auteur_id", user!.id)
-          .maybeSingle()
-      : { data: null };
-
-  // Le côté réseau social : réactions et commentaires sous l'annonce (jamais de coordonnées, la base y veille).
-  const social = user ? await chargerSocial(supabase, "annonce", [annonce.id], user.id) : null;
-  const { data: moi } = user ? await supabase.from("profils").select("role").eq("id", user.id).maybeSingle() : { data: null };
-  // « Partager dans… » (0033) : mes salons et mes discussions (la RLS ne renvoie que les miennes).
-  const [{ data: maClasse }, { data: mesDiscussions }] = user
-    ? await Promise.all([
-        profil?.classe_id ? supabase.from("classes").select("id, nom").eq("id", profil.classe_id).maybeSingle() : Promise.resolve({ data: null }),
-        supabase
+  // Tout ce qui ne dépend que du post-it et de moi, lu EN PARALLÈLE (avant : sept requêtes l'une après l'autre).
+  const [
+    { data: moderation },
+    { data: demande },
+    { data: favori },
+    social,
+    { data: maClasse },
+    { data: mesDiscussions },
+  ] = await Promise.all([
+    // Résultat de la modération IA, montré à l'équipe seulement.
+    estEquipe
+      ? supabase.from("annonces").select("moderation, moderation_raisons, moderation_suggestion").eq("id", annonce.id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    // Ma demande sur ce post-it (s'il y en a une).
+    estEquipe || !user
+      ? Promise.resolve({ data: null })
+      : supabase
+          .from("demandes_contact")
+          .select("id, statut, destinataire_id, destinataire:profils!demandes_contact_destinataire_id_fkey(prenom)")
+          .eq("annonce_id", annonce.id)
+          .eq("demandeur_id", user.id)
+          .maybeSingle(),
+    estEquipe || !user
+      ? Promise.resolve({ data: null })
+      : supabase.from("favoris").select("annonce_id").eq("profil_id", user.id).eq("annonce_id", annonce.id).maybeSingle(),
+    // Le côté réseau social : réactions et commentaires (jamais de coordonnées, la base y veille).
+    user ? chargerSocial(supabase, "annonce", [annonce.id], user.id) : Promise.resolve(null),
+    // « Partager dans… » (0033) : mes salons et mes discussions (la RLS ne renvoie que les miennes).
+    user && profil?.classe_id ? supabase.from("classes").select("id, nom").eq("id", profil.classe_id).maybeSingle() : Promise.resolve({ data: null }),
+    user
+      ? supabase
           .from("demandes_contact")
           .select("id, annonce:annonces(titre), demandeur:profils!demandes_contact_demandeur_id_fkey(id, pseudo), destinataire:profils!demandes_contact_destinataire_id_fkey(id, pseudo)")
           .eq("statut", "acceptee")
           .order("repondu_le", { ascending: false })
-          .limit(20),
-      ])
-    : [{ data: null }, { data: null }];
+          .limit(20)
+      : Promise.resolve({ data: null }),
+  ]);
+  const jours = joursRestants(annonce.expire_le);
+  const prenomContact = (demande?.destinataire as unknown as { prenom: string } | null)?.prenom ?? prenom;
+  // Demande acceptée seulement : les coordonnées (la RLS ne les renverrait pas sinon) et mon avis, ensemble.
+  const [{ data: coordonnees }, { data: monAvis }] =
+    demande?.statut === "acceptee" && user
+      ? await Promise.all([
+          supabase.from("coordonnees").select("telephone, email, reseau").eq("id", demande.destinataire_id).maybeSingle<Coordonnees>(),
+          supabase.from("avis").select("id").eq("demande_id", demande.id).eq("auteur_id", user.id).maybeSingle(),
+        ])
+      : [{ data: null }, { data: null }];
   const salonsPartage = profil ? tousLesSalons({ campus: profil.campus, classe: maClasse ?? null }) : [];
   const discussionsPartage = ((mesDiscussions ?? []) as unknown as { id: string; annonce: { titre: string } | null; demandeur: { id: string; pseudo: string } | null; destinataire: { id: string; pseudo: string } | null }[]).map((d) => {
     const autre = d.demandeur?.id === user?.id ? d.destinataire : d.demandeur;
@@ -432,7 +423,7 @@ export default async function PageAnnonce({
             id={annonce.id}
             liste={social.commentaires.get(annonce.id) ?? []}
             moi={user.id}
-            estAdmin={moi?.role === "admin"}
+            estAdmin={profil?.role === "admin"}
             ouvert
           />
         </section>

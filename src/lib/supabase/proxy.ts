@@ -26,9 +26,11 @@ export async function mettreAJourSession(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims vérifie la signature du jeton localement (clé asymétrique ES256 du projet, JWKS mis en cache) et
+  // rafraîchit la session si besoin : plus d'aller-retour au serveur d'authentification à chaque requête
+  // (recommandation officielle de Supabase pour protéger les pages). La RLS revérifie le jeton en base.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const chemin = request.nextUrl.pathname;
   if (!user && PAGES_PROTEGEES.some((p) => chemin === p || chemin.startsWith(`${p}/`))) {

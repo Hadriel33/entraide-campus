@@ -89,14 +89,13 @@ export default async function PageDemandes({
     (await searchParams).onglet === "envoyees" ? "envoyees" : "recues";
 
   // Reçues : celles qui me sont adressées, et celles des post-its de groupe dont je fais partie (créateur ou membre).
-  const { data: mesGroupes } =
+  const [{ data: mesGroupes }, { data: mesCreations }] =
     onglet === "recues"
-      ? await supabase.from("annonce_membres").select("annonce_id").eq("membre_id", user.id).eq("statut", "accepte")
-      : { data: [] };
-  const { data: mesCreations } =
-    onglet === "recues"
-      ? await supabase.from("annonce_membres").select("annonce_id, annonce:annonces!inner(auteur_id)").eq("annonce.auteur_id", user.id).eq("statut", "accepte")
-      : { data: [] };
+      ? await Promise.all([
+          supabase.from("annonce_membres").select("annonce_id").eq("membre_id", user.id).eq("statut", "accepte"),
+          supabase.from("annonce_membres").select("annonce_id, annonce:annonces!inner(auteur_id)").eq("annonce.auteur_id", user.id).eq("statut", "accepte"),
+        ])
+      : [{ data: [] }, { data: [] }];
   const equipes = [...new Set([...(mesGroupes ?? []), ...(mesCreations ?? [])].map((g) => g.annonce_id))];
   let requete = supabase.from("demandes_contact").select(SELECT).order("cree_le", { ascending: false });
   requete =

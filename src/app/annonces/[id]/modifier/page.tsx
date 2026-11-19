@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { FormulaireAnnonce } from "@/components/annonces/formulaire-annonce";
 import { TitrePage } from "@/components/ui/titre-page";
 import { changerStatut, modifierAnnonce, prolongerAnnonce, supprimerAnnonce } from "../../actions";
@@ -14,10 +13,7 @@ export const metadata: Metadata = { title: "Modifier le post-it" };
 
 export default async function PageModifierAnnonce({ params }: PageProps<"/annonces/[id]/modifier">) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user, profil } = await getSession();
   const { data: annonce } = await supabase
     .from("annonces")
     .select("id, auteur_id, type, categorie, titre, description, contrepartie, lieu, quartier, tram, photo_chemin, statut, expire_le")
@@ -49,7 +45,7 @@ export default async function PageModifierAnnonce({ params }: PageProps<"/annonc
         initial={{ ...annonce, lieu: annonce.lieu ?? "", quartier: annonce.quartier ?? "", tram: annonce.tram ?? "" }}
         libelle="Enregistrer"
         annulerVers={`/annonces/${annonce.id}`}
-        campus={(await getSession()).profil?.campus}
+        campus={profil?.campus}
         photoActuelle={urlPhotoAnnonce(annonce.photo_chemin)}
       />
 

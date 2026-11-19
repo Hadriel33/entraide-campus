@@ -26,11 +26,10 @@ export async function createClient() {
   );
 }
 
-// Utilisateur courant, vérifié auprès de Supabase (jamais déduit d'un paramètre de requête).
+// Utilisateur courant, d'après le jeton vérifié (signature et expiration, via getClaims), jamais déduit d'un
+// paramètre de requête.
 export async function getUtilisateur() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+  const { data } = await supabase.auth.getClaims();
+  return data?.claims ? { id: data.claims.sub, email: (data.claims.email as string | undefined) ?? null } : null;
 }
