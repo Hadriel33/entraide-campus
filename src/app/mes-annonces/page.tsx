@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
+import { exigerSession } from "@/lib/session";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { BoutonLien } from "@/components/ui/bouton";
@@ -11,11 +10,7 @@ import { EtatVide } from "@/components/colette/etat-vide";
 export const metadata: Metadata = { title: "Mes post-its" };
 
 export default async function PageMesAnnonces() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/connexion");
+  const { supabase, user } = await exigerSession();
 
   const { data } = await supabase.from("annonces").select(SELECT_ANNONCE).eq("auteur_id", user.id).order("cree_le", { ascending: false });
   const annonces = (data ?? []) as unknown as Annonce[];

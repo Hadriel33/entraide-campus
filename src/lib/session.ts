@@ -20,13 +20,17 @@ export type ProfilSession = {
   fil_public: boolean;
 };
 
+export type UtilisateurSession = { id: string; email: string | null };
+
 // Utilisateur et profil courants, lus une seule fois par requête (cache React).
-// L'identité vient toujours de supabase.auth.getUser(), jamais d'un paramètre.
+// L'identité vient du jeton vérifié par getClaims (signature ES256 vérifiée localement, expiration comprise),
+// jamais d'un paramètre. Avant : getUser, un aller-retour au serveur d'authentification sur chaque page.
 export const getSession = cache(async () => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const user: UtilisateurSession | null = data?.claims
+    ? { id: data.claims.sub, email: (data.claims.email as string | undefined) ?? null }
+    : null;
   if (!user) return { supabase, user: null, profil: null };
   const { data: profil } = await supabase
     .from("profils")
