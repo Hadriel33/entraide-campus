@@ -486,7 +486,7 @@ export default async function PageDemandes({
       )}
 
       {/* Historique : une ligne par échange fini, pour retrouver qui, quoi, quand, et noter si ce n'est pas fait. */}
-      {historique.length > 0 && (
+      {demandes.length > 0 && (
         <section className="flex flex-col gap-4" aria-label="Historique">
           <h2 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 border-encre pb-2">
             <span className="titre-charte text-section whitespace-nowrap">Historique</span>
@@ -495,6 +495,11 @@ export default async function PageDemandes({
               {onglet === "recues" ? "ceux qui t'ont contacté" : "ceux que tu as contactés"}
             </span>
           </h2>
+          {historique.length === 0 && (
+            <p className="font-main text-lg text-encre-douce">
+              Rien pour l&apos;instant. Un échange arrive ici quand la personne aidée confirme « Bien reçu » (ou s&apos;il est refusé).
+            </p>
+          )}
           <ul className="flex flex-col gap-2">
             {historique.map((d) => {
               const autre = onglet === "recues" ? d.demandeur : d.destinataire;
