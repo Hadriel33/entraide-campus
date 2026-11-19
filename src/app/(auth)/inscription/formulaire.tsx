@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { inscrire, type EtatFormulaire } from "../actions";
+import { inscrire, renvoyerConfirmation, type EtatFormulaire } from "../actions";
+import { Colette } from "@/components/colette/colette";
 import { Champ } from "@/components/ui/champ";
 import { Bouton } from "@/components/ui/bouton";
 import { CAMPUS } from "@/lib/auth/validation";
@@ -10,13 +11,7 @@ import { CAMPUS } from "@/lib/auth/validation";
 export function FormulaireInscription() {
   const [etat, action, enCours] = useActionState<EtatFormulaire, FormData>(inscrire, {});
 
-  if (etat.succes) {
-    return (
-      <p role="status" className="rounded-ui bg-papier-fonce p-4">
-        {etat.message}
-      </p>
-    );
-  }
+  if (etat.succes) return <RegardeTesMails email={etat.email ?? ""} />;
 
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
@@ -57,5 +52,42 @@ export function FormulaireInscription() {
         Déjà un compte ? <Link href="/connexion" className="underline">Se connecter</Link>
       </p>
     </form>
+  );
+}
+
+// Après l'inscription : Colette est partie poster le lien. On dit quoi faire, et on peut le renvoyer.
+function RegardeTesMails({ email }: { email: string }) {
+  const [renvoi, renvoyer, enCours] = useActionState<EtatFormulaire, FormData>(renvoyerConfirmation, {});
+  return (
+    <div role="status" className="pop flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        {/* Un rond blanc derrière Colette : jaune sur post-it jaune, on ne la voyait pas. */}
+        <span className="flex size-24 shrink-0 items-center justify-center rounded-full bg-surface ring-2 ring-encre">
+          <Colette anim="coucou" humeur="contente" accessoire="bob" saison={false} taille={80} titre="Colette part poster ton lien" />
+        </span>
+        <div className="flex flex-col gap-1">
+          <strong className="titre-charte text-2xl leading-none">Regarde tes mails</strong>
+          <span className="font-main text-lg leading-snug text-encre-douce">Colette a posté ton lien de confirmation.</span>
+        </div>
+      </div>
+      <p className="rounded-ui bg-surface/70 px-3 py-2 text-sm">
+        Envoyé à <strong className="break-all">{email}</strong>
+      </p>
+      <ol className="flex flex-col gap-1.5 text-sm">
+        <li><strong>1.</strong> Ouvre le mail « Post-it campus ».</li>
+        <li><strong>2.</strong> Clique sur « Je confirme mon adresse ».</li>
+        <li><strong>3.</strong> Tu arrives sur ton bureau : c&apos;est parti.</li>
+      </ol>
+      <p className="text-xs text-encre-douce">
+        Rien après 2 minutes ? Regarde dans les spams. Le lien sert à prouver que l&apos;adresse de l&apos;école est bien la tienne.
+      </p>
+      <form action={renvoyer} className="flex flex-wrap items-center gap-3">
+        <input type="hidden" name="email" value={email} />
+        <Bouton variante="contour" disabled={enCours} className="text-sm">
+          {enCours ? "Colette y retourne..." : "Renvoyer le mail"}
+        </Bouton>
+        {renvoi.message && <span className={`text-sm ${renvoi.succes ? "text-ok" : "text-alerte"}`}>{renvoi.message}</span>}
+      </form>
+    </div>
   );
 }

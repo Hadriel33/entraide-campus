@@ -1,0 +1,40 @@
+<!-- Post-it campus : modèle d'email Supabase (confirmation d'inscription). À coller dans Supabase > Authentication > Emails > Templates > Confirm signup.
+     Sujet : Confirme ton adresse, Colette t'attend
+     Le lien passe par /auth/confirmer avec token_hash : il marche même si le mail est ouvert sur un autre appareil. -->
+<!doctype html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#fafaf8;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fafaf8;padding:32px 12px;font-family:Helvetica,Arial,sans-serif;color:#111111;">
+  <tr><td align="center">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+      <tr><td style="padding:0 0 16px 4px;font-size:15px;font-weight:bold;letter-spacing:0.5px;">
+        <span style="display:inline-block;background:#fcf08f;border:2px solid #111111;border-radius:6px;padding:2px 8px;font-weight:900;">P</span>
+        &nbsp;POST-IT <span style="color:#b91217;font-style:italic;font-weight:bold;">campus</span>
+      </td></tr>
+      <tr><td style="background:#ffffff;border:2px solid #111111;border-radius:6px;box-shadow:6px 6px 0 #f3e54a;padding:28px 28px 32px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+          <tr><td align="center" style="padding-bottom:8px;">
+            <img src="https://entraide-campus.vercel.app/mail/colette-confirmation.png" width="150" height="165" alt="Colette, la mascotte de Post-it campus" style="display:block;border:0;">
+          </td></tr>
+          <tr><td align="center" style="font-size:28px;line-height:1.1;font-weight:900;text-transform:uppercase;letter-spacing:-0.5px;padding-bottom:6px;">
+            <span style="background:#f3e54a;padding:2px 8px;">Plus qu'un clic</span>
+          </td></tr>
+          <tr><td align="center" style="font-size:17px;line-height:1.5;padding:10px 4px 22px;">Salut ! Tu viens de créer ton compte sur Post-it campus.<br>Confirme que cette adresse de l'école est bien la tienne, et ton bureau t'attend.</td></tr>
+          <tr><td align="center" style="padding-bottom:22px;">
+            <a href="{{ .SiteURL }}/auth/confirmer?token_hash={{ .TokenHash }}&type=email" style="display:inline-block;background:#111111;color:#ffffff;text-decoration:none;font-weight:bold;font-size:17px;padding:14px 26px;border-radius:8px;box-shadow:3px 3px 0 #f3e54a;border:2px solid #111111;">Je confirme mon adresse</a>
+          </td></tr>
+          <tr><td align="center" style="font-size:13px;line-height:1.5;color:#5a5a5a;">
+            Le bouton ne marche pas ? Copie ce lien dans ton navigateur :<br>
+            <a href="{{ .SiteURL }}/auth/confirmer?token_hash={{ .TokenHash }}&type=email" style="color:#5a5a5a;word-break:break-all;">{{ .SiteURL }}/auth/confirmer?token_hash={{ .TokenHash }}&type=email</a>
+          </td></tr>
+        </table>
+      </td></tr>
+      <tr><td style="padding:22px 6px 0;font-size:13px;line-height:1.5;color:#5a5a5a;text-align:center;">
+        Tu n'as pas créé de compte ? Ignore ce mail : sans clic, rien ne se passe.<br>
+        Post-it campus, l'entraide entre étudiants. Projet étudiant (module Vibe Coding, M2 Data).
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
