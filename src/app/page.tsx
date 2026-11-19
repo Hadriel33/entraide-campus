@@ -136,10 +136,6 @@ export default async function Home() {
             <span className="titre-charte text-titre">Suis ton entraide</span>
             <span className="-rotate-2 font-main text-2xl text-encre-douce">comme un colis, avec Colette</span>
           </h2>
-          <p className="font-serif text-xl leading-relaxed text-encre/80">
-            Celui qui aide dit où il en est : c&apos;est parti, je m&apos;y mets, presque fini, c&apos;est livré. L&apos;autre est prévenu à chaque étape, puis
-            confirme « Bien reçu ». L&apos;échange rejoint ton historique, et chacun laisse un avis.
-          </p>
         </div>
         <div className="revele postit papier-ciel p-5 pt-7" style={{ "--rot": "1deg" } as React.CSSProperties}>
           <span className="punaise" aria-hidden />
