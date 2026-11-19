@@ -62,7 +62,7 @@ export async function generateMetadata({
   params,
 }: PageProps<"/annonces/[id]">): Promise<Metadata> {
   const annonce = await lireAnnonce((await params).id);
-  return { title: annonce?.titre ?? "Annonce introuvable" };
+  return { title: annonce?.titre ?? "Post-it introuvable" };
 }
 
 export default async function PageAnnonce({
@@ -150,11 +150,9 @@ export default async function PageAnnonce({
 
   return (
     <article className="apparition flex w-full max-w-2xl flex-col gap-8">
-      <Link
-        href="/annonces"
-        className="text-sm text-encre-douce hover:text-encre"
-      >
-        Retour aux annonces
+      <Link href="/annonces" className="group/retour inline-flex w-fit items-center gap-1.5 text-sm font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+        <span aria-hidden className="transition-transform group-hover/retour:-translate-x-1">←</span>
+        Retour au tableau
       </Link>
       {/* L'annonce en grand post-it, décollé du mur. */}
       <div
@@ -192,8 +190,16 @@ export default async function PageAnnonce({
             {annonce.titre}
           </h1>
         </ViewTransition>
+        {/* Le contexte d'un coup d'œil : où, quand, combien de temps encore. */}
+        <ul className="-mt-1 flex flex-wrap items-center gap-2 text-sm font-semibold" aria-label="Contexte du post-it">
+          {annonce.quartier && <li className="rounded-full bg-surface/80 px-3 py-1">Où : {QUARTIERS[annonce.quartier]}{annonce.lieu ? `, ${annonce.lieu}` : ""}</li>}
+          {!annonce.quartier && annonce.lieu && <li className="rounded-full bg-surface/80 px-3 py-1">Où : {annonce.lieu}</li>}
+          {annonce.tram && <li className="rounded-full bg-encre px-3 py-1 text-surface">Tram {annonce.tram}</li>}
+          <li className="rounded-full bg-surface/80 px-3 py-1">Publié le {dateCourte(annonce.cree_le)}</li>
+          {annonce.statut === "publiee" && jours > 0 && <li className="rounded-full bg-surface/80 px-3 py-1">Encore {jours} jour{jours > 1 ? "s" : ""}</li>}
+        </ul>
         {annonce.photo_chemin && (
-          <div className="relative aspect-[4/3] overflow-hidden rounded-ui border border-encre/15">
+          <div className="relative h-56 overflow-hidden rounded-ui border border-encre/15 sm:h-72">
             <Image src={urlPhotoAnnonce(annonce.photo_chemin)!} alt={`Photo du post-it « ${annonce.titre} »`} fill priority sizes="(min-width: 768px) 640px, 100vw" className="object-cover" />
           </div>
         )}
@@ -213,7 +219,7 @@ export default async function PageAnnonce({
               <BadgeCampus campus={annonce.auteur?.campus} />
             </p>
             <p className="text-sm text-encre-douce">
-              {prenom} · publiée le {dateCourte(annonce.cree_le)}
+              {prenom}
             </p>
           </div>
         </Link>
@@ -237,14 +243,19 @@ export default async function PageAnnonce({
         </p>
       </div>
 
-      {/* La barre sociale tout de suite sous le post-it : soutenir, réagir. */}
-      {social && user && (
-        <div className="-mt-3 flex flex-wrap items-center gap-3">
-          <BoutonSoutien grand annonceId={annonce.id} resume={social.soutiens.get(annonce.id) ?? { n: 0, moi: false }} proprietaire={estEquipe} />
-          <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estEquipe} />
-        </div>
-      )}
-
+      {/* Une seule ligne d'actions : soutenir et réagir à gauche, garder et partager à droite. */}
+      <div className="-mt-3 flex flex-wrap items-center gap-2">
+        {social && user && (
+          <>
+            <BoutonSoutien grand annonceId={annonce.id} resume={social.soutiens.get(annonce.id) ?? { n: 0, moi: false }} proprietaire={estEquipe} />
+            <Reactions cible="annonce" id={annonce.id} resume={social.reactions.get(annonce.id)!} proprietaire={estEquipe} />
+          </>
+        )}
+        <span className="grow" aria-hidden />
+        {!estEquipe && <BoutonFavori annonceId={annonce.id} favori={!!favori} />}
+        {user && annonce.statut === "publiee" && <PartagerDans annonceId={annonce.id} salons={salonsPartage} discussions={discussionsPartage} ouvertAuDepart={partagerOuvert} />}
+        <BoutonPartager titre={annonce.titre} />
+      </div>
 
       {/* IA n°2 : ce que Colette a remarqué, et sa proposition de correction (l'auteur décide). */}
       {estEquipe && moderation?.moderation_suggestion && (
@@ -280,7 +291,7 @@ export default async function PageAnnonce({
             </BoutonLien>
           </div>
           <p className="text-xs text-encre-douce">
-            En attendant, ton annonce est cachée aux autres étudiants (seuls toi et l&apos;admin la voyez). Rien ne change sans ton accord, et un modérateur
+            En attendant, ton post-it est caché aux autres étudiants (seuls toi et l&apos;admin le voyez). Rien ne change sans ton accord, et un modérateur
             humain garde le dernier mot.
           </p>
         </section>
@@ -301,7 +312,7 @@ export default async function PageAnnonce({
         <div role="status" className="flex items-center gap-4 rounded-carte bg-postit-lilas p-4 text-sm">
           <Colette anim="tampon" taille={80} className="shrink-0" />
           <p>
-            <strong className="block font-main text-xl">Colette relit ton annonce</strong>
+            <strong className="block font-main text-xl">Colette relit ton post-it</strong>
             Elle n&apos;est pas visible des autres étudiants pour le moment. Un modérateur va la relire rapidement.
           </p>
         </div>
@@ -310,10 +321,16 @@ export default async function PageAnnonce({
       {user && <EquipePostit annonce={annonce} moi={user.id} estAuteur={estAuteur} />}
 
       {estEquipe ? (
-        <div className="flex flex-wrap gap-3 border-t border-ligne pt-6">
+        <section className="flex flex-wrap items-center gap-3 rounded-carte border border-ligne bg-surface p-4" aria-label="Gérer mon post-it">
+          <h2 className="w-full font-semibold">Gérer mon post-it</h2>
           <BoutonLien href={`/annonces/${annonce.id}/modifier`}>
             Modifier
           </BoutonLien>
+          {estAuteur && annonce.statut === "publiee" && jours <= 7 && (
+            <form action={prolongerAnnonce.bind(null, annonce.id)}>
+              <Bouton variante="contour">{jours === 0 ? "Remettre en ligne" : "Prolonger"}</Bouton>
+            </form>
+          )}
           {estAuteur && annonce.statut !== "masquee" && (
             <form
               action={changerStatut.bind(
@@ -332,7 +349,7 @@ export default async function PageAnnonce({
               <Bouton variante="danger">Supprimer</Bouton>
             </form>
           )}
-        </div>
+        </section>
       ) : (
         <section
           className="flex flex-col gap-3 rounded-carte border border-ligne bg-surface p-4"
@@ -376,7 +393,7 @@ export default async function PageAnnonce({
           {demande?.statut === "refusee" && (
             <p className="flex items-center gap-2 text-sm text-encre-douce">
               <Badge>Refusée</Badge> {prenom} a décliné ta demande. Pas de
-              souci, d&apos;autres annonces t&apos;attendent.
+              souci, d&apos;autres post-its t&apos;attendent.
             </p>
           )}
 
@@ -405,64 +422,25 @@ export default async function PageAnnonce({
         </section>
       )}
 
-      <dl className="divide-y divide-ligne rounded-carte border border-ligne bg-surface text-sm">
-        <div className="flex justify-between gap-4 px-4 py-3">
-          <dt className="text-encre-douce">Contrepartie</dt>
-          <dd className="font-medium">{CONTREPARTIES[annonce.contrepartie]}</dd>
-        </div>
-        {annonce.quartier && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Quartier</dt>
-            <dd className="font-medium">{QUARTIERS[annonce.quartier]}</dd>
-          </div>
-        )}
-        {annonce.tram && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Tram</dt>
-            <dd>
-              <span className="rounded-ui bg-encre px-2 py-0.5 text-sm font-semibold text-surface">
-                Ligne {annonce.tram}
-              </span>
-            </dd>
-          </div>
-        )}
-        {annonce.lieu && (
-          <div className="flex justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Lieu</dt>
-            <dd className="font-medium">{annonce.lieu}</dd>
-          </div>
-        )}
-        {estEquipe && annonce.statut === "publiee" && (
-          <div className="flex items-center justify-between gap-4 px-4 py-3">
-            <dt className="text-encre-douce">Visibilité</dt>
-            <dd className="flex items-center gap-3 font-medium">
-              {jours === 0
-                ? "Expirée, invisible dans la liste"
-                : `Encore ${jours} jour${jours > 1 ? "s" : ""}`}
-              {estAuteur && jours <= 7 && (
-                <form action={prolongerAnnonce.bind(null, annonce.id)}>
-                  <Bouton variante="contour" className="min-h-8 px-2.5 text-sm">
-                    Prolonger
-                  </Bouton>
-                </form>
-              )}
-            </dd>
-          </div>
-        )}
-      </dl>
 
-      <div className="flex flex-wrap gap-2">
-        {!estEquipe && (
-          <BoutonFavori annonceId={annonce.id} favori={!!favori} />
-        )}
-        <BoutonPartager titre={annonce.titre} />
-      </div>
-      {user && annonce.statut === "publiee" && <PartagerDans annonceId={annonce.id} salons={salonsPartage} discussions={discussionsPartage} ouvertAuDepart={partagerOuvert} />}
 
+      {social && user && (
+        <section id="commentaires" className="flex scroll-mt-6 flex-col gap-3 border-t border-ligne pt-6">
+          <h2 className="titre-charte text-section">Commentaires</h2>
+          <Commentaires
+            cible="annonce"
+            id={annonce.id}
+            liste={social.commentaires.get(annonce.id) ?? []}
+            moi={user.id}
+            estAdmin={moi?.role === "admin"}
+            ouvert
+          />
+        </section>
+      )}
       {!estEquipe && (
         <details className="text-sm">
           <summary className="cursor-pointer text-encre-douce hover:text-encre">
-            Signaler cette annonce
+            Signaler ce post-it
           </summary>
           <form
             action={signalerAnnonce.bind(null, annonce.id)}
@@ -480,7 +458,7 @@ export default async function PageAnnonce({
               <option value="arnaque">Arnaque ou demande d&apos;argent</option>
               <option value="inapproprie">Contenu inapproprié</option>
               <option value="coordonnees">
-                Coordonnées écrites dans l&apos;annonce
+                Coordonnées écrites dans le post-it
               </option>
               <option value="hors_sujet">Hors sujet</option>
               <option value="autre">Autre</option>
@@ -497,19 +475,6 @@ export default async function PageAnnonce({
             </Bouton>
           </form>
         </details>
-      )}
-      {social && user && (
-        <section id="commentaires" className="flex scroll-mt-6 flex-col gap-3 border-t border-ligne pt-6">
-          <h2 className="titre-charte text-section">Commentaires</h2>
-          <Commentaires
-            cible="annonce"
-            id={annonce.id}
-            liste={social.commentaires.get(annonce.id) ?? []}
-            moi={user.id}
-            estAdmin={moi?.role === "admin"}
-            ouvert
-          />
-        </section>
       )}
     </article>
   );

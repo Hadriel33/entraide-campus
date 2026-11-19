@@ -26,3 +26,17 @@ export function decouperMentions(texte: string): Morceau[] {
   if (fin < texte.length) morceaux.push({ texte: texte.slice(fin) });
   return morceaux;
 }
+
+// Suggestion de pseudos : le « @debut » en cours de frappe juste avant le curseur (pas un email, pas fini).
+export function mentionEnCours(texte: string, curseur: number): { debut: number; prefixe: string } | null {
+  const avant = texte.slice(0, curseur);
+  const m = /(^|[^a-z0-9._@])@([a-z0-9._]{0,20})$/i.exec(avant);
+  if (!m) return null;
+  return { debut: m.index + m[1].length, prefixe: m[2].toLowerCase() };
+}
+
+// Remplace « @debut » par « @pseudo » suivi d'une espace, et donne la nouvelle place du curseur.
+export function insererMention(texte: string, debut: number, curseur: number, pseudo: string) {
+  const insertion = `@${pseudo} `;
+  return { texte: texte.slice(0, debut) + insertion + texte.slice(curseur), curseur: debut + insertion.length };
+}

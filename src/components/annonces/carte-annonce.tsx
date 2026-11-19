@@ -66,8 +66,8 @@ export function CarteAnnonce({
   const photo = urlPhotoAnnonce(annonce.photo_chemin);
   // La photo du post-it (0031) : vignette sous l'en-tête ; dans le polaroid, elle remplit le cadre.
   const vignette = photo && (
-    <div className={`relative overflow-hidden rounded-[3px] ${f === "polaroid" ? "-mx-1 aspect-square" : "aspect-[4/3]"}`}>
-      <Image src={photo} alt="" fill sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw" className="object-cover" />
+    <div className={`relative overflow-hidden rounded-[3px] ${f === "polaroid" ? "-mx-1 h-36" : "h-28"}`}>
+      <Image src={photo} alt="" fill sizes="(min-width: 1024px) 22vw, (min-width: 640px) 40vw, 80vw" className="object-cover" />
     </div>
   );
 

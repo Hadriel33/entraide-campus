@@ -86,7 +86,16 @@ export async function analyserCV(_: EtatCV, formData: FormData): Promise<EtatCV>
   if (propositions.length === 0) {
     return { propositions, message: "Aucune compétence trouvée dans ce document. Ajoute-les à la main." };
   }
-  return { propositions, message: "Voici ce que l'IA propose. Décoche ce qui ne te correspond pas, ajoute ce qui manque, puis enregistre." };
+  return { propositions, message: "Voici ce que Colette propose : clique sur celles qui te correspondent pour les garder." };
+}
+
+// Enregistrement automatique (retour de test du 19/11 : trop de boutons « Enregistrer »). Chaque ajout ou retrait
+// fait par l'étudiant est gardé ; les propositions de l'IA, elles, attendent toujours son clic (« Garder »).
+export async function sauverCompetences(competences: string[]): Promise<{ ok: boolean }> {
+  const { supabase, user } = await exigerSession();
+  const { error } = await supabase.from("profils").update({ competences: nettoyerCompetences(competences) }).eq("id", user.id);
+  revalidatePath("/compte");
+  return { ok: !error };
 }
 
 // Rien n'est enregistré sans le clic de l'étudiant : c'est lui qui valide la liste finale.
@@ -125,6 +134,17 @@ export async function enregistrerColette(formData: FormData) {
   if (error) redirect("/compte?erreur=verrouille#colette");
   revalidatePath("/", "layout");
   redirect("/compte?ok=colette#colette");
+}
+
+// Ma Colette, enregistrée à chaque choix (sans recharger la page). La base refuse toujours une pièce verrouillée.
+export async function sauverColette(formData: FormData): Promise<{ ok: boolean; verrouille?: boolean }> {
+  const { supabase, user } = await exigerSession();
+  const choix = validerColette(Object.fromEntries(formData));
+  if (!choix) return { ok: false };
+  const { error } = await supabase.from("profils").update(choix).eq("id", user.id);
+  if (error) return { ok: false, verrouille: true };
+  revalidatePath("/", "layout");
+  return { ok: true };
 }
 
 export async function choisirClasse(formData: FormData) {

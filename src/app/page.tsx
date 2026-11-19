@@ -37,7 +37,7 @@ export default async function Home() {
               Cherche
             </span>
             <span className="apparition titre-charte couche-fixe teinte-ocre ml-12 bg-ciel px-3 pt-1.5 text-affiche sm:ml-22" style={{ "--i": 4 } as React.CSSProperties}>
-              Entraide-toi
+              Entraide
             </span>
           </h1>
           <p className="max-w-xl font-serif text-xl leading-snug text-encre/80 sm:text-[1.4rem]">

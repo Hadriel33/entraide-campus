@@ -90,8 +90,8 @@ export function calculerProgression(s: Stats) {
   const badges: Badge[] = [
     badge(
       "premiere_annonce",
-      "Première annonce",
-      "Publier une annonce",
+      "Premier post-it",
+      "Publier un post-it",
       s.annonces,
       1,
       "Publie un post-it : ce que tu sais faire, ou ce que tu cherches.",

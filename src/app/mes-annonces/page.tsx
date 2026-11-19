@@ -8,7 +8,7 @@ import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { EtatVide } from "@/components/colette/etat-vide";
 
-export const metadata: Metadata = { title: "Mes annonces" };
+export const metadata: Metadata = { title: "Mes post-its" };
 
 export default async function PageMesAnnonces() {
   const supabase = await createClient();
@@ -32,8 +32,8 @@ export default async function PageMesAnnonces() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <TitrePage accroche="Tes annonces publiées et archivées.">Mes annonces</TitrePage>
-        <BoutonLien href="/annonces/nouvelle">Publier une annonce</BoutonLien>
+        <TitrePage accroche="Tes post-its publiés et archivés.">Mes post-its</TitrePage>
+        <BoutonLien href="/annonces/nouvelle">Publier un post-it</BoutonLien>
       </div>
       {invitations.length > 0 && (
         <section className="pop flex flex-col gap-4 rounded-carte border-2 border-encre bg-bandeau p-5 shadow-[4px_4px_0_0_var(--color-encre)]">

@@ -20,7 +20,7 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: "/apple-icon", sizes: "180x180", type: "image/png" },
     ],
     shortcuts: [
-      { name: "Publier une annonce", url: "/annonces/nouvelle" },
+      { name: "Publier un post-it", url: "/annonces/nouvelle" },
       { name: "Mes demandes", url: "/demandes" },
       { name: "Le tableau en direct", url: "/mur" },
     ],

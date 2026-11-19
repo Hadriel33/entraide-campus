@@ -6,7 +6,6 @@ import { BadgeCampus } from "@/components/ui/badge";
 import { Section, Sommaire } from "@/components/ui/section";
 import { TitrePage } from "@/components/ui/titre-page";
 import { BoutonTheme } from "@/components/app/theme";
-import { FormulaireCoordonnees } from "../compte/formulaires";
 import { ZoneSensible } from "../compte/zone-sensible";
 import { basculerFil } from "../compte/actions";
 
@@ -14,8 +13,7 @@ export const metadata: Metadata = { title: "Réglages" };
 
 // Les réglages : tout ce qui n'est pas « qui je suis » (ça, c'est Mon profil).
 export default async function PageReglages() {
-  const { supabase, user, profil } = await exigerSession();
-  const { data: coordonnees } = await supabase.from("coordonnees").select("telephone, email, reseau").eq("id", user.id).single();
+  const { user, profil } = await exigerSession();
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -30,20 +28,19 @@ export default async function PageReglages() {
       </TitrePage>
       <Sommaire
         liens={[
-          { href: "#coordonnees", label: "Coordonnées" },
           { href: "#fil", label: "Confidentialité" },
           { href: "#apparence", label: "Apparence" },
           { href: "#compte", label: "Compte" },
         ]}
       />
 
-      <Section
-        id="coordonnees"
-        titre="Mes coordonnées"
-        aide="Cachées par défaut. Seules les personnes dont tu acceptes la demande (ou qui acceptent la tienne) peuvent les voir."
-      >
-        <FormulaireCoordonnees telephone={coordonnees?.telephone ?? ""} email={coordonnees?.email ?? ""} reseau={coordonnees?.reseau ?? ""} />
-      </Section>
+      <p className="rounded-carte border border-ligne bg-surface px-5 py-4 text-sm">
+        Tes coordonnées sont maintenant dans{" "}
+        <Link href="/compte#coordonnees" className="font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+          Mon profil, étape 3
+        </Link>
+        .
+      </p>
 
       <Section id="fil" titre="Apparaître dans le fil" aide="Le fil montre « @lea a aidé @tom ». Une entraide n'y apparaît que si les deux personnes ont dit oui. Jamais de message ni de coordonnées.">
         <form action={basculerFil} className="flex flex-wrap items-center gap-3">

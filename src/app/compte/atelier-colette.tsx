@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Colette, type Accessoire, type CouleurColette, type Humeur, type Motif } from "@/components/colette/colette";
-import { Bouton } from "@/components/ui/bouton";
 import { ACCESSOIRES_COLETTE, COULEURS_COLETTE, HUMEURS_COLETTE, MOTIFS_COLETTE, estDebloque } from "@/lib/profils/colette";
 import type { Stats } from "@/lib/gamification/progression";
-import { enregistrerColette } from "./actions";
+import { sauverColette } from "./actions";
 
 const PASTILLE: Record<string, string> = { jaune: "bg-postit-jaune", lilas: "bg-postit-lilas", ciel: "bg-postit-ciel", ocre: "bg-postit-ocre" };
 
@@ -79,13 +78,35 @@ export function AtelierColette({
   const [a, setA] = useState(accessoire || "aucun");
   const [m, setM] = useState(motif || "uni");
   const [survol, setSurvol] = useState<string | null>(null);
+  // Enregistrée à chaque choix (500 ms après le dernier clic), sans recharger la page ni bouton à cliquer.
+  const [enregistrement, demarrer] = useTransition();
+  const [statut, setStatut] = useState<"" | "ok" | "verrouille" | "erreur">("");
+  const premier = useRef(true);
+  useEffect(() => {
+    if (premier.current) {
+      premier.current = false;
+      return;
+    }
+    const t = window.setTimeout(() => {
+      const fd = new FormData();
+      fd.set("couleur", c);
+      fd.set("humeur", h);
+      fd.set("accessoire", a);
+      fd.set("motif", m);
+      demarrer(async () => {
+        const r = await sauverColette(fd);
+        setStatut(r.ok ? "ok" : r.verrouille ? "verrouille" : "erreur");
+      });
+    }, 500);
+    return () => window.clearTimeout(t);
+  }, [c, h, a, m]);
 
   const debloques = Object.values(ACCESSOIRES_COLETTE).filter((o) => o.condition && estDebloque(o, stats)).length + Object.values(MOTIFS_COLETTE).filter((o) => o.condition && estDebloque(o, stats)).length;
   const aGagner = Object.values(ACCESSOIRES_COLETTE).filter((o) => o.condition).length + Object.values(MOTIFS_COLETTE).filter((o) => o.condition).length;
 
 
   return (
-    <form action={enregistrerColette} className="grid items-start gap-6 sm:grid-cols-[200px_minmax(0,1fr)]">
+    <div className="grid items-start gap-6 sm:grid-cols-[200px_minmax(0,1fr)]">
       <div className="flex flex-col items-center gap-3 sm:sticky sm:top-6">
         <div className="flex w-full justify-center rounded-carte bg-papier-fonce pt-6 pb-4">
           <Colette
@@ -139,8 +160,18 @@ export function AtelierColette({
           <Choix groupe="motif" liste={MOTIFS_COLETTE} valeur={m} changer={setM} stats={stats} indice={setSurvol} />
         </fieldset>
         <p className="text-xs text-encre-douce">Les pièces avec un cadenas se gagnent en s&apos;entraidant, en commentant ou en revenant chaque semaine. Passe la souris dessus pour savoir comment.</p>
-        <Bouton className="self-start">Garder cette Colette</Bouton>
+        <p className="text-sm font-semibold" aria-live="polite">
+          {enregistrement
+            ? "Enregistrement..."
+            : statut === "ok"
+              ? "Ta Colette est à jour partout (profil, post-its, menu)."
+              : statut === "verrouille"
+                ? "Cette pièce n'est pas encore débloquée : le cadenas te dit comment la gagner."
+                : statut === "erreur"
+                  ? "Pas enregistré, réessaie."
+                  : "Chaque choix est enregistré tout de suite."}
+        </p>
       </div>
-    </form>
+    </div>
   );
 }

@@ -1,9 +1,24 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { Bouton } from "@/components/ui/bouton";
+import { useActionState, useRef, useState } from "react";
 import { Champ } from "@/components/ui/champ";
 import { changerPhoto, enregistrerCoordonnees, enregistrerProfil, type EtatProfil } from "./actions";
+
+// Enregistrer en quittant le formulaire, seulement si quelque chose a changé (plus de bouton « Enregistrer »).
+function useAutoEnregistrement() {
+  const modifie = useRef(false);
+  const enregistrerSiModifie = (e: React.FocusEvent<HTMLFormElement>) => {
+    // On reste dans le formulaire (passage d'un champ à l'autre) : on attend la sortie.
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+    if (!modifie.current) return;
+    modifie.current = false;
+    e.currentTarget.requestSubmit();
+  };
+  const marquer = () => {
+    modifie.current = true;
+  };
+  return { marquer, enregistrerSiModifie };
+}
 
 function Message({ etat }: { etat: EtatProfil }) {
   return etat.message ? (
@@ -15,9 +30,10 @@ function Message({ etat }: { etat: EtatProfil }) {
 
 export function FormulaireIdentite({ pseudo, prenom, bio }: { pseudo: string; prenom: string; bio: string }) {
   const [etat, action, enCours] = useActionState<EtatProfil, FormData>(enregistrerProfil, {});
+  const { marquer, enregistrerSiModifie } = useAutoEnregistrement();
   const [texte, setTexte] = useState(bio);
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
+    <form action={action} onChange={marquer} onBlur={enregistrerSiModifie} className="flex flex-col gap-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <Champ label="Pseudo" name="pseudo" defaultValue={pseudo} erreur={etat.erreurs?.pseudo} aide="Visible par tous, par exemple sam.photo" />
         <Champ label="Prénom" name="prenom" defaultValue={prenom} erreur={etat.erreurs?.prenom} />
@@ -36,9 +52,7 @@ export function FormulaireIdentite({ pseudo, prenom, bio }: { pseudo: string; pr
         <span className="text-xs font-normal text-encre-douce">{texte.length} / 160</span>
       </label>
       <Message etat={etat} />
-      <Bouton className="self-start" disabled={enCours}>
-        {enCours ? "Enregistrement..." : "Enregistrer"}
-      </Bouton>
+      <p className="text-xs text-encre-douce" aria-live="polite">{enCours ? "Enregistrement..." : "Enregistré automatiquement quand tu quittes un champ."}</p>
     </form>
   );
 }
@@ -66,6 +80,8 @@ export function FormulairePhoto({ apercu }: { apercu: React.ReactNode }) {
             onChange={(e) => {
               const f = e.target.files?.[0];
               setNouvelle(f ? URL.createObjectURL(f) : null);
+              // Enregistrée tout de suite (plus de bouton « Enregistrer la photo »).
+              if (f) e.currentTarget.form?.requestSubmit();
             }}
           />
         </label>
@@ -73,19 +89,16 @@ export function FormulairePhoto({ apercu }: { apercu: React.ReactNode }) {
         {etat.erreurs?.photo && <span className="text-sm text-alerte">{etat.erreurs.photo}</span>}
         <Message etat={etat} />
       </div>
-      {nouvelle && (
-        <Bouton disabled={enCours} className="pop">
-          {enCours ? "Envoi..." : "Enregistrer la photo"}
-        </Bouton>
-      )}
+      {enCours && <span className="pop text-sm font-semibold" role="status">Envoi de la photo...</span>}
     </form>
   );
 }
 
 export function FormulaireCoordonnees({ telephone, email, reseau }: { telephone: string; email: string; reseau: string }) {
   const [etat, action, enCours] = useActionState<EtatProfil, FormData>(enregistrerCoordonnees, {});
+  const { marquer, enregistrerSiModifie } = useAutoEnregistrement();
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
+    <form action={action} onChange={marquer} onBlur={enregistrerSiModifie} className="flex flex-col gap-4" noValidate>
       <div className="grid gap-4 sm:grid-cols-2">
         <Champ label="Téléphone" name="telephone" type="tel" defaultValue={telephone} erreur={etat.erreurs?.telephone} autoComplete="tel" />
         <Champ label="Email de contact" name="email" type="email" defaultValue={email} erreur={etat.erreurs?.email} autoComplete="email" />
@@ -93,9 +106,7 @@ export function FormulaireCoordonnees({ telephone, email, reseau }: { telephone:
       <Champ label="Réseau (facultatif)" name="reseau" defaultValue={reseau} erreur={etat.erreurs?.reseau} aide="Instagram, LinkedIn, Discord..." />
       {etat.erreurs?.general && <p className="text-sm text-alerte">{etat.erreurs.general}</p>}
       <Message etat={etat} />
-      <Bouton className="self-start" disabled={enCours}>
-        {enCours ? "Enregistrement..." : "Enregistrer mes coordonnées"}
-      </Bouton>
+      <p className="text-xs text-encre-douce" aria-live="polite">{enCours ? "Enregistrement..." : "Enregistré automatiquement quand tu quittes un champ."}</p>
     </form>
   );
 }

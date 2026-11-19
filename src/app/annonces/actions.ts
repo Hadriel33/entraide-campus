@@ -107,7 +107,7 @@ export async function modifierAnnonce(id: string, _: EtatAnnonce, formData: Form
     .select("id");
   if (error || !data?.length) {
     if (photo.chemin) await supabase.storage.from("annonces").remove([photo.chemin]);
-    return { message: "Modification impossible : cette annonce n'existe pas, ou tu n'es pas dans son équipe.", valeurs: champs };
+    return { message: "Modification impossible : ce post-it n'existe pas, ou tu n'es pas dans son équipe.", valeurs: champs };
   }
   // L'ancienne photo part (le bucket ne laisse supprimer que dans son propre dossier : sinon elle reste, sans lien).
   if (avant?.photo_chemin && avant.photo_chemin !== finale) await supabase.storage.from("annonces").remove([avant.photo_chemin]);

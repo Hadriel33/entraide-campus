@@ -7,7 +7,6 @@ import { MiniPostit, SELECT_MINI, type MiniAnnonce } from "@/components/annonces
 import { Bouton } from "@/components/ui/bouton";
 import { Colette } from "@/components/colette/colette";
 import { STICKERS, contenuSticker, stickerDe } from "@/lib/messages/stickers";
-import type { Suggestion } from "@/lib/messages/brise-glace";
 
 export type Message = {
   id: string;
@@ -27,8 +26,8 @@ export function Conversation({
   moi,
   initiaux,
   prenomAutre,
-  suggestions = [],
   noms,
+  debut,
 }: {
   demandeId: string;
   moi: string;
@@ -36,14 +35,14 @@ export function Conversation({
   prenomAutre: string;
   /** Discussion de groupe : le pseudo de chaque participant, affiché au-dessus de ses messages. */
   noms?: Record<string, string>;
-  suggestions?: Suggestion[];
+  /** Le début de l'histoire, en tête du fil : la demande (avec son petit mot) puis l'acceptation. */
+  debut?: { demandeur: string; message: string | null; demandeLe: string; accepteur: string; accepteLe: string | null };
 }) {
   const [messages, setMessages] = useState<Message[]>(initiaux);
   const [texte, setTexte] = useState("");
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [planche, setPlanche] = useState(false);
-  const [idees, setIdees] = useState(false);
   const fil = useRef<HTMLOListElement>(null);
 
   useEffect(() => {
@@ -120,9 +119,22 @@ export function Conversation({
     <div className="flex flex-col gap-3">
       <ol
         ref={fil}
-        className="flex max-h-[60dvh] min-h-48 flex-col gap-2 overflow-y-auto rounded-carte border border-ligne bg-surface p-4"
+        className="flex max-h-[65dvh] min-h-72 flex-col gap-3 overflow-y-auto rounded-carte border border-ligne bg-surface p-4 sm:p-5"
         aria-live="polite"
       >
+        {debut && (
+          <li className="flex flex-col items-center gap-2 border-b border-dashed border-ligne pb-3 text-center text-sm text-encre-douce">
+            <span>
+              <strong className="text-encre">@{debut.demandeur}</strong> a demandé le contact · {heure(debut.demandeLe)}
+            </span>
+            {debut.message && <span className="max-w-md rounded-carte bg-postit-jaune px-4 py-2 font-main text-lg leading-snug text-encre">« {debut.message} »</span>}
+            {debut.accepteLe && (
+              <span className="rounded-full bg-ok-fond px-3 py-1 text-xs font-semibold text-ok">
+                @{debut.accepteur} a accepté · {heure(debut.accepteLe)} : vos coordonnées sont visibles
+              </span>
+            )}
+          </li>
+        )}
         {messages.length === 0 && (
           <li className="m-auto max-w-xs text-center text-sm text-encre-douce">
             Pas encore de message. Dis bonjour à {prenomAutre} et proposez un
@@ -135,7 +147,7 @@ export function Conversation({
           return (
             <li
               key={m.id}
-              className={`pop flex max-w-[80%] flex-col gap-0.5 ${deMoi ? "self-end items-end" : "self-start items-start"}`}
+              className={`pop flex max-w-[85%] flex-col gap-1 ${deMoi ? "self-end items-end" : "self-start items-start"}`}
             >
               {noms && !deMoi && <span className="px-1 text-xs font-bold text-encre-douce">@{noms[m.auteur_id] ?? "?"}</span>}
               {sticker ? (
@@ -160,7 +172,7 @@ export function Conversation({
                 </p>
               ) : (
                 <p
-                  className={`rounded-carte px-3.5 py-2 text-[15px] whitespace-pre-line ${deMoi ? "bg-encre text-surface" : "bg-papier-fonce"}`}
+                  className={`rounded-carte px-4 py-2.5 text-base leading-snug whitespace-pre-line ${deMoi ? "bg-encre text-surface" : "bg-papier-fonce"}`}
                 >
                   {m.contenu}
                 </p>
@@ -173,33 +185,6 @@ export function Conversation({
           );
         })}
       </ol>
-
-      {/* Colette souffle une première phrase (tant que je n'ai rien écrit, ou à la demande). */}
-      {suggestions.length > 0 &&
-        (idees || !messages.some((m) => m.auteur_id === moi)) && (
-          <div className="pop flex flex-col gap-2 rounded-carte border border-dashed border-ligne-forte bg-surface p-3">
-            <p className="flex items-center gap-2 font-main text-lg">
-              <Colette anim="reflechit" taille={36} saison={false} />
-              Colette te souffle :
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map((s) => (
-                <button
-                  key={s.ton}
-                  type="button"
-                  onClick={() => {
-                    setTexte(s.texte);
-                    setIdees(false);
-                    document.getElementById("message")?.focus();
-                  }}
-                  className={`presse rounded-ui px-3 py-1.5 text-left text-sm hover:-translate-y-0.5 ${s.ton === "blague" ? "bg-postit-jaune" : s.ton === "sympa" ? "bg-postit-lilas" : "bg-postit-ciel"}`}
-                >
-                  {s.texte}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
       {planche && (
         <div
@@ -269,18 +254,6 @@ export function Conversation({
           placeholder={`Écris à ${prenomAutre}... (Entrée pour envoyer)`}
           className="min-h-12 flex-1 resize-none rounded-ui border border-ligne-forte bg-surface px-3 py-2 outline-none focus:border-encre"
         />
-        {suggestions.length > 0 &&
-          messages.some((m) => m.auteur_id === moi) && (
-            <button
-              type="button"
-              onClick={() => setIdees((v) => !v)}
-              aria-pressed={idees}
-              title="Une idée de phrase ?"
-              className="presse hidden min-h-12 shrink-0 rounded-ui border border-ligne-forte bg-surface px-2.5 text-sm font-semibold hover:border-encre sm:block"
-            >
-              Une idée ?
-            </button>
-          )}
         <Bouton disabled={envoi || !texte.trim()}>
           {envoi ? "..." : "Envoyer"}
         </Bouton>

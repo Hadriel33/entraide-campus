@@ -28,7 +28,7 @@ export function PartagerDans({
       <button
         type="button"
         onClick={() => setOuvert(true)}
-        className="presse inline-flex min-h-11 items-center gap-2 rounded-ui border border-ligne-forte bg-surface px-4 font-semibold hover:border-encre"
+        className="presse inline-flex min-h-10 items-center gap-2 rounded-ui border border-ligne-forte bg-surface px-3 text-sm font-semibold hover:border-encre"
       >
         <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
@@ -38,7 +38,7 @@ export function PartagerDans({
     );
 
   return (
-    <form id="partager" action={partager} className="pop flex w-full scroll-mt-24 flex-col gap-3 rounded-carte border border-encre bg-surface p-4 shadow-[3px_3px_0_0_var(--color-bandeau)]">
+    <form id="partager" action={partager} className="pop flex w-full basis-full scroll-mt-24 flex-col gap-3 rounded-carte border border-encre bg-surface p-4 shadow-[3px_3px_0_0_var(--color-bandeau)]">
       <input type="hidden" name="annonce" value={annonceId} />
       <div className="flex items-baseline justify-between gap-2">
         <strong className="titre-charte text-lg">Partager ce post-it</strong>

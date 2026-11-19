@@ -11,6 +11,7 @@ import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { TableauImpact } from "./impact";
 import { SanteIA } from "./sante-ia";
+import { CoutIA } from "./cout-ia";
 import { MOTIFS_SIGNALEMENT } from "@/lib/social/signalement";
 import {
   traiterSignalementMessage,
@@ -30,7 +31,7 @@ export const metadata: Metadata = { title: "Admin" };
 const MOTIFS: Record<string, string> = {
   arnaque: "Arnaque",
   inapproprie: "Inapproprié",
-  coordonnees: "Coordonnées dans l'annonce",
+  coordonnees: "Coordonnées dans le post-it",
   hors_sujet: "Hors sujet",
   autre: "Autre",
 };
@@ -144,7 +145,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <TitrePage accroche="Modération des annonces, signalements et rôles. Chaque action est vérifiée par la base.">
+      <TitrePage accroche="Modération des post-its, signalements et rôles. Chaque action est vérifiée par la base.">
         Admin
       </TitrePage>
 
@@ -152,10 +153,10 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           {[
             { label: "étudiants inscrits", valeur: s.etudiants },
-            { label: "annonces publiées", valeur: s.annonces },
+            { label: "post-its publiés", valeur: s.annonces },
             { label: "mises en relation", valeur: s.mises_en_relation },
             {
-              label: "annonces à modérer",
+              label: "post-its à modérer",
               valeur: s.a_moderer,
               alerte: s.a_moderer > 0,
             },
@@ -217,6 +218,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
       {onglet === "impact" ? (
         <>
           <SanteIA />
+          <CoutIA supabase={supabase} />
           <TableauImpact supabase={supabase} />
         </>
       ) : onglet === "moderation" ? (
@@ -355,7 +357,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
                           )}
                         >
                           <Bouton variante="danger">
-                            Masquer l&apos;annonce
+                            Masquer le post-it
                           </Bouton>
                         </form>
                       )}

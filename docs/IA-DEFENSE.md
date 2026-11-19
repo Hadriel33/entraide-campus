@@ -77,6 +77,11 @@ L'étudiant décrit son idée en une phrase, Colette remplit tout le formulaire 
 - **Modèles de secours** : si Gemini 2.5 Flash ne répond pas, la passerelle essaie un modèle plus léger puis un autre fournisseur ; « Tester maintenant » affiche la vraie cause d'une panne.
 - **L'IA propose, des règles fixes vérifient** (`src/lib/ia/regles.ts`, 18 tests) : les règles ne peuvent que rendre la décision plus stricte, jamais plus laxiste.
 
+## Le coût des IA, suivi et plafonné (ajouté le 19/11)
+- Chaque appel est noté par le serveur : quelle IA, quel modèle a vraiment répondu (secours compris), tokens en entrée et en sortie, coût estimé d'après les tarifs publics (table `ia_usages`, migration 0035).
+- Un **plafond total** en euros se règle dans Admin › Impact › « Coût des IA ». Avant chaque appel, le serveur vérifie la dépense : plafond atteint, les IA s'arrêtent et l'appli bascule sur ses secours (relecture humaine, tri par règles, pause pour le CV et la rédaction). 0 € coupe tout.
+- Un étudiant ne peut ni lire la dépense ni ajouter de fausses lignes pour épuiser le plafond : écriture réservée au serveur (clé secrète), lecture à l'admin (test SQL `0035`, 6 cas).
+
 ## Questions qu'on peut nous poser
 - **« Et si l'IA se trompe ? »** Elle ne décide jamais seule : l'auteur accepte ou non la correction, l'admin tranche les cas graves, et l'annonce n'est jamais supprimée par l'IA.
 - **« Pourquoi pas un simple filtre de mots ? »** Il rate le ton, les arnaques bien écrites et les numéros écrits en lettres. On garde quand même un filtre fixe pour les coordonnées, en filet de sécurité.

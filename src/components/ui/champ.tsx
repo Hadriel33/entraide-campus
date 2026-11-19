@@ -24,7 +24,7 @@ export function Champ({
         defaultValue={defaultValue}
         autoComplete={autoComplete}
         aria-invalid={!!erreur}
-        className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3 py-2 text-base font-normal outline-none focus:border-encre focus:ring-3 focus:ring-accent/20 aria-[invalid=true]:border-alerte"
+        className="min-h-11 rounded-ui border-2 border-ligne-forte bg-surface px-3 py-2 text-base font-normal outline-none transition-shadow focus:border-encre focus:shadow-[3px_3px_0_0_var(--color-bandeau)] aria-[invalid=true]:border-alerte"
       />
       {erreur ? (
         <span className="text-sm font-normal text-alerte">{erreur}</span>

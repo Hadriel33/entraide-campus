@@ -325,7 +325,7 @@ export default async function PageAnnonces({
               Mode projection
             </BoutonLien>
             <BoutonLien href="/annonces/nouvelle">
-              Publier une annonce
+              Publier un post-it
             </BoutonLien>
           </div>
         </div>
@@ -513,7 +513,7 @@ export default async function PageAnnonces({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <nav
             className="inline-flex self-start rounded-ui bg-papier-fonce p-1"
-            aria-label="Type d'annonce"
+            aria-label="Type de post-it"
           >
             {onglets.map((o) => {
               const actif = filtres.type === o.valeur;
@@ -602,24 +602,6 @@ export default async function PageAnnonces({
                   aria-hidden
                 />
                 {t.famille}
-              </span>
-            ))}
-          </p>
-          <p
-            className="flex flex-wrap items-center gap-x-3 gap-y-1"
-            aria-label="Légende des formes"
-          >
-            <span className="font-semibold">Les formes :</span>
-            {[
-              { c: "covoiturage", l: "covoit = billet" },
-              { c: "coloc", l: "coloc = petite annonce" },
-              { c: "materiel", l: "prêt = étiquette" },
-              { c: "shooting", l: "shooting = polaroid" },
-              { c: "binome", l: "binôme = duo" },
-            ].map((x) => (
-              <span key={x.c} className="flex items-center gap-1">
-                <PictoCategorie categorie={x.c} className="size-3.5" />
-                {x.l}
               </span>
             ))}
           </p>
@@ -722,7 +704,7 @@ export default async function PageAnnonces({
           <p className="min-w-56 flex-1 text-sm leading-snug">
             <BadgeIA numero={3} className="mr-1.5 align-middle" />
             {coletteOk === true
-              ? "Colette a relu les 40 dernières annonces et garde celles qui te vont vraiment, même écrites avec d'autres mots."
+              ? "Colette a relu les 40 derniers post-its et garde ceux qui te vont vraiment, même écrites avec d'autres mots."
               : coletteOk === false
                 ? "Colette est indisponible pour l'instant : voici le classement simple, par mots et catégories."
                 : "Le classement simple compare les mots exacts. Colette, elle, comprend le sens : « Premiere Pro » colle à « monter une vidéo »."}
@@ -795,7 +777,7 @@ export default async function PageAnnonces({
           }
           action={
             <BoutonLien href="/annonces/nouvelle" variante="contour">
-              Publier une annonce
+              Publier un post-it
             </BoutonLien>
           }
         >

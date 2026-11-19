@@ -8,26 +8,40 @@ import { TitrePage } from "@/components/ui/titre-page";
 import { Section, Sommaire } from "@/components/ui/section";
 import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
-import { FormulaireIdentite, FormulairePhoto } from "./formulaires";
+import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
 import { TenueGagnee } from "@/components/colette/tenue-gagnee";
 import { piecesGagnees } from "@/lib/colette/recompenses";
 import { AtelierColette } from "./atelier-colette";
+import { ChoixClasse } from "./choix-classe";
 import { choisirClasse, proposerClasse } from "./actions";
 import { Bouton } from "@/components/ui/bouton";
 
 export const metadata: Metadata = { title: "Mon profil" };
 
-// Mon profil : seulement « qui je suis » (identité, compétences, Colette, classe).
-// Coordonnées, confidentialité, apparence et compte sont dans Réglages.
+// Mon profil, en étapes numérotées (retour de test du 19/11) : qui je suis, compétences, coordonnées, Colette, classe.
+// Tout s'enregistre automatiquement. Confidentialité, apparence et compte restent dans Réglages.
 export default async function PageCompte({ searchParams }: PageProps<"/compte">) {
   const { supabase, user, profil } = await exigerSession();
   const { erreur } = await searchParams;
-  const [{ data: stats }, { data: classes }, etatAccueil] = await Promise.all([
+  const [{ data: stats }, { data: classes }, etatAccueil, { data: coordonnees }] = await Promise.all([
     supabase.rpc("stats_profil", { cible: user.id }),
     supabase.from("classes").select("id, nom, validee").eq("campus", profil.campus).order("nom"),
     lireEtatAccueil(supabase, profil),
+    supabase.from("coordonnees").select("telephone, email, reseau").eq("id", user.id).maybeSingle(),
   ]);
+  // Les étapes et leur état (coche quand c'est fait).
+  const etapes = [
+    { id: "photo", titre: "Qui je suis", fait: !!profil.avatar_chemin },
+    { id: "competences", titre: "Mes compétences", fait: (profil.competences?.length ?? 0) > 0 },
+    { id: "coordonnees", titre: "Mes coordonnées", fait: etatAccueil.coordonnees },
+    { id: "colette", titre: "Ma Colette", fait: true },
+    { id: "classe", titre: "Ma classe", fait: !!profil.classe_id },
+  ];
+  const titreEtape = (id: string) => {
+    const i = etapes.findIndex((e) => e.id === id);
+    return `${i + 1}. ${etapes[i].titre}${etapes[i].fait ? "  ✓" : ""}`;
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -60,16 +74,9 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
       </div>
       {/* « Bien démarrer » : les étapes du profil, ici et plus sur le tableau. Disparaît quand tout est fait. */}
       <ChecklistAccueil etat={etatAccueil} />
-      <Sommaire
-        liens={[
-          { href: "#photo", label: "Qui je suis" },
-          { href: "#competences", label: "Compétences" },
-          { href: "#colette", label: "Ma Colette" },
-          { href: "#classe", label: "Ma classe" },
-        ]}
-      />
+      <Sommaire liens={etapes.map((e, i) => ({ href: `#${e.id}`, label: `${i + 1}. ${e.titre}${e.fait ? " ✓" : ""}` }))} />
 
-      <Section id="photo" titre="Qui je suis" aide="Ce que les autres étudiants voient sur ton profil et tes annonces.">
+      <Section id="photo" titre={titreEtape("photo")} aide="Ce que les autres étudiants voient sur ton profil et tes post-its.">
         <FormulairePhoto apercu={<Avatar chemin={profil.avatar_chemin} nom={profil.pseudo} taille="xl" colette={profil} />} />
         <div className="border-t border-ligne pt-4">
           <FormulaireIdentite pseudo={profil.pseudo} prenom={profil.prenom} bio={profil.bio ?? ""} />
@@ -78,15 +85,23 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
 
       <Section
         id="competences"
-        titre="Mes compétences"
+        titre={titreEtape("competences")}
         aide="Ce que tu peux proposer aux autres. Dépose ton CV : l'IA te fait des propositions, tu gardes ce qui est juste."
       >
         <AssistantCompetences actuelles={profil.competences ?? []} />
       </Section>
 
       <Section
+        id="coordonnees"
+        titre={titreEtape("coordonnees")}
+        aide="Cachées par défaut. Seules les personnes dont tu acceptes la demande (ou qui acceptent la tienne) peuvent les voir."
+      >
+        <FormulaireCoordonnees telephone={coordonnees?.telephone ?? ""} email={coordonnees?.email ?? ""} reseau={coordonnees?.reseau ?? ""} />
+      </Section>
+
+      <Section
         id="colette"
-        titre="Ma Colette"
+        titre={titreEtape("colette")}
         aide={profil.avatar_chemin ? "Ton personnage dans l'appli (badges, classement). Ta photo reste ton avatar principal." : "Pas de photo ? Ta Colette te représente partout dans l'appli."}
       >
         {(erreur === "verrouille" || erreur === "colette") && (
@@ -105,12 +120,12 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
         />
       </Section>
 
-      <Section id="classe" titre="Ma classe" aide="Chaque coup de main que tu donnes fait monter ta classe au classement.">
+      <Section id="classe" titre={titreEtape("classe")} aide="Chaque coup de main que tu donnes fait monter ta classe au classement.">
         {classes && classes.length > 0 ? (
           <form action={choisirClasse} className="flex flex-wrap items-end gap-2">
             <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-semibold">
               Classe (campus de {profil.campus})
-              <select name="classe" defaultValue={profil.classe_id ?? ""} className="min-h-11 rounded-ui border border-ligne-forte bg-surface px-3 text-base font-normal">
+              <ChoixClasse defaut={profil.classe_id ?? ""}>
                 <option value="">Pas de classe</option>
                 {[
                   { titre: "Bachelor", filtre: (n: string) => n.startsWith("B") },
@@ -129,9 +144,8 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
                     </optgroup>
                   ) : null;
                 })}
-              </select>
+              </ChoixClasse>
             </label>
-            <Bouton>Enregistrer</Bouton>
           </form>
         ) : (
           <p className="font-main text-lg text-encre-douce">Les classes de ton campus n&apos;ont pas encore été ajoutées : propose la tienne.</p>
