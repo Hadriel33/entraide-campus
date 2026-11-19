@@ -148,11 +148,11 @@ export default async function PageCarte({ searchParams }: PageProps<"/carte">) {
                   type="button"
                   popoverTarget={`quartier-${q}`}
                   className="block cursor-pointer"
-                  aria-label={`${QUARTIERS[q]} : ${liste.length} annonce${liste.length > 1 ? "s" : ""}`}
+                  aria-label={`${QUARTIERS[q]} : ${liste.length} post-it${liste.length > 1 ? "s" : ""}`}
                 >
                   {/* Petit post-it plié avec le nombre d'annonces, et sa punaise sur le point exact */}
                   <span
-                    className={`colle postit ${estCampusQ ? "papier-jaune ring-2 ring-encre" : premiere ? teinte(premiere.categorie).papier : "papier-gris"} flex items-center gap-1 px-2 pt-2.5 pb-1 text-xs font-bold ${liste.length || estCampusQ ? "" : "opacity-80"}`}
+                    className={`colle postit ${estCampusQ ? "papier-jaune ring-2 ring-encre" : premiere ? teinte(premiere.categorie).papier : "papier-gris"} flex items-center gap-1 px-1 pt-2 pb-0.5 text-xs font-bold sm:px-2 sm:pt-2.5 sm:pb-1 ${liste.length || estCampusQ ? "" : "opacity-80"}`}
                     style={
                       {
                         "--i": i,
@@ -163,7 +163,8 @@ export default async function PageCarte({ searchParams }: PageProps<"/carte">) {
                     <span className="punaise" aria-hidden />
                     {/* Seulement le nombre : les quartiers du centre sont proches, des noms se chevaucheraient
                         (trouvé par le parcours Playwright). Le nom est dans l'aperçu au survol et dans le post-it. */}
-                    <span className="titre-charte text-base">
+                    {/* Plus petit sur téléphone : à deux chiffres, les punaises du centre se touchaient. */}
+                    <span className="titre-charte text-sm sm:text-base">
                       {liste.length}
                     </span>
                   </span>

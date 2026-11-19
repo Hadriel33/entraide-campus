@@ -89,7 +89,7 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     ["/demandes", /Mes échanges/i],
     ["/classement", /Classement/i],
     ["/compte", /Mon profil/i],
-    ["/mes-annonces", /annonces/i],
+    ["/mes-annonces", /Mes post-its/i],
     ["/mur", /Le tableau/i],
     ["/fil", /Le fil/i],
     ["/reglages", /Réglages/i],
