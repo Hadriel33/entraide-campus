@@ -3,7 +3,7 @@ import Link from "next/link";
 import { exigerSession } from "@/lib/session";
 import { SELECT_ANNONCE, type Annonce } from "@/lib/annonces/requetes";
 import { joursRestants } from "@/lib/annonces/expiration";
-import { TYPES, type Categorie } from "@/lib/annonces/validation";
+import type { Categorie } from "@/lib/annonces/validation";
 import { suggerer } from "@/lib/matching/suggestions";
 import {
   calculerProgression,
@@ -25,12 +25,10 @@ import { CarteDefi } from "@/components/profil/carte-defi";
 import { TenueGagnee } from "@/components/colette/tenue-gagnee";
 import { piecesGagnees } from "@/lib/colette/recompenses";
 import { CarteSerie } from "@/components/profil/carte-serie";
-import { FilCampus } from "@/components/campus/fil";
 import { messageColette } from "@/lib/gamification/message-colette";
 import { defiDeLaSemaine } from "@/lib/gamification/defis";
 import { saisonDu } from "@/lib/design/saisons";
 import { Avatar } from "@/components/ui/avatar";
-import { Bouton } from "@/components/ui/bouton";
 
 export const metadata: Metadata = { title: "Mon bureau" };
 
@@ -344,42 +342,40 @@ export default async function PageBureau() {
 
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-10">
-          {/* Un post-it en 20 secondes : on pré-remplit le formulaire de publication. */}
-          <section className="couche-fixe teinte-bandeau flex flex-col gap-4 rounded-carte border border-ligne bg-surface p-5 sm:p-6">
-            <h2 className="titre-charte text-section">
-              Un post-it en 20 secondes
+          {/* Les discussions en premier et en grand : c'est là que l'entraide se passe (retour de test du 19/11). */}
+          <section className="flex flex-col gap-4" aria-labelledby="discussions">
+            <h2 id="discussions" className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="titre-charte text-section">Mes discussions</span>
+              <Link href="/demandes" className="ml-auto text-sm font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+                Tout voir dans Mes échanges
+              </Link>
             </h2>
-            <form action="/annonces/nouvelle" className="flex flex-col gap-3">
-              <div className="flex gap-1 self-start rounded-ui bg-papier-fonce p-1">
-                {Object.entries(TYPES).map(([v, l], i) => (
-                  <label
-                    key={v}
-                    className="cursor-pointer rounded-[4px] px-3.5 py-1.5 text-sm font-semibold text-encre-douce has-[:checked]:bg-surface has-[:checked]:text-encre has-[:checked]:shadow-sm"
-                  >
-                    <input
-                      type="radio"
-                      name="type"
-                      value={v}
-                      defaultChecked={i === 0}
-                      className="sr-only"
-                    />
-                    {l}
-                  </label>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <label className="flex min-w-60 flex-1">
-                  <span className="sr-only">Ton annonce en une phrase</span>
-                  <input
-                    name="titre"
-                    maxLength={80}
-                    placeholder="Ex. : je fais tes photos de profil LinkedIn"
-                    className="min-h-12 w-full rounded-ui border border-ligne-forte bg-papier px-4 text-base outline-none focus:border-encre focus:bg-surface"
-                  />
-                </label>
-                <Bouton className="min-h-12">Continuer</Bouton>
-              </div>
-            </form>
+            {((contacts ?? []) as unknown as Contact[]).length === 0 ? (
+              <p className="rounded-carte border border-dashed border-ligne-forte p-5 text-encre-douce">
+                Quand une demande est acceptée, la discussion apparaît ici.
+              </p>
+            ) : (
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {((contacts ?? []) as unknown as Contact[]).map((c) => {
+                  const autre = c.demandeur_id === user.id ? c.destinataire : c.demandeur;
+                  return (
+                    <li key={c.id}>
+                      <Link
+                        href={`/demandes/${c.id}`}
+                        className="presse group flex items-center gap-4 rounded-carte border border-ligne bg-surface p-4 hover:-translate-y-0.5 hover:border-encre hover:shadow-[3px_3px_0_0_var(--color-bandeau)]"
+                      >
+                        <Avatar chemin={autre?.avatar_chemin} nom={autre?.pseudo ?? "?"} taille="lg" />
+                        <span className="min-w-0 flex-1">
+                          <strong className="block text-lg leading-tight">@{autre?.pseudo}</strong>
+                          <span className="block truncate text-sm text-encre-douce">{c.annonce?.titre}</span>
+                        </span>
+                        <span aria-hidden className="text-xl transition-transform group-hover:translate-x-1">→</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </section>
 
           <section className="flex flex-col gap-5" aria-labelledby="pour-toi">
@@ -418,8 +414,8 @@ export default async function PageBureau() {
               <div className="flex items-center gap-4 rounded-carte border border-dashed border-ligne-forte p-5">
                 <Colette anim="cherche" taille={70} />
                 <p className="text-sm text-encre-douce">
-                  Colette cherche encore. Ajoute tes compétences ou publie une
-                  annonce : elle saura quoi te montrer.{" "}
+                  Colette cherche encore. Ajoute tes compétences ou publie un
+                  post-it : elle saura quoi te montrer.{" "}
                   <Link
                     href="/compte#competences"
                     className="font-semibold text-encre underline underline-offset-2"
@@ -436,7 +432,6 @@ export default async function PageBureau() {
           {stats && <CarteSerie serie={(stats as Stats).serie ?? 0} />}
           <CarteDefi supabase={supabase} />
 
-          <FilCampus supabase={supabase} moiDansLeFil={profil.fil_public} />
 
           {p && (
             <section className="flex flex-col gap-3 rounded-carte border border-ligne bg-surface p-5">
@@ -445,39 +440,6 @@ export default async function PageBureau() {
             </section>
           )}
 
-          <section className="flex flex-col gap-3 rounded-carte border border-ligne bg-surface p-5">
-            <h2 className="titre-charte text-xl">Discussions</h2>
-            {((contacts ?? []) as unknown as Contact[]).length === 0 ? (
-              <p className="text-sm text-encre-douce">
-                Quand une demande est acceptée, la discussion apparaît ici.
-              </p>
-            ) : (
-              ((contacts ?? []) as unknown as Contact[]).map((c) => {
-                const autre =
-                  c.demandeur_id === user.id ? c.destinataire : c.demandeur;
-                return (
-                  <Link
-                    key={c.id}
-                    href={`/demandes/${c.id}`}
-                    className="presse -mx-2 flex items-center gap-3 rounded-ui p-2 hover:bg-papier-fonce"
-                  >
-                    <Avatar
-                      chemin={autre?.avatar_chemin}
-                      nom={autre?.pseudo ?? "?"}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <strong className="block text-sm">
-                        @{autre?.pseudo}
-                      </strong>
-                      <span className="block truncate text-xs text-encre-douce">
-                        {c.annonce?.titre}
-                      </span>
-                    </span>
-                  </Link>
-                );
-              })
-            )}
-          </section>
 
           <section className="flex flex-col gap-3 rounded-carte border border-ligne bg-surface p-5">
             <h2 className="titre-charte text-xl">Cette semaine</h2>
