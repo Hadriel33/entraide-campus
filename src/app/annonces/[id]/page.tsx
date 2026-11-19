@@ -71,7 +71,9 @@ export default async function PageAnnonce({
 }: PageProps<"/annonces/[id]">) {
   const { id } = await params;
   // Juste publié : le post-it tombe sur le tableau et la punaise s'enfonce.
-  const vientDePublier = (await searchParams).ok === "publiee";
+  const parametres = await searchParams;
+  const vientDePublier = parametres.ok === "publiee";
+  const partagerOuvert = parametres.partager === "1";
   // La RLS ne renvoie rien si l'annonce n'est pas visible pour moi : même réponse qu'une annonce inexistante.
   const annonce = await lireAnnonce(id);
   if (!annonce) notFound();
@@ -455,7 +457,7 @@ export default async function PageAnnonce({
         )}
         <BoutonPartager titre={annonce.titre} />
       </div>
-      {user && annonce.statut === "publiee" && <PartagerDans annonceId={annonce.id} salons={salonsPartage} discussions={discussionsPartage} />}
+      {user && annonce.statut === "publiee" && <PartagerDans annonceId={annonce.id} salons={salonsPartage} discussions={discussionsPartage} ouvertAuDepart={partagerOuvert} />}
 
       {!estEquipe && (
         <details className="text-sm">

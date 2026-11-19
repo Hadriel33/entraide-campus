@@ -16,8 +16,10 @@ import { grouperParAnnonce, resumeCandidat } from "@/lib/demandes/choix";
 import type { Stats } from "@/lib/gamification/progression";
 import { inclinaison } from "@/lib/design/teintes";
 import { EtatVide } from "@/components/colette/etat-vide";
+import { SuiviColette } from "@/components/echanges/suivi-colette";
+import { colonneEchange, jeSuisAide, type Etape } from "@/lib/echanges/suivi";
 
-export const metadata: Metadata = { title: "Demandes" };
+export const metadata: Metadata = { title: "Mes échanges" };
 
 type Personne = {
   id: string;
@@ -31,13 +33,13 @@ type Demande = {
   statut: "en_attente" | "acceptee" | "refusee";
   message: string | null;
   cree_le: string;
-  annonce: { id: string; titre: string } | null;
+  annonce: { id: string; titre: string; type: "propose" | "cherche" } | null;
   demandeur: Personne | null;
   destinataire: Personne | null;
 };
 
 const PERSONNE = "id, prenom, pseudo, campus, avatar_chemin";
-const SELECT = `id, statut, message, cree_le, annonce:annonces(id, titre), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`;
+const SELECT = `id, statut, message, cree_le, annonce:annonces(id, titre, type), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`;
 
 const STATUTS = {
   en_attente: <Badge>En attente</Badge>,
@@ -56,8 +58,8 @@ const COLONNES = {
     },
     {
       statut: "acceptee",
-      titre: "En contact",
-      note: "la discussion est ouverte",
+      titre: "En cours",
+      note: "Colette suit l'entraide",
       papier: "papier-ciel",
     },
   ],
@@ -70,8 +72,8 @@ const COLONNES = {
     },
     {
       statut: "acceptee",
-      titre: "En contact",
-      note: "à toi de jouer",
+      titre: "En cours",
+      note: "Colette suit l'entraide",
       papier: "papier-ciel",
     },
   ],
@@ -130,6 +132,13 @@ export default async function PageDemandes({
         .in("demande_id", acceptees)
     : { data: [] };
   const avisDonnes = new Set((mesAvis ?? []).map((a) => a.demande_id));
+  // Le suivi de chaque échange accepté (0034) : Colette livreuse, puis « Bien reçu ».
+  const { data: suivis } = acceptees.length
+    ? await supabase.from("suivis_entraide").select("demande_id, etape, mot").in("demande_id", acceptees)
+    : { data: [] };
+  const suiviDe = new Map((suivis ?? []).map((x) => [x.demande_id as string, { etape: x.etape as Etape, mot: x.mot as string | null }]));
+  const colonne = (d: Demande) => colonneEchange({ statut: d.statut, etape: suiviDe.get(d.id)?.etape ?? null });
+  const terminees = demandes.filter((d) => colonne(d) === "termine");
 
   // Plusieurs intéressés sur une même annonce : on les regroupe pour comparer (des faits, jamais de coordonnées).
   const { groupes, seules } = grouperParAnnonce(
@@ -275,6 +284,22 @@ export default async function PageDemandes({
     );
   }
 
+  function suivi(d: Demande, prenomAutre: string) {
+    if (!d.annonce || !d.demandeur) return null;
+    const s = suiviDe.get(d.id);
+    return (
+      <SuiviColette
+        demandeId={d.id}
+        etape={s?.etape ?? null}
+        mot={s?.mot ?? null}
+        aide={jeSuisAide({ type: d.annonce.type, demandeurId: d.demandeur.id, moi: user.id })}
+        prenomAutre={prenomAutre}
+        retour="liste"
+        compact
+      />
+    );
+  }
+
   function carte(d: Demande, i: number, papier: string) {
     const autre = onglet === "recues" ? d.demandeur : d.destinataire;
     if (!autre) return null;
@@ -340,6 +365,7 @@ export default async function PageDemandes({
             <BoutonLien href={`/demandes/${d.id}`} className="self-start">
               Discuter avec le groupe
             </BoutonLien>
+            {suivi(d, d.destinataire.prenom)}
           </>
         )}
         {d.statut === "acceptee" && !(onglet === "recues" && d.destinataire && d.destinataire.id !== user.id) && (
@@ -351,6 +377,7 @@ export default async function PageDemandes({
             <BoutonLien href={`/demandes/${d.id}`} className="self-start">
               Discuter avec {autre.prenom}
             </BoutonLien>
+            {suivi(d, autre.prenom)}
             {!avisDonnes.has(d.id) && (
               <FormulaireAvis
                 demandeId={d.id}
@@ -366,13 +393,13 @@ export default async function PageDemandes({
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
-      <TitrePage accroche="Accepte une demande pour échanger vos coordonnées. Tant que tu n'as pas accepté, les tiennes restent cachées.">
-        Demandes
+      <TitrePage accroche="Tes mises en contact. Accepte pour échanger vos coordonnées (avant, les tiennes restent cachées), puis suis l'entraide avec Colette jusqu'au « Bien reçu ».">
+        Mes échanges
       </TitrePage>
 
       <nav
         className="inline-flex self-start rounded-ui bg-papier-fonce p-1"
-        aria-label="Type de demandes"
+        aria-label="Échanges reçus ou envoyés"
       >
         {[
           { valeur: "recues", label: "Reçues", href: "/demandes" },
@@ -411,7 +438,7 @@ export default async function PageDemandes({
       {demandes.length > 0 && (
         <div className="grid items-start gap-10 lg:grid-cols-2">
           {COLONNES[onglet].map((col) => {
-            const liste = demandes.filter((d) => d.statut === col.statut);
+            const liste = demandes.filter((d) => d.statut === col.statut && colonne(d) !== "termine");
             return (
               <section
                 key={col.statut}
@@ -448,6 +475,19 @@ export default async function PageDemandes({
             );
           })}
         </div>
+      )}
+
+      {terminees.length > 0 && (
+        <section className="flex flex-col gap-7" aria-label="Terminés">
+          <h2 className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b-2 border-encre pb-2">
+            <span className="titre-charte text-section whitespace-nowrap">Terminés</span>
+            <span className="titre-charte rounded-[3px] bg-encre px-1.5 pt-0.5 text-sm text-surface">{terminees.length}</span>
+            <span className="ml-auto -rotate-2 font-main text-lg text-encre-douce">bien reçu, merci</span>
+          </h2>
+          <div className="grid items-start gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {terminees.map((d, i) => carte(d, i, "papier-lilas"))}
+          </div>
+        </section>
       )}
 
       {demandes.some((d) => d.statut === "refusee") && (

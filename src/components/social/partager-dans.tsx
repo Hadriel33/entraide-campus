@@ -7,8 +7,19 @@ import { SALONS_THEMES, type Salon } from "@/lib/social/social";
 
 // « Partager dans… » : envoyer ce post-it dans un salon (général, campus, classe, thème) ou une discussion,
 // avec un petit mot. Il y apparaît en mini post-it cliquable.
-export function PartagerDans({ annonceId, salons, discussions }: { annonceId: string; salons: Salon[]; discussions: { id: string; nom: string }[] }) {
-  const [ouvert, setOuvert] = useState(false);
+export function PartagerDans({
+  annonceId,
+  salons,
+  discussions,
+  ouvertAuDepart = false,
+}: {
+  annonceId: string;
+  salons: Salon[];
+  discussions: { id: string; nom: string }[];
+  /** Arrivé depuis le bouton « Partager » d'une carte du tableau : le panneau est déjà ouvert. */
+  ouvertAuDepart?: boolean;
+}) {
+  const [ouvert, setOuvert] = useState(ouvertAuDepart);
   const [etat, partager, enCours] = useActionState<EtatPartage, FormData>(partagerPostit, {});
   const miens = salons.filter((s) => !s.id.startsWith("theme:"));
 
@@ -27,7 +38,7 @@ export function PartagerDans({ annonceId, salons, discussions }: { annonceId: st
     );
 
   return (
-    <form action={partager} className="pop flex w-full flex-col gap-3 rounded-carte border border-encre bg-surface p-4 shadow-[3px_3px_0_0_var(--color-bandeau)]">
+    <form id="partager" action={partager} className="pop flex w-full scroll-mt-24 flex-col gap-3 rounded-carte border border-encre bg-surface p-4 shadow-[3px_3px_0_0_var(--color-bandeau)]">
       <input type="hidden" name="annonce" value={annonceId} />
       <div className="flex items-baseline justify-between gap-2">
         <strong className="titre-charte text-lg">Partager ce post-it</strong>

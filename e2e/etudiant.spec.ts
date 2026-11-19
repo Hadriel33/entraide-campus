@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { pasDeDebordement, surveillerErreurs } from "./outils";
+import { joindreSiHydratation, pasDeDebordement, surveillerErreurs } from "./outils";
 
 // Le parcours d'un étudiant connecté, EN LECTURE SEULE (rien n'est publié ni accepté en prod).
 // Il aurait attrapé le bug du 02/10 : tableau, liste et détail des annonces vides.
@@ -86,7 +86,7 @@ test("le bureau, les badges et leur post-it", async ({ page }) => {
 
 test("les autres pages s'affichent sans erreur", async ({ page }) => {
   for (const [chemin, titre] of [
-    ["/demandes", /Demandes/i],
+    ["/demandes", /Mes échanges/i],
     ["/classement", /Classement/i],
     ["/compte", /Mon profil/i],
     ["/mes-annonces", /annonces/i],
@@ -104,6 +104,7 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1500); // React signale un écart d'hydratation après coup
     await pasDeDebordement(page);
+    await joindreSiHydratation(page, chemin, erreurs);
     expect(erreurs, chemin).toEqual([]);
   }
 });

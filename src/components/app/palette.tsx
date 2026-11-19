@@ -22,7 +22,7 @@ const PAGES: Commande[] = [
     aide: "Raccourci : n",
     href: "/annonces/nouvelle",
   },
-  { label: "Demandes", aide: "Reçues et envoyées", href: "/demandes" },
+  { label: "Mes échanges", aide: "Mises en contact et suivi des entraides", href: "/demandes" },
   {
     label: "Notifications",
     aide: "Ce qui te concerne",

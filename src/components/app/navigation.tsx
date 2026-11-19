@@ -26,7 +26,7 @@ function groupes(demandesEnAttente: number, estAdmin: boolean): { titre: string;
     {
       titre: "Mes affaires",
       liens: [
-        { href: "/demandes", label: "Demandes", icone: "demandes", compteur: demandesEnAttente },
+        { href: "/demandes", label: "Mes échanges", icone: "demandes", compteur: demandesEnAttente },
         { href: "/mes-annonces", label: "Mes annonces", icone: "mesAnnonces" },
         { href: "/favoris", label: "Favoris", icone: "favoris" },
         ...(estAdmin ? [{ href: "/admin", label: "Admin", icone: "admin" as const }] : []),
@@ -126,7 +126,8 @@ export function BarreLaterale({
   return (
     <>
       {/* Bureau : barre latérale */}
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-6 overflow-y-auto border-r border-ligne bg-surface px-4 py-5 md:flex">
+      {/* Tient en entier dans l'écran (resserré sur les écrans bas) : pas de barre de défilement à elle. */}
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-4 overflow-y-auto border-r border-ligne bg-surface px-4 py-4 [scrollbar-width:none] md:flex [@media(max-height:760px)]:gap-3 [@media(max-height:760px)]:py-3">
         <div className="flex items-center justify-between gap-1">
           <Link
             href="/bureau"
@@ -138,23 +139,23 @@ export function BarreLaterale({
         </div>
         <Link
           href="/annonces/nouvelle"
-          className="presse flex items-center justify-center gap-2 rounded-ui bg-encre px-3 py-3 text-base font-semibold text-surface shadow-[3px_3px_0_0_var(--color-bandeau)] hover:bg-encre/85"
+          className="presse flex items-center justify-center gap-2 rounded-ui bg-encre px-3 py-2.5 text-base font-semibold text-surface shadow-[3px_3px_0_0_var(--color-bandeau)] hover:bg-encre/85"
         >
           <Icone d={ICONES.plus} className="size-5" />
           Publier un post-it
         </Link>
         {/* Deux groupes nettement séparés : le titre du groupe en petites capitales, les liens en gros avec
             leur icône, la page en cours sur fond jaune (repérable du premier coup d'œil). */}
-        <nav className="flex flex-col gap-7" aria-label="Navigation principale">
+        <nav className="flex flex-col gap-4 [@media(max-height:760px)]:gap-2" aria-label="Navigation principale">
           {menu.map((g) => (
-            <div key={g.titre} className="flex flex-col gap-1">
-              <p className="mb-1.5 border-b border-ligne px-3 pb-2 text-xs font-bold tracking-[0.14em] text-encre-douce uppercase">{g.titre}</p>
+            <div key={g.titre} className="flex flex-col gap-0.5">
+              <p className="mb-1 border-b border-ligne px-3 pb-1.5 text-xs font-bold tracking-[0.14em] text-encre-douce uppercase">{g.titre}</p>
               {g.liens.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
                   aria-current={actif(l.href) ? "page" : undefined}
-                  className="presse group/lien flex items-center gap-3 rounded-ui px-3 py-2.5 text-[0.95rem] font-semibold text-encre/75 hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-bandeau aria-[current=page]:text-encre aria-[current=page]:shadow-[3px_3px_0_0_var(--color-encre)]"
+                  className="presse group/lien flex items-center gap-3 rounded-ui px-3 py-2 text-[0.95rem] [@media(max-height:760px)]:py-1.5 font-semibold text-encre/75 hover:bg-papier-fonce hover:text-encre aria-[current=page]:bg-bandeau aria-[current=page]:text-encre aria-[current=page]:shadow-[3px_3px_0_0_var(--color-encre)]"
                 >
                   <Icone d={ICONES[l.icone]} className="size-5 shrink-0 opacity-70 group-aria-[current=page]/lien:opacity-100" />
                   {l.label}
@@ -340,7 +341,7 @@ function OngletsMobile({
           className={`${onglet} relative`}
         >
           <Icone d={ICONES.demandes} />
-          Demandes
+          Échanges
           {demandesEnAttente > 0 && (
             <span className="pop absolute top-1 right-[calc(50%-20px)] min-w-4 rounded-full bg-accent px-1 text-center text-[10px] leading-4 font-semibold text-surface">
               {demandesEnAttente}

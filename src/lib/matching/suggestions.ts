@@ -70,6 +70,8 @@ export function suggerer<A extends AnnonceCandidate>(
     })
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
+    // Deux post-its au même titre (deux auteurs) : on n'en garde qu'un, sinon « Pour toi » bégaie.
+    .filter((s, i, liste) => liste.findIndex((x) => normaliser(x.annonce.titre).trim() === normaliser(s.annonce.titre).trim()) === i)
     .slice(0, max);
 }
 

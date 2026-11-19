@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { SuiviColette } from "@/components/echanges/suivi-colette";
+import { jeSuisAide, type Etape } from "@/lib/echanges/suivi";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigerSession } from "@/lib/session";
@@ -80,7 +82,7 @@ export default async function PageConversation({
   const dansLaPaire = user.id === demande.demandeur.id || user.id === demande.destinataire.id;
   const autre =
     demande.demandeur.id === user.id ? demande.destinataire : demande.demandeur;
-  const [{ data: messages }, { data: coordonnees }] = await Promise.all([
+  const [{ data: messages }, { data: coordonnees }, { data: suivi }] = await Promise.all([
     supabase
       .from("messages")
       .select(`id, auteur_id, contenu, cree_le, ${SELECT_MINI}`)
@@ -92,7 +94,9 @@ export default async function PageConversation({
       .select("telephone, email, reseau")
       .eq("id", autre.id)
       .maybeSingle<Coordonnees>(),
+    supabase.from("suivis_entraide").select("etape, mot").eq("demande_id", id).maybeSingle<{ etape: Etape; mot: string | null }>(),
   ]);
+  const aide = demande.annonce ? jeSuisAide({ type: demande.annonce.type as "propose" | "cherche", demandeurId: demande.demandeur.id, moi: user.id }) : false;
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
@@ -100,7 +104,7 @@ export default async function PageConversation({
         href="/demandes"
         className="text-sm text-encre-douce hover:text-encre"
       >
-        Retour aux demandes
+        Retour à mes échanges
       </Link>
       {ok === "choisi" && (
         <p
@@ -167,6 +171,17 @@ export default async function PageConversation({
             <BlocCoordonnees c={coordonnees} prenom={autre.prenom} />
           </div>
         </details>
+      )}
+      {/* Le suivi façon colis : celui qui aide avance, l'autre confirme « Bien reçu ». */}
+      {demande.annonce && (
+        <SuiviColette
+          demandeId={id}
+          etape={suivi?.etape ?? null}
+          mot={suivi?.mot ?? null}
+          aide={aide}
+          prenomAutre={enGroupe ? "le groupe" : autre.prenom}
+          retour="discussion"
+        />
       )}
       <Conversation
         demandeId={id}

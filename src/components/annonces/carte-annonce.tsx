@@ -212,6 +212,19 @@ export function CarteAnnonce({
         <div className="mt-auto flex items-center gap-2.5 pt-1">
           {soutien && <BoutonSoutien annonceId={annonce.id} resume={soutien} proprietaire={proprietaire} />}
           <CompteurDiscussion n={nbCommentaires} />
+          {/* Partager sans ouvrir le post-it d'abord : on arrive sur « Partager dans… » déjà ouvert. */}
+          {soutien && annonce.statut === "publiee" && (
+            <Link
+              href={`/annonces/${annonce.id}?partager=1#partager`}
+              aria-label={`Partager « ${annonce.titre} » dans un salon ou une discussion`}
+              title="Partager dans un salon ou une discussion"
+              className="presse relative z-10 ml-auto inline-flex size-9 items-center justify-center rounded-full border-[1.5px] border-encre/40 hover:border-encre hover:bg-surface/70"
+            >
+              <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
+              </svg>
+            </Link>
+          )}
         </div>
       )}
       <div className={`${soutien || nbCommentaires > 0 ? "" : "mt-auto "}flex flex-wrap items-end justify-between gap-x-2 gap-y-1 pt-1`}>

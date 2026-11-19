@@ -30,7 +30,7 @@ export default async function PageNotifications() {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <MarqueurLu actif={notifications.some((n) => !n.lu)} />
-      <TitrePage accroche="Demandes, réponses, messages et avis : tout ce qui te concerne.">Notifications</TitrePage>
+      <TitrePage accroche="Mises en contact, réponses, messages, suivis et avis : tout ce qui te concerne.">Notifications</TitrePage>
       {notifications.length ? (
         <ol className="flex flex-col gap-2">
           {notifications.map((n, i) => (
