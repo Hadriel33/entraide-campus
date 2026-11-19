@@ -17,14 +17,15 @@ Objectif : si l'appli gagne, elle est publiée sur le campus. Elle doit tenir av
 
 ## À faire par Hadriel (je ne manipule ni mots de passe ni clés secrètes)
 - [x] Créer son compte (@hadri) : nommé **admin** le 01/10
-- [ ] **Brevo en SMTP** (Supabase › Authentication › Emails › SMTP Settings, avec la clé SMTP Brevo) : sans ça, Supabase n'envoie d'emails qu'aux membres de l'équipe, donc le « mot de passe oublié » ne marche pas pour les autres étudiants. Une fois branché : réactiver « Confirm email ».
+- [x] **Brevo en SMTP** (Supabase › Authentication › Emails › SMTP Settings, avec la clé SMTP Brevo) : sans ça, Supabase n'envoie d'emails qu'aux membres de l'équipe, donc le « mot de passe oublié » ne marche pas pour les autres étudiants. Une fois branché : réactiver « Confirm email ». **Fait le 19/11** (Confirm email et Secure email change activés).
+- [ ] **Modèles d'email avec Colette** : coller `supabase/emails/confirmation.html`, `mot-de-passe.html` et `changement-adresse.html` dans Supabase › Authentication › Emails › Templates (sujets en tête de chaque fichier).
 - [ ] Test complet avec 2 comptes : suivre `docs/RECETTE.md` (toutes les cases)
 
 - [ ] **Clé serveur** : ajouter `SUPABASE_SECRET_KEY` sur Vercel (Production et Preview, « Sensitive »), redéployer, puis Admin › Impact › « Tester maintenant » : les 4 lignes doivent être OK. Sans elle, l'IA n°2 ne relit aucune annonce en ligne.
 - [ ] **Compte robot des parcours** : `npm run robot` (tape un mot de passe : le script inscrit le robot, range les secrets GitHub et lance le parcours). Variante sans script : `supabase/demo/compte-robot.sql`. Le parcours connecté tournera après chaque déploiement et chaque matin (onglet Actions › Parcours).
 
 ## Décisions à prendre
-- [x] **Appli réservée aux emails de l'école** (@mail-esd.com, @mail-esp.com), école déduite automatiquement. **Ne devient sûr qu'avec la confirmation d'email**, donc avec le SMTP branché.
+- [x] **Appli réservée aux emails de l'école** (@mail-esd.com, @mail-esp.com), école déduite automatiquement. **Ne devient sûr qu'avec la confirmation d'email**, donc avec le SMTP branché. Confirmation activée le 19/11 : c'est sûr.
 - [ ] Nom de domaine propre (ex. `entraide-campus.fr`), à brancher sur Vercel en 5 minutes.
 - [ ] Premières annonces crédibles pour l'ouverture : la liste de 20 est prête dans `docs/CONTENU-DEMO.md`, à publier par de vrais étudiants volontaires.
 

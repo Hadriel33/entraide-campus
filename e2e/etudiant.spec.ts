@@ -109,6 +109,20 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
   }
 });
 
+// « Demandes » est devenu « Mes échanges » (19/11) : le menu, les deux onglets et la page doivent suivre.
+test("« Mes échanges » : le menu y mène, avec les onglets Reçus et Envoyés", async ({ page }) => {
+  const erreurs = surveillerErreurs(page);
+  await page.goto("/bureau");
+  await page.getByRole("link", { name: /échanges/i }).filter({ visible: true }).first().click();
+  await expect(page).toHaveURL(/\/demandes/);
+  await expect(page.getByRole("heading", { name: /Mes échanges/i }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: "Reçus", exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Envoyés", exact: true }).click();
+  await expect(page).toHaveURL(/onglet=envoyees/);
+  await page.waitForLoadState("networkidle");
+  expect(erreurs).toEqual([]);
+});
+
 test("la bulle de Colette ouvre les salons du campus", async ({ page }) => {
   const erreurs = surveillerErreurs(page);
   await page.goto("/fil");

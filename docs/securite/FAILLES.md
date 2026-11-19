@@ -48,9 +48,23 @@
 | Lire les signalements des autres, signaler en masse ou son propre message | Modération | Signalements visibles de leur auteur et de l'admin ; 20 par jour ; pas sur ses messages | `0031` |
 | Partager un post-it caché dans un salon, ou glisser un post-it dans la discussion d'autrui | n°1 / n°3 | Le partage exige que le post-it soit visible et que le salon ou la discussion soit à moi | `0033` |
 | Lire un post-it masqué grâce à un vieux partage | Modération | Le message reste, mais la RLS des annonces ne renvoie plus le post-it (« Post-it indisponible ») | `0033` |
+| Avancer le suivi d'une entraide à la place de celui qui aide, reculer une étape, glisser un numéro dans le petit mot | n°1 / Triche | Aucune écriture directe dans `suivis_entraide` : seule `avancer_entraide` écrit, après avoir vérifié qui aide, l'ordre des étapes et `contient_coordonnees` | `0034` |
+| Se dire « Bien reçu » soi-même, ou avant la livraison ; lire le suivi d'un échange qui n'est pas le sien | n°3 / Triche | `confirmer_entraide` réservée à celui qui reçoit, seulement à l'étape « livré » ; lecture limitée aux participants de l'échange | `0034` |
+| S'inscrire avec l'adresse de l'école de quelqu'un d'autre | Identité | **Fermée le 19/11** : confirmation d'email activée (Brevo en SMTP). Sans clic sur le lien reçu dans la boîte de l'école, pas de connexion | Test à la main (fenêtre privée) |
+
+### Security Advisor de Supabase (19/11) : 0 erreur, 28 avertissements, tous voulus
+Les 28 avertissements sont du même type : « fonction SECURITY DEFINER appelable ». Chacune vérifie l'appelant elle-même :
+| Fonctions | Pourquoi c'est voulu |
+|---|---|
+| `definir_role`, `changer_campus` | Commencent par `if not est_admin() then raise` : un étudiant est refusé |
+| `avancer_entraide`, `confirmer_entraide`, `repondre_demande` | Vérifient qui aide, qui reçoit, qui fait partie de l'équipe (tests `0029`, `0034`) |
+| `est_admin`, `est_equipe`, `cible_visible`, `est_membre_annonce`, `peut_lire_salon` | Utilisées par les règles RLS : doivent être appelables par les connectés, ne renvoient que vrai ou faux |
+| `fil_campus`, `classement_campus`, `stats_profil`... | Lectures qui appliquent les mêmes filtres que les pages (modération, consentement au fil) |
+| `pseudo_disponible`, `stats_publiques` (publiques) | L'inscription doit vérifier un pseudo avant d'avoir un compte ; l'accueil montre des totaux sans aucun nom |
+Limite assumée : la protection contre les mots de passe divulgués est réservée à l'offre Pro ; on impose 8 caractères minimum.
 
 ### À rejouer avant le 26/11 (éditeur SQL Supabase, chaque fichier finit par « OK : … »)
-`0023`, `0024`, `0025`, `0027`, `0028`, `0029`, `0031`, `0033` dans `supabase/tests/`. Puis, à la main avec deux comptes : coordonnées invisibles avant accord (y compris dans l'onglet Réseau du navigateur), impossible de modifier le post-it de l'autre, conversation illisible pour un troisième compte.
+`0023`, `0024`, `0025`, `0027`, `0028`, `0029`, `0031`, `0033`, `0034` dans `supabase/tests/` (`0034` rejoué en ligne le 19/11 : « OK : 9 tests suivi réussis »). Puis, à la main avec deux comptes : coordonnées invisibles avant accord (y compris dans l'onglet Réseau du navigateur), impossible de modifier le post-it de l'autre, conversation illisible pour un troisième compte.
 
 ## À compléter le 26 novembre (chasse aux failles en classe)
 | # | Trouvée par | Ce qu'il a fait | Ce qu'il a vu | Gravité | Correction | Test ajouté | Attaque rejouée ? |
