@@ -16,6 +16,7 @@ export function SuiviColette({
   compact = false,
   lienAvis,
   avisDonne = false,
+  demo = false,
 }: {
   demandeId: string;
   etape: Etape | null;
@@ -29,6 +30,8 @@ export function SuiviColette({
   /** Une fois terminé : où laisser son avis (la discussion renvoie vers la carte de « Mes échanges »). */
   lienAvis?: string;
   avisDonne?: boolean;
+  /** Page d'accueil : on montre la barre et Colette seulement (aucun bouton, aucune action). */
+  demo?: boolean;
 }) {
   const r = rang(etape);
   const fini = etape === "recu";
@@ -40,7 +43,7 @@ export function SuiviColette({
   const depart = fini || r <= 0 ? position : ((r - 1) / (ETAPES.length - 1)) * 100;
   const trajet = { "--depart": `${depart}%`, "--arrivee": `${position}%` } as React.CSSProperties;
   const bulle = mot ?? (fini ? RECU.phrase : courante?.phrase ?? (aide ? `Dis à ${prenomAutre} où tu en es.` : `${prenomAutre} te tiendra au courant ici.`));
-  const suivantes = aide ? etapesSuivantes(etape) : [];
+  const suivantes = aide && !demo ? etapesSuivantes(etape) : [];
 
   return (
     <section aria-label="Suivi de l'entraide" className="@container flex flex-col gap-3 rounded-carte border border-ligne bg-surface/80 p-4">
@@ -108,6 +111,8 @@ export function SuiviColette({
         </form>
       )}
 
+      {!demo && (
+        <>
       {/* Ce qui se passe ensuite, dit simplement (sinon on ne sait pas comment « fermer » l'échange). */}
       {aide && etape === "livre" && (
         <p className="text-sm text-encre-douce">Livré ! L&apos;échange se ferme quand {prenomAutre} confirme « Bien reçu ».</p>
@@ -134,6 +139,8 @@ export function SuiviColette({
             Bien reçu, merci !
           </BoutonEtape>
         </form>
+      )}
+        </>
       )}
     </section>
   );
