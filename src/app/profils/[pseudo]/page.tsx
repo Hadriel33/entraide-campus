@@ -27,7 +27,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
   const { data: profil } = await supabase.from("profils").select("id, prenom, pseudo, campus, avatar_chemin, bio, competences, role, cree_le, classe_id, colette_couleur, colette_humeur, colette_accessoire, colette_motif, classe:classes!profils_classe_id_fkey(nom)").eq("pseudo", pseudo).maybeSingle();
   if (!profil) notFound();
 
-  const [{ data: stats }, { data: annonces }, { data: avis }] = await Promise.all([
+  const [{ data: stats }, { data: annoncesCreees }, { data: avis }, { data: groupes }] = await Promise.all([
     supabase.rpc("stats_profil", { cible: profil.id }),
     supabase.from("annonces").select(SELECT_ANNONCE).eq("auteur_id", profil.id).eq("statut", "publiee").order("cree_le", { ascending: false }),
     supabase
@@ -36,7 +36,13 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
       .eq("cible_id", profil.id)
       .order("cree_le", { ascending: false })
       .limit(20),
+    // Les post-its de groupe dont la personne fait partie (membre qui a accepté) : ils sont aussi les siens.
+    supabase.from("annonce_membres").select(`annonce:annonces(${SELECT_ANNONCE})`).eq("membre_id", profil.id).eq("statut", "accepte"),
   ]);
+  const annonces = [
+    ...((annoncesCreees ?? []) as unknown as Annonce[]),
+    ...((groupes ?? []) as unknown as { annonce: Annonce | null }[]).map((g) => g.annonce).filter((a): a is Annonce => !!a && a.statut === "publiee"),
+  ].sort((x, y) => Date.parse(y.cree_le) - Date.parse(x.cree_le));
   const s = stats as Stats | null;
   const listeAvis = (avis ?? []) as unknown as Avis[];
 
@@ -115,7 +121,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
         <h2 className="titre-charte text-section">Annonces en cours</h2>
         {annonces?.length ? (
           <div className="grid gap-x-6 gap-y-9 pt-3 sm:grid-cols-2">
-            {(annonces as unknown as Annonce[]).map((a, i) => (
+            {annonces.map((a, i) => (
               <CarteAnnonce key={a.id} annonce={a} index={i} />
             ))}
           </div>
