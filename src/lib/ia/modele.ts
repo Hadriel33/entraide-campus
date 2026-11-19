@@ -1,5 +1,6 @@
 import "server-only";
 import { generateText, Output } from "ai";
+import { budgetDisponible, noterUsage, type IA } from "./budget";
 import { z } from "zod";
 import { PROMPT_COMPETENCES } from "./prompts/competences";
 import { PROMPT_MODERATION } from "./prompts/moderation";
@@ -32,12 +33,21 @@ const MODELE = "google/gemini-2.5-flash";
 // Si Gemini ne répond pas (panne, limite de l'offre gratuite), la passerelle essaie ces modèles, dans l'ordre.
 const SECOURS = { gateway: { models: ["google/gemini-2.5-flash-lite", "openai/gpt-4.1-mini"] } };
 
+// Le modèle réellement servi (la passerelle peut basculer sur un modèle de secours).
+function modeleServi(r: { response?: { modelId?: string } }) {
+  return r.response?.modelId ?? MODELE;
+}
+async function suivre(ia: IA, r: { usage?: { inputTokens?: number; outputTokens?: number }; response?: { modelId?: string } }) {
+  await noterUsage(ia, modeleServi(r), r.usage);
+}
+
 // IA n°1 : compétences depuis un CV (PDF). Renvoie null si l'IA est indisponible ou trop lente.
 export async function extraireCompetences(
   pdf: Uint8Array,
 ): Promise<string[] | null> {
+  if (!(await budgetDisponible())) return null; // plafond des IA atteint (réglé dans l'admin)
   try {
-    const { output } = await generateText({
+    const r = await generateText({
       model: MODELE,
       system: PROMPT_COMPETENCES,
       output: Output.object({
@@ -64,6 +74,8 @@ export async function extraireCompetences(
       maxRetries: 1,
       providerOptions: SECOURS,
     });
+    await suivre("cv", r);
+    const { output } = r;
     return nettoyerCompetences(output.competences);
   } catch (erreur) {
     console.error("IA compétences indisponible", erreur);
@@ -81,8 +93,9 @@ export async function modererAnnonce(
   },
   surErreur?: (erreur: unknown) => void,
 ): Promise<ReponseModeration | null> {
+  if (!(await budgetDisponible())) return null; // plafond des IA atteint (réglé dans l'admin)
   try {
-    const { output } = await generateText({
+    const r = await generateText({
       model: MODELE,
       system: PROMPT_MODERATION,
       output: Output.object({
@@ -99,6 +112,8 @@ export async function modererAnnonce(
       maxRetries: 1,
       providerOptions: SECOURS,
     });
+    await suivre("moderation", r);
+    const { output } = r;
     return output;
   } catch (erreur) {
     console.error("IA modération indisponible", erreur);
@@ -111,8 +126,9 @@ export async function modererAnnonce(
 export async function redigerAnnonce(idee: string): Promise<Brouillon | null> {
   const cles = <T extends object>(o: T) =>
     Object.keys(o) as [string, ...string[]];
+  if (!(await budgetDisponible())) return null; // plafond des IA atteint (réglé dans l'admin)
   try {
-    const { output } = await generateText({
+    const r = await generateText({
       model: MODELE,
       system: PROMPT_REDACTION,
       output: Output.object({
@@ -136,6 +152,8 @@ ${idee}
       maxRetries: 1,
       providerOptions: SECOURS,
     });
+    await suivre("redaction", r);
+    const { output } = r;
     return nettoyerBrouillon(output);
   } catch (erreur) {
     console.error("IA rédaction indisponible", erreur);
@@ -152,8 +170,9 @@ export async function matcherAnnonces(
   surErreur?: (erreur: unknown) => void,
 ): Promise<Map<string, Match> | null> {
   if (annonces.length === 0) return new Map();
+  if (!(await budgetDisponible())) return null; // plafond des IA atteint (réglé dans l'admin)
   try {
-    const { output } = await generateText({
+    const r = await generateText({
       model: MODELE,
       system: PROMPT_MATCHING,
       output: Output.object({
@@ -174,6 +193,8 @@ export async function matcherAnnonces(
       maxRetries: 1,
       providerOptions: SECOURS,
     });
+    await suivre("tri", r);
+    const { output } = r;
     return nettoyerMatchs(
       output.resultats,
       annonces.map((a) => a.id),

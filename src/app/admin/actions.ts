@@ -203,3 +203,14 @@ export async function traiterSignalementMessage(id: string, supprimer: boolean) 
   revalidatePath("/admin");
   redirect("/admin?onglet=moderation&ok=moderation");
 }
+
+// Plafond total des IA (0035) : en euros, entre 0 (IA coupées) et 1000. La RLS n'autorise que l'admin.
+export async function changerPlafondIA(formData: FormData) {
+  const { supabase } = await exigerAdmin();
+  const brut = Number(String(formData.get("plafond") ?? "").replace(",", "."));
+  if (Number.isFinite(brut) && brut >= 0 && brut <= 1000) {
+    await supabase.from("ia_reglages").update({ plafond_eur: Math.round(brut * 100) / 100, maj_le: new Date().toISOString() }).eq("id", true);
+  }
+  revalidatePath("/admin");
+  redirect("/admin?onglet=impact#cout-ia");
+}

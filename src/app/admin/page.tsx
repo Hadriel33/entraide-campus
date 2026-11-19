@@ -11,6 +11,7 @@ import { Bouton } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { TableauImpact } from "./impact";
 import { SanteIA } from "./sante-ia";
+import { CoutIA } from "./cout-ia";
 import { MOTIFS_SIGNALEMENT } from "@/lib/social/signalement";
 import {
   traiterSignalementMessage,
@@ -217,6 +218,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
       {onglet === "impact" ? (
         <>
           <SanteIA />
+          <CoutIA supabase={supabase} />
           <TableauImpact supabase={supabase} />
         </>
       ) : onglet === "moderation" ? (

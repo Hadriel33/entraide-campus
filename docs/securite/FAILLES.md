@@ -50,6 +50,7 @@
 | Lire un post-it masqué grâce à un vieux partage | Modération | Le message reste, mais la RLS des annonces ne renvoie plus le post-it (« Post-it indisponible ») | `0033` |
 | Avancer le suivi d'une entraide à la place de celui qui aide, reculer une étape, glisser un numéro dans le petit mot | n°1 / Triche | Aucune écriture directe dans `suivis_entraide` : seule `avancer_entraide` écrit, après avoir vérifié qui aide, l'ordre des étapes et `contient_coordonnees` | `0034` |
 | Se dire « Bien reçu » soi-même, ou avant la livraison ; lire le suivi d'un échange qui n'est pas le sien | n°3 / Triche | `confirmer_entraide` réservée à celui qui reçoit, seulement à l'étape « livré » ; lecture limitée aux participants de l'échange | `0034` |
+| Épuiser le plafond des IA en ajoutant de fausses consommations, ou lire la dépense | Coût | `ia_usages` : écriture réservée au serveur (clé secrète), lecture à l'admin ; `ia_reglages` : seul l'admin lit et règle le plafond, dans les bornes 0 à 1000 € | `0035` |
 | S'inscrire avec l'adresse de l'école de quelqu'un d'autre | Identité | **Fermée le 19/11** : confirmation d'email activée (Brevo en SMTP). Sans clic sur le lien reçu dans la boîte de l'école, pas de connexion | Test à la main (fenêtre privée) |
 
 ### Security Advisor de Supabase (19/11) : 0 erreur, 28 avertissements, tous voulus
@@ -64,7 +65,7 @@ Les 28 avertissements sont du même type : « fonction SECURITY DEFINER appelabl
 Limite assumée : la protection contre les mots de passe divulgués est réservée à l'offre Pro ; on impose 8 caractères minimum.
 
 ### À rejouer avant le 26/11 (éditeur SQL Supabase, chaque fichier finit par « OK : … »)
-`0023`, `0024`, `0025`, `0027`, `0028`, `0029`, `0031`, `0033`, `0034` dans `supabase/tests/` (`0034` rejoué en ligne le 19/11 : « OK : 9 tests suivi réussis »). Puis, à la main avec deux comptes : coordonnées invisibles avant accord (y compris dans l'onglet Réseau du navigateur), impossible de modifier le post-it de l'autre, conversation illisible pour un troisième compte.
+`0023`, `0024`, `0025`, `0027`, `0028`, `0029`, `0031`, `0033`, `0034`, `0035` dans `supabase/tests/` (`0034` et `0035` rejoués en ligne le 19/11 : 9 et 6 tests réussis). Puis, à la main avec deux comptes : coordonnées invisibles avant accord (y compris dans l'onglet Réseau du navigateur), impossible de modifier le post-it de l'autre, conversation illisible pour un troisième compte.
 
 ## À compléter le 26 novembre (chasse aux failles en classe)
 | # | Trouvée par | Ce qu'il a fait | Ce qu'il a vu | Gravité | Correction | Test ajouté | Attaque rejouée ? |
