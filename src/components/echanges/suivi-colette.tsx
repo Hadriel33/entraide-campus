@@ -43,7 +43,7 @@ export function SuiviColette({
   const suivantes = aide ? etapesSuivantes(etape) : [];
 
   return (
-    <section aria-label="Suivi de l'entraide" className="flex flex-col gap-3 rounded-carte border border-ligne bg-surface/80 p-4">
+    <section aria-label="Suivi de l'entraide" className="@container flex flex-col gap-3 rounded-carte border border-ligne bg-surface/80 p-4">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="titre-charte text-base">Suivi de l&apos;entraide</h3>
         <span className="text-xs font-semibold text-encre-douce">
@@ -60,7 +60,7 @@ export function SuiviColette({
           {ETAPES.map((e, i) => (
             <li key={e.code} className="relative flex flex-col items-center" aria-current={courante?.code === e.code ? "step" : undefined}>
               <span className={`size-4 rounded-full border-2 border-encre ${i <= r || fini ? "bg-bandeau" : "bg-surface"}`} aria-hidden />
-              <span className={`absolute top-5 text-[11px] leading-tight font-semibold whitespace-nowrap ${i <= r || fini ? "text-encre" : "text-encre-douce"} ${i === 0 ? "left-0" : i === ETAPES.length - 1 ? "right-0" : "-translate-x-1/2 left-1/2"}`}>
+              <span className={`absolute top-5 text-[11px] leading-tight font-semibold whitespace-nowrap ${(fini ? "livre" : courante?.code) === e.code ? "" : "@max-md:hidden"} ${i <= r || fini ? "text-encre" : "text-encre-douce"} ${i === 0 ? "left-0" : i === ETAPES.length - 1 ? "right-0" : "-translate-x-1/2 left-1/2"}`}>
                 {e.label}
               </span>
             </li>
