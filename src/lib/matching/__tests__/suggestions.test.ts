@@ -10,6 +10,37 @@ const base: AnnonceCandidate = {
 };
 
 describe("suggerer", () => {
+  // Retour de test du 19/11 : Matthieu, 13 compétences marketing, et « Pour moi » presque vide.
+  it("un mot fort d'une compétence suffit (« Landing Page Design » retrouve « Maquette d'une landing page »)", () => {
+    const moi = { competences: ["Landing Page Design"], categoriesProposees: [], categoriesCherchees: [] };
+    const a = { ...base, id: "lp", categorie: "ux_ui" as const, titre: "Maquette d'une landing page", description: "Je fournis les textes." };
+    const s = suggerer(moi, [a]);
+    expect(s).toHaveLength(1);
+    expect(s[0].raison).toMatch(/Landing Page Design/);
+  });
+  it("une compétence relie à son domaine (SEO, Content Marketing : Rédaction et réseaux sociaux)", () => {
+    const moi = { competences: ["SEO", "Content Marketing"], categoriesProposees: [], categoriesCherchees: [] };
+    const a = { ...base, id: "red", categorie: "redaction" as const, titre: "Relecture de mon mémoire", description: "40 pages, orthographe et clarté." };
+    const s = suggerer(moi, [a]);
+    expect(s).toHaveLength(1);
+    expect(s[0].raisons.join(" ")).toMatch(/Rédaction et réseaux sociaux/);
+  });
+  it("le profil de Matthieu trouve plusieurs post-its, la compétence exacte en premier", () => {
+    const moi = {
+      competences: ["Digital Marketing Strategy", "Google Ads", "Google Analytics", "SEO", "Content Marketing", "Landing Page Design", "Project Management", "vibe coding"],
+      categoriesProposees: [],
+      categoriesCherchees: [],
+    };
+    const annonces: AnnonceCandidate[] = [
+      { ...base, id: "ga", categorie: "data_ia", titre: "Comprendre Google Analytics", description: "Analyser le trafic du site de mon alternance." },
+      { ...base, id: "lp", categorie: "ux_ui", titre: "Maquette d'une landing page", description: "Une page simple pour présenter mon projet." },
+      { ...base, id: "red", categorie: "redaction", titre: "Traduction anglaise de mon portfolio", description: "Une dizaine de pages." },
+      { ...base, id: "covoit", categorie: "covoiturage", titre: "Covoit le jeudi soir", description: "Vers Talence." },
+    ];
+    const s = suggerer(moi, annonces, Infinity);
+    expect(s.map((x) => x.annonce.id)).toEqual(["ga", "lp", "red"]);
+  });
+
   it("ne propose pas deux fois le même titre (deux auteurs, même post-it)", () => {
     const moi = { competences: ["Python"], categoriesProposees: [], categoriesCherchees: [] };
     const a = { ...base, id: "a", categorie: "dev" as const, titre: "Aide Python pour mon mémoire", description: "Script Python." };
