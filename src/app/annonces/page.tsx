@@ -18,7 +18,7 @@ import {
 } from "@/lib/annonces/validation";
 import { CAMPUS, estCampus } from "@/lib/auth/validation";
 import { quartiersDu } from "@/lib/carte/mercator";
-import { TEINTES, inclinaison, teinte } from "@/lib/design/teintes";
+import { inclinaison, teinte } from "@/lib/design/teintes";
 import { LigneAnnonce } from "@/components/annonces/ligne-annonce";
 import { CarteAnnonce } from "@/components/annonces/carte-annonce";
 import { PictoCategorie } from "@/components/annonces/picto-categorie";
@@ -590,21 +590,6 @@ export default async function PageAnnonces({
           )}
         </nav>
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-encre-douce">
-          <p
-            className="flex flex-wrap items-center gap-x-3 gap-y-1"
-            aria-label="Légende des couleurs"
-          >
-            <span className="font-semibold">Les couleurs :</span>
-            {Object.values(TEINTES).map((t) => (
-              <span key={t.famille} className="flex items-center gap-1.5">
-                <span
-                  className={`size-3 rounded-[2px] ${t.point}`}
-                  aria-hidden
-                />
-                {t.famille}
-              </span>
-            ))}
-          </p>
           <nav
             className="inline-flex rounded-ui bg-papier-fonce p-1"
             aria-label="Affichage"

@@ -98,13 +98,6 @@ export async function sauverCompetences(competences: string[]): Promise<{ ok: bo
   return { ok: !error };
 }
 
-// Rien n'est enregistré sans le clic de l'étudiant : c'est lui qui valide la liste finale.
-export async function enregistrerCompetences(competences: string[]) {
-  const { supabase, user } = await exigerSession();
-  await supabase.from("profils").update({ competences: nettoyerCompetences(competences) }).eq("id", user.id);
-  revalidatePath("/compte");
-  redirect("/compte?ok=competences");
-}
 
 // ---------- RGPD : droit à l'effacement ----------
 
@@ -125,16 +118,6 @@ export async function supprimerMonCompte() {
 
 // ---------- Ma Colette et ma classe ----------
 
-export async function enregistrerColette(formData: FormData) {
-  const { supabase, user } = await exigerSession();
-  const choix = validerColette(Object.fromEntries(formData));
-  if (!choix) redirect("/compte?erreur=colette#colette");
-  // La base refuse un objet pas encore débloqué (trigger verifier_garde_robe).
-  const { error } = await supabase.from("profils").update(choix).eq("id", user.id);
-  if (error) redirect("/compte?erreur=verrouille#colette");
-  revalidatePath("/", "layout");
-  redirect("/compte?ok=colette#colette");
-}
 
 // Ma Colette, enregistrée à chaque choix (sans recharger la page). La base refuse toujours une pièce verrouillée.
 export async function sauverColette(formData: FormData): Promise<{ ok: boolean; verrouille?: boolean }> {
