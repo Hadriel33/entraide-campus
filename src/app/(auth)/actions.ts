@@ -11,6 +11,8 @@ export type EtatFormulaire = {
   message?: string;
   succes?: boolean;
   valeurs?: Record<string, string>;
+  /** Après l'inscription : l'adresse à qui le lien est parti (pour l'afficher et le renvoyer). */
+  email?: string;
 };
 
 function texte(formData: FormData, cle: string) {
@@ -65,10 +67,23 @@ export async function inscrire(_: EtatFormulaire, formData: FormData): Promise<E
   if (!data.session) {
     return {
       succes: true,
+      email: champs.email,
       message: `Presque fini : on t'a envoyé un lien de confirmation à ${champs.email}.`,
     };
   }
   redirect("/bienvenue?ok=bienvenue");
+}
+
+// « Je n'ai rien reçu » : on renvoie le lien de confirmation. Supabase limite les envois (message clair si trop tôt).
+// La réponse est la même que l'adresse existe ou non : on ne révèle rien.
+export async function renvoyerConfirmation(_: EtatFormulaire, formData: FormData): Promise<EtatFormulaire> {
+  const email = texte(formData, "email").trim();
+  if (!/^[^@\s]+@mail-es[dp]\.com$/i.test(email)) return { message: "Adresse invalide." };
+  const origine = (await headers()).get("origin") ?? "https://entraide-campus.vercel.app";
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resend({ type: "signup", email, options: { emailRedirectTo: `${origine}/auth/confirmer` } });
+  if (error) return { message: messageErreur(error.code, error.message) };
+  return { succes: true, message: "C'est reparti : regarde à nouveau ta boîte (et les spams)." };
 }
 
 export async function connecter(_: EtatFormulaire, formData: FormData): Promise<EtatFormulaire> {
