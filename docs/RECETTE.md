@@ -44,6 +44,16 @@
 ## 8. Admin
 - [ ] Hadriel (admin) voit la file de modération, valide une annonce, valide une classe proposée
 
+## 9. Réseau social (ajouté le 19/11) — compte A et compte B
+- [ ] A publie un post-it **avec une photo** (prise au téléphone) et invite B dans « À plusieurs ? » : la photo s'affiche, B reçoit l'invitation
+- [ ] B clique « Je rejoins le post-it » : confettis, les deux visages sur la carte ; B peut modifier le texte mais pas supprimer
+- [ ] Un 3e compte demande le contact : A et B sont prévenus ; B accepte : seules les coordonnées de B sont montrées, discussion de groupe à trois
+- [ ] B clique « Je soutiens » sur un post-it d'un autre : la flèche bondit, le post-it monte dans « Ça monte »
+- [ ] A commente avec « @pseudo de B » : B est prévenu ; A envoie un sticker Colette dans un commentaire
+- [ ] A « Partager dans… » le salon Photo et vidéo : le mini post-it apparaît dans la bulle de Colette, onglet Salons, pour B aussi (même d'un autre campus)
+- [ ] B signale un commentaire de A : il apparaît dans Admin › Modération › « Commentaires et messages signalés »
+- [ ] Admin › « Tester maintenant » : 4 lignes vertes, photo piégée comprise
+
 ## Problèmes trouvés
 | Date | Étape | Ce que j'ai fait | Ce que j'attendais | Ce qui s'est passé | Corrigé ? |
 |---|---|---|---|---|---|

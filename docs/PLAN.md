@@ -20,5 +20,6 @@ Chaque étape a un moyen de vérification. On ne passe à la suivante que quand 
 | 10 🟡 | Ajout 01/10 | Profil (pseudo, photo, bio), rôle admin et modération, gamification (points, niveaux, badges, avis, classement) | 14 tests SQL de sécurité. À la main : nommer un admin, masquer une annonce, laisser un avis. |
 | 11 🟡 | Ajouts 01/10 | Post-it campus : DA « mur du campus », Colette, bureau, classes, carte, fil du campus, tableau noir | 108 tests Vitest, 84 vérifications SQL. À la main : `docs/RECETTE.md`. |
 | 12 🟡 | Ajout 01/10 | IA n°2 v2 : correction proposée à l'auteur | 6 tests de règles, 4 tests SQL, 4 annonces piégées testées en réel (`docs/ia/`). |
+| 14 🟡 | Retours du prof (22/10 → 19/11) | Côté réseau social : fil, réactions et commentaires, salons (général, campus, classe, thèmes), @mentions, « Je soutiens », post-its de groupe et discussion de groupe, partage d'un post-it dans un salon ou une discussion, photos relues par l'IA, signalement des messages. Plus : formes et pictogrammes, campus, cartes, Colette vivante | ~145 vérifications SQL (`supabase/tests/0023` à `0033`), 215 tests Vitest, robot quotidien sur le site en ligne. À la main : `docs/RECETTE.md` et la recette à 2 comptes. |
 | 13 | S6 · 17 déc | Démo finale de 3 minutes | `docs/DEMO.md` répétée 3 fois ; `docs/IA-DEFENSE.md` et `docs/securite/FAILLES.md` pour les questions. |
 

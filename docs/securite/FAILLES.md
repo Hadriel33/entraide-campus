@@ -1,7 +1,7 @@
 # Failles trouvées, corrigées, et le test qui le prouve
 
 > Le cours : « Pour chaque faille, note ce que tu as fait, ce que tu as vu et pourquoi c'est grave. Corrige côté base et écris un test qui la vérifie. Refais l'attaque toi-même. »
-> Tout est vérifié **en base** (RLS, triggers, droits par colonne), pas seulement caché à l'écran. 84 vérifications SQL rejouables dans `supabase/tests/`.
+> Tout est vérifié **en base** (RLS, triggers, droits par colonne), pas seulement caché à l'écran. Environ 145 vérifications SQL rejouables dans `supabase/tests/` (84 au 02/10, puis une série par fonction ajoutée), plus 215 tests Vitest et un robot qui parcourt le site en ligne chaque jour.
 
 ## Failles réelles trouvées pendant notre chasse à blanc (01/10/2026)
 | # | Ce qu'on a fait | Ce qu'on a vu | Pourquoi c'est grave | Correction | Test qui la rejoue |
@@ -29,6 +29,28 @@
 | Apparaître dans le fil du campus sans son accord, ou cocher le fil d'un autre | Vie privée | Double consentement exigé par la fonction, mise à jour limitée à soi | `0020` |
 | Chercher une clé secrète dans le code GitHub ou dans le JavaScript du site | Clés | Aucune clé : IA par jeton OIDC Vercel, clé Supabase secrète uniquement côté serveur ; la CI cherche des clés à chaque push | CI GitHub |
 | Changer `/annonces/12` en `/13` | Énumération | Identifiants UUID, « introuvable » identique pour une annonce cachée ou inexistante | chasse à blanc |
+
+### Ajouts depuis le 22/10 (côté réseau social) : les nouvelles portes, et pourquoi elles tiennent
+| Attaque | Règle | Pourquoi elle échoue | Test |
+|---|---|---|---|
+| Écrire ou lire dans le salon d'un autre campus ou d'une autre classe | n°3 (salons) | `peut_lire_salon` en base, pour la lecture comme pour l'écriture | `0025` |
+| Écrire un numéro ou un email dans un commentaire ou un salon | n°1 | `contient_coordonnees` refuse le message en base, même par l'API | `0025` |
+| Signer un message ou un commentaire au nom d'un autre | Identité | L'auteur est imposé par le trigger (`auth.uid()`) | `0025` |
+| Mentionner quelqu'un sous un post-it caché pour lui en montrer le contenu | Vie privée | Pas de notification de mention sur un post-it non public ; 5 mentions au plus | `0027` |
+| Porter une tenue de Colette pas encore gagnée (micro, flamme, étoilé) | Triche | Conditions recalculées depuis les vraies stats (commentaires, réactions reçues, série) | `0027` |
+| Soutenir son propre post-it, ou deux fois le même | Triche | Trigger et clé unique ; les soutiens ne rapportent aucun point | `0028` |
+| S'ajouter soi-même à un post-it de groupe, dépasser 4 personnes | n°2 | Seul le créateur invite, 3 membres au plus, l'invité doit accepter | `0029` |
+| Modifier un post-it de groupe avant d'avoir accepté l'invitation, ou le supprimer en étant membre | n°2 | Policy « membres acceptés » pour modifier ; suppression réservée au créateur | `0029` |
+| Voir les coordonnées du créateur d'un post-it de groupe alors qu'un autre membre a accepté | n°1 | Celui qui accepte devient le destinataire : seules ses coordonnées sont montrées | `0029` |
+| Lire une discussion de groupe sans en faire partie (ou en simple invité) | n°3 | Lecture réservée au demandeur, à celui qui a accepté et à l'équipe qui a dit oui | `0029` |
+| Poser la photo d'un post-it dans le dossier d'un autre, ou un chemin bidon (`../`) | n°2 / Stockage | Policies Storage par dossier ; trigger qui vérifie le dossier ; chemin contrôlé par la base | `0031` |
+| Publier une photo choquante ou avec un numéro dessus | Modération | L'IA n°2 relit la photo avec le texte ; changer de photo relance la relecture | `0031`, « Tester maintenant » (photo piégée) |
+| Lire les signalements des autres, signaler en masse ou son propre message | Modération | Signalements visibles de leur auteur et de l'admin ; 20 par jour ; pas sur ses messages | `0031` |
+| Partager un post-it caché dans un salon, ou glisser un post-it dans la discussion d'autrui | n°1 / n°3 | Le partage exige que le post-it soit visible et que le salon ou la discussion soit à moi | `0033` |
+| Lire un post-it masqué grâce à un vieux partage | Modération | Le message reste, mais la RLS des annonces ne renvoie plus le post-it (« Post-it indisponible ») | `0033` |
+
+### À rejouer avant le 26/11 (éditeur SQL Supabase, chaque fichier finit par « OK : … »)
+`0023`, `0024`, `0025`, `0027`, `0028`, `0029`, `0031`, `0033` dans `supabase/tests/`. Puis, à la main avec deux comptes : coordonnées invisibles avant accord (y compris dans l'onglet Réseau du navigateur), impossible de modifier le post-it de l'autre, conversation illisible pour un troisième compte.
 
 ## À compléter le 26 novembre (chasse aux failles en classe)
 | # | Trouvée par | Ce qu'il a fait | Ce qu'il a vu | Gravité | Correction | Test ajouté | Attaque rejouée ? |
