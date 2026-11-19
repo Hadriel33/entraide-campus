@@ -11,8 +11,7 @@ import {
   type Coordonnees,
 } from "@/components/demandes/coordonnees";
 import { Colette } from "@/components/colette/colette";
-import type { Categorie } from "@/lib/annonces/validation";
-import { graineDe, phrasesColette } from "@/lib/messages/brise-glace";
+import { CATEGORIES, TYPES, type Categorie } from "@/lib/annonces/validation";
 import { Conversation, type Message } from "./conversation";
 import { SELECT_MINI } from "@/components/annonces/mini-postit";
 
@@ -41,13 +40,16 @@ export default async function PageConversation({
   const { data } = await supabase
     .from("demandes_contact")
     .select(
-      `id, statut, annonce:annonces(id, titre, type, categorie, auteur_id, auteur:profils!annonces_auteur_id_fkey(${PERSONNE})), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`,
+      `id, statut, message, cree_le, repondu_le, annonce:annonces(id, titre, type, categorie, auteur_id, auteur:profils!annonces_auteur_id_fkey(${PERSONNE})), demandeur:profils!demandes_contact_demandeur_id_fkey(${PERSONNE}), destinataire:profils!demandes_contact_destinataire_id_fkey(${PERSONNE})`,
     )
     .eq("id", id)
     .maybeSingle();
   const demande = data as unknown as {
     id: string;
     statut: string;
+    message: string | null;
+    cree_le: string;
+    repondu_le: string | null;
     annonce: {
       id: string;
       titre: string;
@@ -99,7 +101,7 @@ export default async function PageConversation({
   const aide = demande.annonce ? jeSuisAide({ type: demande.annonce.type as "propose" | "cherche", demandeurId: demande.demandeur.id, moi: user.id }) : false;
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
       <Link href="/demandes" className="group/retour inline-flex w-fit items-center gap-1.5 text-sm font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
         <span aria-hidden className="transition-transform group-hover/retour:-translate-x-1">←</span>
         Retour à mes échanges
@@ -119,20 +121,30 @@ export default async function PageConversation({
           a quitté le tableau. Dis bonjour à {autre.prenom} !
         </p>
       )}
-      <header className="apparition flex flex-wrap items-center gap-3">
-        {enGroupe ? (
-          <span className="flex shrink-0">
-            {[...participants.values()].map((p, i) => (
-              <span key={p.id} className={`rounded-full ring-2 ring-papier ${i ? "-ml-3" : ""}`}>
-                <Avatar chemin={p.avatar_chemin} nom={p.pseudo} taille="lg" />
-              </span>
-            ))}
-          </span>
-        ) : (
-          <Avatar chemin={autre.avatar_chemin} nom={autre.pseudo} taille="lg" />
+      {/* Le sujet d'abord : le post-it dont on parle, en grand ; puis avec qui. */}
+      <header className="apparition flex flex-col gap-3">
+        {demande.annonce && (
+          <Link href={`/annonces/${demande.annonce.id}`} className="group flex flex-col gap-1 self-start">
+            <span className="flex flex-wrap items-center gap-2 text-xs font-bold tracking-wide uppercase">
+              <span className="titre-charte rounded-[3px] bg-encre px-1.5 pt-0.5 text-sm text-surface">{TYPES[demande.annonce.type as keyof typeof TYPES]}</span>
+              {CATEGORIES[demande.annonce.categorie]}
+            </span>
+            <span className="titre-charte text-titre text-balance decoration-4 underline-offset-4 group-hover:underline">{demande.annonce.titre}</span>
+          </Link>
         )}
-        <div className="min-w-0 flex-1">
-          <h1 className="flex flex-wrap items-center gap-2 text-xl font-semibold">
+        <div className="flex flex-wrap items-center gap-3">
+          {enGroupe ? (
+            <span className="flex shrink-0">
+              {[...participants.values()].map((p, i) => (
+                <span key={p.id} className={`rounded-full ring-2 ring-papier ${i ? "-ml-3" : ""}`}>
+                  <Avatar chemin={p.avatar_chemin} nom={p.pseudo} />
+                </span>
+              ))}
+            </span>
+          ) : (
+            <Avatar chemin={autre.avatar_chemin} nom={autre.pseudo} />
+          )}
+          <p className="flex flex-wrap items-center gap-2 font-semibold">
             {enGroupe ? (
               <>
                 Discussion de groupe
@@ -140,74 +152,62 @@ export default async function PageConversation({
               </>
             ) : (
               <>
-                <Link href={`/profils/${autre.pseudo}`} className="hover:underline">
+                avec{" "}
+                <Link href={`/profils/${autre.pseudo}`} className="underline-offset-2 hover:underline">
                   @{autre.pseudo}
                 </Link>
                 <BadgeCampus campus={autre.campus} />
               </>
             )}
-          </h1>
-          {demande.annonce && (
-            <p className="truncate text-sm text-encre-douce">
-              À propos de{" "}
-              <Link
-                href={`/annonces/${demande.annonce.id}`}
-                className="underline-offset-2 hover:underline"
-              >
-                « {demande.annonce.titre} »
-              </Link>
-            </p>
-          )}
+          </p>
         </div>
       </header>
-      {dansLaPaire && (
-        <details className="text-sm">
-          <summary className="cursor-pointer text-encre-douce hover:text-encre">
-            Voir les coordonnées de {autre.prenom}
-          </summary>
-          <div className="mt-2">
-            <BlocCoordonnees c={coordonnees} prenom={autre.prenom} />
-          </div>
-        </details>
-      )}
-      {/* Le suivi façon colis : celui qui aide avance, l'autre confirme « Bien reçu ». */}
-      {demande.annonce && (
-        <SuiviColette
-          demandeId={id}
-          etape={suivi?.etape ?? null}
-          mot={suivi?.mot ?? null}
-          majLe={suivi?.maj_le ?? null}
-          aide={aide}
-          prenomAutre={enGroupe ? "le groupe" : autre.prenom}
-          retour="discussion"
-          lienAvis={`/demandes${user.id === demande.demandeur.id ? "?onglet=envoyees" : ""}#demande-${id}`}
-        />
-      )}
-      <Conversation
-        demandeId={id}
-        moi={user.id}
-        initiaux={(messages ?? []) as unknown as Message[]}
-        prenomAutre={enGroupe ? "le groupe" : autre.prenom}
-        noms={enGroupe ? Object.fromEntries([...participants.values()].map((p) => [p.id, p.pseudo])) : undefined}
-        suggestions={
-          demande.annonce
-            ? phrasesColette({
-                categorie: demande.annonce.categorie,
-                // Sur un « je propose », l'auteur aide ; sur un « je cherche », c'est l'autre.
-                jAide:
-                  (demande.annonce.type === "propose") ===
-                  (demande.annonce.auteur_id === user.id),
-                prenom: autre.prenom,
-                graine: graineDe(id),
-              })
-            : []
-        }
-      />
-      <p className="text-xs text-encre-douce">
-        {enGroupe
-          ? `Visible seulement par ses participants : ${[...participants.values()].map((p) => "@" + p.pseudo).join(", ")}. Les coordonnées restent entre @${demande.demandeur.pseudo} et @${demande.destinataire.pseudo}.`
-          : "Cette conversation n'est visible que par vous deux."}
-      </p>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="flex min-w-0 flex-col gap-3">
+          <Conversation
+            demandeId={id}
+            moi={user.id}
+            initiaux={(messages ?? []) as unknown as Message[]}
+            prenomAutre={enGroupe ? "le groupe" : autre.prenom}
+            noms={enGroupe ? Object.fromEntries([...participants.values()].map((p) => [p.id, p.pseudo])) : undefined}
+            debut={{
+              demandeur: demande.demandeur.pseudo,
+              message: demande.message,
+              demandeLe: demande.cree_le,
+              accepteur: demande.destinataire.pseudo,
+              accepteLe: demande.repondu_le,
+            }}
+          />
+          <p className="text-xs text-encre-douce">
+            {enGroupe
+              ? `Visible seulement par ses participants : ${[...participants.values()].map((p) => "@" + p.pseudo).join(", ")}. Les coordonnées restent entre @${demande.demandeur.pseudo} et @${demande.destinataire.pseudo}.`
+              : "Cette conversation n'est visible que par vous deux."}
+          </p>
+        </div>
+        {/* Sur le côté : le suivi de l'entraide et les coordonnées. */}
+        <aside className="flex flex-col gap-4 lg:sticky lg:top-6">
+          {demande.annonce && (
+            <SuiviColette
+              demandeId={id}
+              etape={suivi?.etape ?? null}
+              mot={suivi?.mot ?? null}
+              majLe={suivi?.maj_le ?? null}
+              aide={aide}
+              prenomAutre={enGroupe ? "le groupe" : autre.prenom}
+              retour="discussion"
+              lienAvis={`/demandes${user.id === demande.demandeur.id ? "?onglet=envoyees" : ""}#demande-${id}`}
+            />
+          )}
+          {dansLaPaire && (
+            <details className="rounded-carte border border-ligne bg-surface p-4 text-sm">
+              <summary className="cursor-pointer font-semibold">Coordonnées de {autre.prenom}</summary>
+              <div className="mt-2">
+                <BlocCoordonnees c={coordonnees} prenom={autre.prenom} />
+              </div>
+            </details>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }
