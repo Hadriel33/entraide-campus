@@ -102,6 +102,7 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     ).toBeVisible();
     // On attend la fin du chargement : une erreur tardive est rangée sur SA page, pas sur la suivante.
     await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1500); // React signale un écart d'hydratation après coup
     await pasDeDebordement(page);
     expect(erreurs, chemin).toEqual([]);
   }
@@ -115,6 +116,16 @@ test("la bulle de Colette ouvre les salons du campus", async ({ page }) => {
   await expect(page.getByRole("button", { name: /Général/ })).toBeVisible();
   await page.getByRole("button", { name: /Général/ }).click();
   await expect(page.getByPlaceholder(/Écrire dans Général/)).toBeVisible();
+  expect(erreurs).toEqual([]);
+});
+
+test("les salons par thème sont ouverts à tous et s'ouvrent depuis la bulle", async ({ page }) => {
+  const erreurs = surveillerErreurs(page);
+  await page.goto("/fil");
+  await page.getByRole("button", { name: /^Messages/ }).click();
+  await page.getByRole("tab", { name: "Salons" }).click();
+  await page.getByRole("button", { name: /Photo et vidéo/ }).click();
+  await expect(page.getByPlaceholder(/Écrire dans Photo et vidéo/)).toBeVisible();
   expect(erreurs).toEqual([]);
 });
 

@@ -53,8 +53,23 @@ export function salonsDe({ campus, classe }: { campus: string; classe: { id: str
   ];
 }
 
+// Les salons par thème (migration 0033) : ouverts à tous les étudiants, tous campus confondus.
+export const SALONS_THEMES: Salon[] = [
+  { id: "theme:photo-video", nom: "Photo et vidéo" },
+  { id: "theme:dev", nom: "Dev et no-code" },
+  { id: "theme:design", nom: "Design et UX" },
+  { id: "theme:data-ia", nom: "Data et IA" },
+  { id: "theme:logement", nom: "Coloc et covoit" },
+];
+
+export function tousLesSalons(moi: { campus: string; classe: { id: string; nom: string } | null }): Salon[] {
+  return [...salonsDe(moi), ...SALONS_THEMES];
+}
+
 export function nomSalon(id: string, nomClasse?: string) {
   if (id === "general") return "Général";
+  const theme = SALONS_THEMES.find((s) => s.id === id);
+  if (theme) return theme.nom;
   if (id.startsWith("campus:")) return `Campus de ${id.slice(7)}`;
   return nomClasse ?? "Ma classe";
 }

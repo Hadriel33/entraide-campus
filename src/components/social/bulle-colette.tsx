@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { salonsDe, type Salon } from "@/lib/social/social";
+import { tousLesSalons, type Salon } from "@/lib/social/social";
+import { MiniPostit, SELECT_MINI, type MiniAnnonce } from "@/components/annonces/mini-postit";
 import { Avatar } from "@/components/ui/avatar";
 import { ilYa } from "@/lib/temps";
 import { contenuSticker, stickerDe } from "@/lib/messages/stickers";
@@ -12,7 +13,7 @@ import { SignalerMessage } from "./signaler-message";
 
 type Personne = { pseudo: string; avatar_chemin: string | null; colette_couleur?: string };
 type Conversation = { id: string; repondu_le: string | null; annonce: { titre: string } | null; demandeur: Personne | null; destinataire: Personne | null; demandeur_id: string };
-type MessageSalon = { id: string; auteur_id: string; contenu: string; cree_le: string; auteur: Personne | null };
+type MessageSalon = { id: string; auteur_id: string; contenu: string; cree_le: string; auteur: Personne | null; annonce_id?: string | null; annonce?: MiniAnnonce | null };
 
 // La tête de Colette en lettre : une enveloppe post-it avec ses yeux, et sa punaise en guise de cachet.
 function ColetteLettre() {
@@ -28,13 +29,14 @@ function ColetteLettre() {
   );
 }
 
+const SELECT = `id, auteur_id, contenu, cree_le, auteur:profils!salon_messages_auteur_id_fkey(pseudo, avatar_chemin, colette_couleur), ${SELECT_MINI}`;
+
 // Un salon en direct : les 50 derniers messages, puis Realtime (qui respecte la RLS : je ne reçois que mes salons).
 function ChatSalon({ salon, moi, retour }: { salon: Salon; moi: string; retour: () => void }) {
   const [messages, setMessages] = useState<MessageSalon[]>([]);
   const [texte, setTexte] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const fil = useRef<HTMLOListElement>(null);
-  const SELECT = "id, auteur_id, contenu, cree_le, auteur:profils!salon_messages_auteur_id_fkey(pseudo, avatar_chemin, colette_couleur)";
 
   useEffect(() => {
     const supabase = createClient();
@@ -101,6 +103,11 @@ function ChatSalon({ salon, moi, retour }: { salon: Salon; moi: string; retour: 
               <div className={`flex max-w-[80%] flex-col rounded-carte px-3 py-1.5 text-sm ${mien ? "bg-encre text-surface" : "bg-papier-fonce"}`}>
                 {!mien && <span className="text-xs font-semibold">@{m.auteur?.pseudo}</span>}
                 {stickerDe(m.contenu) ? <StickerAffiche contenu={m.contenu} taille={52} /> : <span className="break-words">{m.contenu}</span>}
+                {m.annonce_id && (
+                  <span className="mt-1 block">
+                    <MiniPostit annonce={m.annonce ?? null} />
+                  </span>
+                )}
                 <span className={`flex items-center gap-2 text-[10px] ${mien ? "text-surface/60" : "text-encre-douce"}`}>
                   {ilYa(m.cree_le)}
                   {!mien && <SignalerMessage cible="salon" id={m.id} />}
@@ -151,7 +158,7 @@ export function BulleColette({
   const [onglet, setOnglet] = useState<"perso" | "salons">("perso");
   const [salon, setSalon] = useState<Salon | null>(null);
   const [conversations, setConversations] = useState<Conversation[] | null>(null);
-  const salons = salonsDe({ campus, classe });
+  const salons = tousLesSalons({ campus, classe });
 
   useEffect(() => {
     if (!ouvert || conversations) return;
@@ -218,7 +225,7 @@ export function BulleColette({
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate font-semibold">{s.nom}</span>
                       <span className="text-xs text-encre-douce">
-                        {s.id === "general" ? "Tous les campus" : s.id.startsWith("campus:") ? "Les étudiants de ton campus" : "Ta classe"}
+                        {s.id === "general" ? "Tous les campus" : s.id.startsWith("campus:") ? "Les étudiants de ton campus" : s.id.startsWith("theme:") ? "Par thème, tous les campus" : "Ta classe"}
                       </span>
                     </span>
                   </button>

@@ -18,6 +18,8 @@ import {
 import { joursRestants } from "@/lib/annonces/expiration";
 import { BoutonFavori } from "@/components/annonces/bouton-favori";
 import { BoutonPartager } from "@/components/annonces/bouton-partager";
+import { PartagerDans } from "@/components/social/partager-dans";
+import { tousLesSalons } from "@/lib/social/social";
 import { inclinaison, teinte } from "@/lib/design/teintes";
 import { Avatar } from "@/components/ui/avatar";
 import { chargerSocial } from "@/lib/social/requetes";
@@ -74,7 +76,7 @@ export default async function PageAnnonce({
   const annonce = await lireAnnonce(id);
   if (!annonce) notFound();
 
-  const { supabase, user } = await getSession();
+  const { supabase, user, profil } = await getSession();
   const estAuteur = user?.id === annonce.auteur_id;
   // Post-it de groupe : les membres qui ont accepté font partie de l'équipe (modifier, répondre, pas de demande à soi-même).
   const equipe = equipeAcceptee(annonce.membres);
@@ -126,6 +128,23 @@ export default async function PageAnnonce({
   // Le côté réseau social : réactions et commentaires sous l'annonce (jamais de coordonnées, la base y veille).
   const social = user ? await chargerSocial(supabase, "annonce", [annonce.id], user.id) : null;
   const { data: moi } = user ? await supabase.from("profils").select("role").eq("id", user.id).maybeSingle() : { data: null };
+  // « Partager dans… » (0033) : mes salons et mes discussions (la RLS ne renvoie que les miennes).
+  const [{ data: maClasse }, { data: mesDiscussions }] = user
+    ? await Promise.all([
+        profil?.classe_id ? supabase.from("classes").select("id, nom").eq("id", profil.classe_id).maybeSingle() : Promise.resolve({ data: null }),
+        supabase
+          .from("demandes_contact")
+          .select("id, annonce:annonces(titre), demandeur:profils!demandes_contact_demandeur_id_fkey(id, pseudo), destinataire:profils!demandes_contact_destinataire_id_fkey(id, pseudo)")
+          .eq("statut", "acceptee")
+          .order("repondu_le", { ascending: false })
+          .limit(20),
+      ])
+    : [{ data: null }, { data: null }];
+  const salonsPartage = profil ? tousLesSalons({ campus: profil.campus, classe: maClasse ?? null }) : [];
+  const discussionsPartage = ((mesDiscussions ?? []) as unknown as { id: string; annonce: { titre: string } | null; demandeur: { id: string; pseudo: string } | null; destinataire: { id: string; pseudo: string } | null }[]).map((d) => {
+    const autre = d.demandeur?.id === user?.id ? d.destinataire : d.demandeur;
+    return { id: d.id, nom: `@${autre?.pseudo ?? "?"} · « ${(d.annonce?.titre ?? "post-it").slice(0, 40)} »` };
+  });
 
   return (
     <article className="apparition flex w-full max-w-2xl flex-col gap-8">
@@ -436,6 +455,7 @@ export default async function PageAnnonce({
         )}
         <BoutonPartager titre={annonce.titre} />
       </div>
+      {user && annonce.statut === "publiee" && <PartagerDans annonceId={annonce.id} salons={salonsPartage} discussions={discussionsPartage} />}
 
       {!estEquipe && (
         <details className="text-sm">
