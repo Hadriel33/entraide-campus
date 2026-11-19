@@ -3,7 +3,7 @@
 > Le cours : un vrai parcours, en direct sur l'appli en ligne, pas de capture ni de vidéo. Raconter l'histoire d'une personne.
 
 ## Avant de commencer (la veille au plus tard, sans toucher au code)
-- [ ] Lancer `supabase/demo/rafraichir-demo.sql` dans l'éditeur SQL : les post-its de démo expirent, sans ça le tableau est vide.
+- [ ] Lancer `supabase/demo/rafraichir-demo.sql` dans l'éditeur SQL : les post-its de démo expirent, sans ça le tableau est vide. Il donne aussi une étape de suivi aux échanges de démo (Colette livreuse et Historique remplis).
 - [ ] Deux comptes ouverts dans **deux navigateurs** (pas deux onglets du même : sinon, même session) :
   - **Sam** (photographe) : son CV PDF prêt sur le bureau, son post-it « Portraits pro pour ton LinkedIn » publié **avec une photo**.
   - **Léa** (organise le gala de son asso) : connectée, sur le tableau.
@@ -21,10 +21,11 @@
 | 0:30 | Léa | Ouvre le post-it de Sam (avec sa photo), clique « Je soutiens » puis « Demander le contact » | « Le numéro de Sam est caché. Pas juste à l'écran : la base refuse de l'envoyer. Règle d'or n°1. » |
 | 0:50 | Sam | La demande est punaisée sur son bureau, il accepte | Confettis. « Sam accepte : les coordonnées apparaissent des deux côtés et une discussion s'ouvre. » |
 | 1:05 | Les deux | Un message, puis un sticker Colette, reçus en direct | « Cette conversation n'est lisible que par eux deux, règle d'or n°3. » |
-| 1:25 | Sam | Mon profil, dépose son CV | « IA n°1 : Colette lit le CV et propose ses compétences. Sam garde ce qui est juste. Le CV n'est jamais stocké. » |
-| 1:50 | Léa | Publie « RECHERCHE PHOTOGRAPHE, appelle le 06... » | Le post-it tombe et la punaise s'enfonce. « IA n°2 : Colette relit chaque post-it, photo comprise. » Ouvrir le post-it : elle propose une version sans le numéro. « Elle ne refuse pas sèchement, elle aide. Léa clique Appliquer. » |
-| 2:20 | Léa | « Partager dans… » le salon Photo et vidéo | « Et comme sur un réseau social, le post-it circule : il apparaît dans le salon de tous les campus, en mini post-it cliquable. » |
-| 2:40 | | Le mur en direct (projection), puis le classement | « Le campus le voit en direct, et chaque entraide fait monter sa classe. » |
+| 1:20 | Sam | Suivi de l'entraide : « Je m'y mets » avec le mot « retouches jeudi » | Colette met son casque et marche sur la barre. « Léa suit l'avancée comme un colis. Quand c'est livré, elle confirme Bien reçu, l'échange passe dans l'Historique et chacun laisse un avis. » |
+| 1:35 | Sam | Mon profil, dépose son CV | « IA n°1 : Colette lit le CV et propose ses compétences. Sam garde ce qui est juste. Le CV n'est jamais stocké. » |
+| 2:00 | Léa | Publie « RECHERCHE PHOTOGRAPHE, appelle le 06... » | Le post-it tombe et la punaise s'enfonce. « IA n°2 : Colette relit chaque post-it, photo comprise. » Ouvrir le post-it : elle propose une version sans le numéro. « Elle ne refuse pas sèchement, elle aide. Léa clique Appliquer. » |
+| 2:25 | Léa | « Partager dans… » le salon Photo et vidéo | « Et comme sur un réseau social, le post-it circule : il apparaît dans le salon de tous les campus, en mini post-it cliquable. » |
+| 2:45 | | Le mur en direct (projection), puis le classement | « Le campus le voit en direct, et chaque entraide fait monter sa classe. » |
 | 3:00 | | | Fin. |
 
 ## Après la démo : expliquer nos choix (questions préparées)

@@ -54,6 +54,15 @@
 - [ ] B signale un commentaire de A : il apparaît dans Admin › Modération › « Commentaires et messages signalés »
 - [ ] Admin › « Tester maintenant » : 4 lignes vertes, photo piégée comprise
 
+## 10. Suivi d'une entraide et confirmation d'email (ajouté le 19/11) — compte A et compte B
+- [ ] B demande le contact sur un post-it « Je propose » de A, A accepte : le suivi apparaît dans « Mes échanges » › En cours, Colette dort au départ
+- [ ] A clique « Je m'y mets » avec un petit mot : le bouton dit « Colette y va... », puis Colette marche jusqu'à l'étape ; B reçoit une notification avec le mot
+- [ ] B ne voit aucun bouton d'étape (seulement « Quand ce sera livré, tu fermeras l'échange ici ») ; un petit mot avec un numéro est refusé
+- [ ] A clique « C'est livré » ; B clique « Bien reçu, merci ! » : l'échange passe dans l'Historique des deux côtés, A est prévenu, la notation s'affiche
+- [ ] Sur téléphone : une seule étiquette d'étape sous la barre, rien ne déborde
+- [ ] Fenêtre privée : nouvelle inscription, écran « Regarde tes mails », mail avec Colette reçu ; connexion refusée avant le clic, acceptée après ; « Renvoyer le mail » fonctionne
+- [ ] « Mot de passe oublié » : le mail arrive, le lien mène à la page du nouveau mot de passe (même ouvert sur un autre appareil)
+
 ## Problèmes trouvés
 | Date | Étape | Ce que j'ai fait | Ce que j'attendais | Ce qui s'est passé | Corrigé ? |
 |---|---|---|---|---|---|
