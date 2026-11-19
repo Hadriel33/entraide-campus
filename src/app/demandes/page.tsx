@@ -296,6 +296,7 @@ export default async function PageDemandes({
         prenomAutre={prenomAutre}
         retour="liste"
         compact
+        avisDonne={avisDonnes.has(d.id)}
       />
     );
   }
