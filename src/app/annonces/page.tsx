@@ -1,7 +1,9 @@
+import { SAISIE_COMPACTE } from "@/components/ui/saisie";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { niveauMatch, suggerer } from "@/lib/matching/suggestions";
+import { classerAvecColette } from "@/lib/matching/colette-tri";
 import { matcherAnnonces } from "@/lib/ia/modele";
 import { BadgeIA } from "@/components/ia/badge-ia";
 import { resumerSoutiens, type ResumeSoutien } from "@/lib/social/soutiens";
@@ -65,8 +67,6 @@ function lienFiltre(actuels: Filtres, change: Filtres) {
   return q ? `/annonces?${q}` : "/annonces";
 }
 
-const CLASSE_SAISIE =
-  "min-h-10 rounded-ui border border-ligne-forte bg-surface px-3 text-sm outline-none focus:border-encre";
 
 export default async function PageAnnonces({
   searchParams,
@@ -192,6 +192,7 @@ export default async function PageAnnonces({
   let pourToi: ReturnType<typeof suggerer<Annonce>> = [];
   let matchs = new Map<string, { niveau: string; raisons: string[] }>();
   let coletteOk: boolean | null = null; // null : pas demandé ; false : IA indisponible
+  let coletteRien = false; // Colette a relu mais rien retenu : on montre le tri par règles
   let profilMatch: { competences: string[]; categories: string[] } | null =
     null;
   if ((sansFiltre || pourMoi) && user && profil) {
@@ -241,25 +242,17 @@ export default async function PageAnnonces({
           })),
         );
         coletteOk = ia !== null;
-        if (ia) {
-          const regles = new Map(classees.map((c) => [c.annonce.id, c.score]));
-          const note = (id: string) => ia.get(id)?.pertinence ?? 0;
-          annonces = lot
-            .filter((a) => note(a.id) >= 2)
-            .sort(
-              (a, b) =>
-                note(b.id) - note(a.id) ||
-                (regles.get(b.id) ?? 0) - (regles.get(a.id) ?? 0),
-            );
+        // Colette ne retient rien : on garde le tri par règles (la liste n'est jamais vidée par l'IA).
+        const relues = ia ? classerAvecColette(lot, ia, new Map(classees.map((c) => [c.annonce.id, c.score]))) : null;
+        coletteRien = !!ia && !relues;
+        if (relues) {
+          annonces = relues.map((r) => r.annonce);
           matchs = new Map(
-            annonces.map((a) => [
-              a.id,
+            relues.map((r) => [
+              r.annonce.id,
               {
-                niveau:
-                  note(a.id) === 3
-                    ? "Colette : parfait pour toi"
-                    : "Colette : ça peut coller",
-                raisons: [ia.get(a.id)?.raison ?? ""].filter(Boolean),
+                niveau: r.pertinence === 3 ? "Colette : parfait pour toi" : "Colette : ça peut coller",
+                raisons: [r.raison].filter(Boolean),
               },
             ]),
           );
@@ -401,7 +394,7 @@ export default async function PageAnnonces({
               <select
                 name="quartier"
                 defaultValue={filtres.quartier ?? ""}
-                className={CLASSE_SAISIE}
+                className={SAISIE_COMPACTE}
               >
                 <option value="">Tous les quartiers</option>
                 {/* Les quartiers du campus affiché ; avec « tous les campus », rangés par ville. */}
@@ -424,7 +417,7 @@ export default async function PageAnnonces({
               <select
                 name="tram"
                 defaultValue={filtres.tram ?? ""}
-                className={CLASSE_SAISIE}
+                className={SAISIE_COMPACTE}
               >
                 <option value="">Toutes</option>
                 {TRAMS.map((t) => (
@@ -440,7 +433,7 @@ export default async function PageAnnonces({
               <select
                 name="campus"
                 defaultValue={campus ?? "tous"}
-                className={CLASSE_SAISIE}
+                className={SAISIE_COMPACTE}
               >
                 <option value="tous">Tous les campus</option>
                 {CAMPUS.map((c) => (
@@ -456,7 +449,7 @@ export default async function PageAnnonces({
               <select
                 name="contrepartie"
                 defaultValue={filtres.contrepartie ?? ""}
-                className={CLASSE_SAISIE}
+                className={SAISIE_COMPACTE}
               >
                 <option value="">Toutes</option>
                 {Object.entries(CONTREPARTIES).map(([v, l]) => (
@@ -688,7 +681,9 @@ export default async function PageAnnonces({
           />
           <p className="min-w-56 flex-1 text-sm leading-snug">
             <BadgeIA numero={3} className="mr-1.5 align-middle" />
-            {coletteOk === true
+            {coletteRien
+              ? "Colette n'a rien trouvé de plus précis dans les 40 derniers post-its : voici le classement simple, par mots et catégories."
+              : coletteOk === true
               ? "Colette a relu les 40 derniers post-its et garde ceux qui te vont vraiment, même écrites avec d'autres mots."
               : coletteOk === false
                 ? "Colette est indisponible pour l'instant : voici le classement simple, par mots et catégories."

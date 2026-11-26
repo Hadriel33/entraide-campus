@@ -6,7 +6,7 @@ import { ACCESSOIRES_COLETTE, COULEURS_COLETTE, HUMEURS_COLETTE, MOTIFS_COLETTE,
 import type { Stats } from "@/lib/gamification/progression";
 import { sauverColette } from "./actions";
 
-const PASTILLE: Record<string, string> = { jaune: "bg-postit-jaune", lilas: "bg-postit-lilas", ciel: "bg-postit-ciel", ocre: "bg-postit-ocre" };
+const PASTILLE: Record<string, string> = { jaune: "bg-postit-jaune", lilas: "bg-postit-lilas", ciel: "bg-postit-ciel", ocre: "bg-postit-ocre", menthe: "bg-postit-menthe", rose: "bg-postit-rose" };
 
 function Cadenas() {
   return (

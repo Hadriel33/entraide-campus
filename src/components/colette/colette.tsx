@@ -4,7 +4,7 @@ import { saisonDu } from "@/lib/design/saisons";
 // Pur SVG + CSS (animations dans globals.css, section « Colette »), utilisable côté serveur.
 // Les couleurs viennent des jetons du thème (test front-portable) : aucune couleur en dur ici.
 
-export type CouleurColette = "jaune" | "lilas" | "ciel" | "ocre";
+export type CouleurColette = "jaune" | "lilas" | "ciel" | "ocre" | "menthe" | "rose";
 export type Humeur = "contente" | "surprise" | "fiere" | "decue" | "fachee" | "concentree" | "dort" | "rit";
 export type Accessoire =
   | "aucun"
@@ -30,6 +30,10 @@ export type Accessoire =
   | "bob"
   | "bandana"
   | "ballon"
+  | "lunettes_rondes"
+  | "moustache"
+  | "casquette"
+  | "antennes"
   // Tenue de la guide (le tuto) : on la reconnaît, ce n'est pas ta Colette
   | "guide"
   // Tenues de saison (portées par la mascotte, pas choisissables en avatar)
@@ -44,6 +48,8 @@ const PAPIER: Record<CouleurColette, [string, string]> = {
   lilas: ["var(--color-postit-lilas)", "var(--color-coin-lilas)"],
   ciel: ["var(--color-postit-ciel)", "var(--color-coin-ciel)"],
   ocre: ["var(--color-postit-ocre)", "var(--color-coin-ocre)"],
+  menthe: ["var(--color-postit-menthe)", "var(--color-coin-menthe)"],
+  rose: ["var(--color-postit-rose)", "var(--color-coin-rose)"],
 };
 
 const K = "var(--color-encre)";
@@ -375,6 +381,33 @@ function AccessoireDevant({ a }: { a: Accessoire }) {
           <path d="M152 36 Q154 30 160 29" stroke={BLANC} strokeWidth="2.5" fill="none" strokeLinecap="round" />
         </g>
       );
+    case "lunettes_rondes":
+      return (
+        <g stroke="var(--color-encre-bleue)" strokeWidth="4" fill="none">
+          <circle cx="66" cy="76" r="14" />
+          <circle cx="100" cy="76" r="14" />
+          <path d="M80 74 Q83 70 86 74 M52 74 L32 70 M114 74 L134 70" strokeLinecap="round" />
+        </g>
+      );
+    case "moustache":
+      return <path d="M83 95 Q74 85 62 91 Q55 95 57 101 Q66 96 83 98 Q100 96 109 101 Q111 95 104 91 Q92 85 83 95 Z" fill={K} />;
+    case "casquette":
+      return (
+        <g stroke={K} strokeWidth="2.5" strokeLinejoin="round">
+          <path d="M42 34 Q44 6 83 6 Q122 6 124 34 Z" fill={ROUGE} />
+          <path d="M44 30 Q26 24 14 34 Q28 40 46 35 Z" fill={ROUGE} />
+          <path d="M83 6 V34 M60 10 Q66 22 64 34 M106 10 Q100 22 102 34" fill="none" strokeWidth="1.5" />
+          <circle cx="83" cy="6" r="4" fill={K} />
+        </g>
+      );
+    case "antennes":
+      return (
+        <g className="col-flotte" stroke={K} strokeWidth="3" strokeLinecap="round" fill="none">
+          <path d="M70 30 Q64 12 52 4 M96 30 Q102 12 114 4" />
+          <circle cx="52" cy="4" r="6" fill="var(--color-ok)" strokeWidth="2.5" />
+          <circle cx="114" cy="4" r="6" fill="var(--color-ok)" strokeWidth="2.5" />
+        </g>
+      );
     case "guide":
       return (
         <g>
@@ -605,7 +638,7 @@ export function Colette({
   if (deSaison) accessoire = deSaison.tenue;
   const [fond, coin] = PAPIER[couleur];
   const joue = couleur === "lilas" ? "var(--color-ocre)" : "var(--color-lilas)";
-  const cachePunaise = ["diplome", "noel", "couronne", "casque", "sorciere", "guide", "bob"].includes(accessoire);
+  const cachePunaise = ["diplome", "noel", "couronne", "casque", "sorciere", "guide", "bob", "casquette"].includes(accessoire);
   const corps = anim === "danse" ? "col-danse" : anim === "flotte" || anim === "coucou" ? "col-flotte" : anim === "saute" ? "col-saute" : anim === "dort" ? "col-respire" : anim === "cherche" ? "col-cherche" : anim === "debordee" ? "col-tremble" : anim === "reflechit" ? "col-penche" : "";
 
   return (

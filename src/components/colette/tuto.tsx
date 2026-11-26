@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 import { Colette, type AnimColette } from "./colette";
 
 const CLE = "postit-tuto";
@@ -33,10 +34,12 @@ function abonner(rappel: () => void) {
 }
 
 // Tuto de premier passage : Colette en bas de l'écran, une bulle par étape, « Passer » toujours visible.
+// Seulement sur le bureau (il en parle) : il ne gêne ni la page Bienvenue ni la création du profil.
 export function TutoColette() {
   const vu = useSyncExternalStore(abonner, lire, () => "vu");
   const [etape, setEtape] = useState(0);
-  if (vu) return null;
+  const chemin = usePathname();
+  if (vu || chemin !== "/bureau") return null;
 
   const fermer = () => {
     try {

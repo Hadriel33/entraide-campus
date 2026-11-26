@@ -1,5 +1,6 @@
 "use client";
 
+import { SAISIE } from "@/components/ui/saisie";
 import { useActionState, useState } from "react";
 import { Bouton, BoutonLien } from "@/components/ui/bouton";
 import { Champ } from "@/components/ui/champ";
@@ -12,8 +13,6 @@ import type { EtatAnnonce } from "@/app/annonces/actions";
 
 type Action = (etat: EtatAnnonce, formData: FormData) => Promise<EtatAnnonce>;
 
-const CLASSE_SAISIE =
-  "min-h-11 rounded-ui border-2 border-ligne-forte bg-surface px-3 py-2 text-base font-normal outline-none transition-shadow focus:border-encre focus:shadow-[3px_3px_0_0_var(--color-bandeau)] aria-[invalid=true]:border-alerte";
 
 function Erreur({ texte }: { texte?: string }) {
   return texte ? <span className="text-sm font-normal text-alerte">{texte}</span> : null;
@@ -71,7 +70,7 @@ export function FormulaireAnnonce({
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
           Catégorie
-          <select name="categorie" defaultValue={v.categorie ?? ""} aria-invalid={!!e.categorie} className={CLASSE_SAISIE}>
+          <select name="categorie" defaultValue={v.categorie ?? ""} aria-invalid={!!e.categorie} className={SAISIE}>
             <option value="" disabled>
               Choisir une catégorie
             </option>
@@ -85,7 +84,7 @@ export function FormulaireAnnonce({
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
           Contrepartie
-          <select name="contrepartie" defaultValue={v.contrepartie ?? ""} aria-invalid={!!e.contrepartie} className={CLASSE_SAISIE}>
+          <select name="contrepartie" defaultValue={v.contrepartie ?? ""} aria-invalid={!!e.contrepartie} className={SAISIE}>
             <option value="" disabled>
               Choisir
             </option>
@@ -108,7 +107,7 @@ export function FormulaireAnnonce({
           rows={5}
           defaultValue={v.description}
           aria-invalid={!!e.description}
-          className={`${CLASSE_SAISIE} resize-y`}
+          className={`${SAISIE} resize-y`}
         />
         {e.description ? (
           <Erreur texte={e.description} />
@@ -122,7 +121,7 @@ export function FormulaireAnnonce({
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
           Où ? (facultatif)
-          <select name="quartier" value={ou} onChange={(ev) => setOu(ev.target.value)} aria-invalid={!!e.quartier} className={CLASSE_SAISIE}>
+          <select name="quartier" value={ou} onChange={(ev) => setOu(ev.target.value)} aria-invalid={!!e.quartier} className={SAISIE}>
             <option value="">Pas précisé</option>
             {quartiers.map((valeur) => (
               <option key={valeur} value={valeur}>
@@ -135,7 +134,7 @@ export function FormulaireAnnonce({
         {avecTram && ou !== "a_distance" && ou !== "hors_bordeaux" && (
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
           Tram le plus proche (facultatif)
-          <select name="tram" defaultValue={v.tram ?? ""} aria-invalid={!!e.tram} className={CLASSE_SAISIE}>
+          <select name="tram" defaultValue={v.tram ?? ""} aria-invalid={!!e.tram} className={SAISIE}>
             <option value="">Pas précisé</option>
             {TRAMS.map((t) => (
               <option key={t} value={t}>
@@ -165,7 +164,7 @@ export function FormulaireAnnonce({
       {avecEquipe ? (
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
           À plusieurs ? Invite tes potes (facultatif)
-          <ChampMention name="equipe" defaultValue={v.equipe ?? ""} placeholder="Tape @ pour chercher un pseudo" className={`${CLASSE_SAISIE} w-full`} />
+          <ChampMention name="equipe" defaultValue={v.equipe ?? ""} placeholder="Tape @ pour chercher un pseudo" className={`${SAISIE} w-full`} />
           <span className="text-xs font-normal text-encre-douce">Jusqu&apos;à 3 pseudos. Chacun reçoit une invitation et apparaît sur le post-it quand il a dit oui.</span>
         </label>
       ) : (

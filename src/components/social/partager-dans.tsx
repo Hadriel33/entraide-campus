@@ -1,5 +1,6 @@
 "use client";
 
+import { SAISIE } from "@/components/ui/saisie";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { partagerPostit, type EtatPartage } from "@/app/fil/actions";
@@ -48,7 +49,7 @@ export function PartagerDans({
       </div>
       <label className="flex flex-col gap-1.5 text-sm font-semibold">
         Où ?
-        <select name="destination" required defaultValue="" className="min-h-11 rounded-ui border border-ligne-forte bg-surface px-3 text-base font-normal">
+        <select name="destination" required defaultValue="" className={SAISIE}>
           <option value="" disabled>
             Choisir un salon ou une discussion
           </option>
