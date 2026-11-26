@@ -27,8 +27,13 @@ export async function pasDeDebordement(page: Page) {
 
 // Écart d'hydratation (React #418) : on joint au rapport le HTML envoyé par le serveur et la page finale du
 // navigateur, pour trouver à coup sûr l'élément qui diffère (l'erreur minifiée ne le dit pas).
-export async function joindreSiHydratation(page: Page, chemin: string, erreurs: string[]) {
+export async function joindreSiHydratation(page: Page, chemin: string, erreurs: string[], htmlRecu?: string) {
   if (!erreurs.some((e) => e.includes("#418"))) return;
+  // La page EXACTE reçue par le navigateur (pas une seconde requête) et le début du document tel que le navigateur
+  // l'a construit, noté au DOMContentLoaded, avant que React ne reprenne la page (voir espionHydratation).
+  if (htmlRecu) await test.info().attach(`html-recu-navigateur${chemin.replace(/\W+/g, "-")}.html`, { body: htmlRecu, contentType: "text/plain" });
+  const initial = await page.evaluate(() => (window as unknown as { __domInitial?: string }).__domInitial ?? "");
+  if (initial) await test.info().attach(`dom-avant-react${chemin.replace(/\W+/g, "-")}.html`, { body: initial, contentType: "text/plain" });
   const serveur = await (await page.request.get(chemin)).text();
   const nom = chemin.replace(/\W+/g, "-");
   await test.info().attach(`html-serveur${nom}.html`, { body: serveur, contentType: "text/plain" });
@@ -48,6 +53,14 @@ export async function espionHydratation(page: Page) {
     return notes; // navigateur sans protocole Chrome : pas d'espion
   }
   const nosPoints = new Set<string>();
+  // Le début du document au DOMContentLoaded : où se trouvent <meta charset>, <head> et le début de <body>.
+  await page.addInitScript(() => {
+    document.addEventListener("DOMContentLoaded", () => {
+      const html = document.documentElement.outerHTML;
+      const corps = html.indexOf("<body");
+      (window as unknown as { __domInitial?: string }).__domInitial = html.slice(0, 3000) + "\n...\n" + html.slice(Math.max(0, corps - 200), corps + 2000);
+    });
+  });
   await cdp.send("Debugger.enable");
   cdp.on("Debugger.scriptParsed", async ({ scriptId, url }) => {
     if (!/\/_next\/static\/.*\.js/.test(url)) return;

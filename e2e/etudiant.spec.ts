@@ -96,7 +96,8 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     ["/reglages", /Réglages/i],
   ] as const) {
     const erreurs = surveillerErreurs(page);
-    await page.goto(chemin);
+    const reponse = await page.goto(chemin);
+    const htmlRecu = (await reponse?.text().catch(() => "")) ?? "";
     await expect(
       page.getByRole("heading", { name: titre }).first(),
       chemin,
@@ -105,7 +106,7 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1500); // React signale un écart d'hydratation après coup
     await pasDeDebordement(page);
-    await joindreSiHydratation(page, chemin, erreurs);
+    await joindreSiHydratation(page, chemin, erreurs, htmlRecu);
     if (espion.length) await test.info().attach(`espion-hydratation${chemin.replace(/\W+/g, "-")}.txt`, { body: espion.join("\n\n"), contentType: "text/plain" });
     expect(erreurs, `${chemin}\n${espion.join("\n")}`).toEqual([]);
   }

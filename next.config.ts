@@ -16,11 +16,6 @@ const ENTETES = [
 ];
 
 const nextConfig: NextConfig = {
-  // Métadonnées toujours dans <head>, d'un bloc (doc Next.js « Streaming metadata », option documentée pour le
-  // désactiver). Sinon, selon la vitesse de la réponse, elles arrivaient à la fin du <body> et React trouvait un
-  // <meta charset> là où il attendait la page : erreur d'hydratation #418 sur Réglages, un jour sur deux (robot).
-  // Nos métadonnées sont fixes ou lues en cache : rien à attendre de plus.
-  htmlLimitedBots: /.*/,
   images: {
     // Seules les photos de profil du bucket public « avatars » sont autorisées.
     remotePatterns: [
