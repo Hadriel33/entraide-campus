@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { joindreSiHydratation, pasDeDebordement, surveillerErreurs } from "./outils";
+import { espionHydratation, joindreSiHydratation, pasDeDebordement, surveillerErreurs } from "./outils";
 
 // Le parcours d'un étudiant connecté, EN LECTURE SEULE (rien n'est publié ni accepté en prod).
 // Il aurait attrapé le bug du 02/10 : tableau, liste et détail des annonces vides.
@@ -85,6 +85,7 @@ test("le bureau, les badges et leur post-it", async ({ page }) => {
 });
 
 test("les autres pages s'affichent sans erreur", async ({ page }) => {
+  const espion = await espionHydratation(page);
   for (const [chemin, titre] of [
     ["/demandes", /Mes échanges/i],
     ["/classement", /Classement/i],
@@ -105,7 +106,8 @@ test("les autres pages s'affichent sans erreur", async ({ page }) => {
     await page.waitForTimeout(1500); // React signale un écart d'hydratation après coup
     await pasDeDebordement(page);
     await joindreSiHydratation(page, chemin, erreurs);
-    expect(erreurs, chemin).toEqual([]);
+    if (espion.length) await test.info().attach(`espion-hydratation${chemin.replace(/\W+/g, "-")}.txt`, { body: espion.join("\n\n"), contentType: "text/plain" });
+    expect(erreurs, `${chemin}\n${espion.join("\n")}`).toEqual([]);
   }
 });
 
