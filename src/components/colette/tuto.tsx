@@ -8,7 +8,7 @@ const ETAPES: { anim: AnimColette; texte: string }[] = [
   { anim: "coucou", texte: "Salut, je suis Colette la guide (casquette verte, pancarte « ? »). Ta Colette à toi, tu la crées dans ton profil. Ici, c'est ton bureau : tout ce qui t'attend est punaisé en haut." },
   {
     anim: "accroche",
-    texte: "Sur le tableau, chaque post-it est une annonce. Le pictogramme en haut dit la catégorie, la forme dit le type : billet pour un covoit, petite annonce pour une coloc, étiquette pour un prêt, polaroid pour un shooting.",
+    texte: "Sur le tableau, chaque post-it est une proposition ou une recherche. Le pictogramme en haut dit la catégorie, la forme dit le type : billet pour un covoit, petite annonce pour une coloc, étiquette pour un prêt, polaroid pour un shooting.",
   },
   { anim: "tampon", texte: "Un post-it te plaît ? « Demander le contact ». Ton numéro reste caché tant que tu n'as pas dit oui." },
   { anim: "lit", texte: "Mes 4 IA : je lis ton CV pour proposer tes compétences, j'écris un post-it à partir d'une phrase, je le relis avant publication, et je trie le tableau « Pour moi ». Tout est expliqué dans « Les IA de Colette »." },

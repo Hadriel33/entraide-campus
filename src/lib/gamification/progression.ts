@@ -103,7 +103,7 @@ export function calculerProgression(s: Stats) {
       "Aider un étudiant une première fois",
       s.aides_donnees,
       1,
-      "Accepte une demande sur une annonce où tu proposes ton aide, ou réponds à un « je cherche ».",
+      "Accepte une demande sur un post-it où tu proposes ton aide, ou réponds à un « je cherche ».",
       "/annonces?type=cherche",
     ),
     badge(
@@ -130,7 +130,7 @@ export function calculerProgression(s: Stats) {
       "Recevoir 5 coups de main",
       s.aides_recues,
       5,
-      "Fais-toi aider 5 fois : demande le contact sur des annonces « je propose ».",
+      "Fais-toi aider 5 fois : demande le contact sur des post-its « je propose ».",
       "/annonces?type=propose",
     ),
     badge(

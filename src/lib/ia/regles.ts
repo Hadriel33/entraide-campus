@@ -57,7 +57,7 @@ export function deciderModeration(
 
   if (detecterCoordonnees(texte)) {
     raisons.unshift(
-      "Coordonnées écrites dans l'annonce (elles doivent s'échanger après accord).",
+      "Coordonnées écrites dans le post-it (elles doivent s'échanger après accord).",
     );
     if (ORDRE[statut] < ORDRE.a_verifier) statut = "a_verifier";
   }

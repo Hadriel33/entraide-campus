@@ -172,7 +172,7 @@ export async function verifierIA(): Promise<EtatIA> {
       ? {
           ok: m.r.statut !== "ok",
           ms: m.ms,
-          detail: `verdict « ${m.r.statut} » sur une annonce avec un numéro`,
+          detail: `verdict « ${m.r.statut} » sur un post-it avec un numéro`,
         }
       : { ok: false, ms: m.ms, detail: `pas de réponse du modèle : ${causes.moderation ?? "cause inconnue"}` },
     photo: ph.r

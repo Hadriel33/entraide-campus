@@ -33,7 +33,7 @@ export default async function PageFavoris() {
           titre="Pas encore de favori"
           action={
             <BoutonLien href="/annonces" variante="contour">
-              Voir les annonces
+              Voir le tableau
             </BoutonLien>
           }
         >

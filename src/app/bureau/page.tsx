@@ -137,7 +137,7 @@ export default async function PageBureau() {
       texte:
         d.annonce?.type === "cherche"
           ? `@${d.demandeur?.pseudo ?? "quelqu'un"} te propose son aide pour « ${d.annonce.titre} »`
-          : `@${d.demandeur?.pseudo ?? "quelqu'un"} veut ton aide pour « ${d.annonce?.titre ?? "ton annonce"} »`,
+          : `@${d.demandeur?.pseudo ?? "quelqu'un"} veut ton aide pour « ${d.annonce?.titre ?? "ton post-it"} »`,
       action: "répondre",
       lien: `/demandes#demande-${d.id}`,
     })),
@@ -150,7 +150,7 @@ export default async function PageBureau() {
           joursRestants(a.expire_le) === 0
             ? "Expire aujourd'hui"
             : `Expire dans ${joursRestants(a.expire_le)} j`,
-        texte: `Ton annonce « ${a.titre} »`,
+        texte: `Ton post-it « ${a.titre} »`,
         action: "prolonger",
         lien: `/annonces/${a.id}`,
       })),

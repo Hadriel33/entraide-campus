@@ -227,7 +227,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
             <div>
               <h2 className="text-lg font-semibold">File de modération IA</h2>
               <p className="text-sm text-encre-douce">
-                L&apos;IA relit chaque annonce publiée ou modifiée. Elle ne
+                L&apos;IA relit chaque post-it publié ou modifié. Elle ne
                 supprime rien : c&apos;est toi qui décides.
               </p>
             </div>
@@ -303,7 +303,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
               </ul>
             ) : (
               <p className="text-sm text-encre-douce">
-                Rien à modérer. Toutes les annonces ont été validées.
+                Rien à modérer. Tous les post-its ont été validés.
               </p>
             )}
           </section>
@@ -407,12 +407,12 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="text-lg font-semibold">Dernières annonces</h2>
+            <h2 className="text-lg font-semibold">Derniers post-its</h2>
             <div className="overflow-x-auto rounded-carte border border-ligne bg-surface">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-ligne text-encre-douce">
                   <tr>
-                    <th className="px-4 py-2.5 font-medium">Annonce</th>
+                    <th className="px-4 py-2.5 font-medium">Post-it</th>
                     <th className="px-4 py-2.5 font-medium">Auteur</th>
                     <th className="px-4 py-2.5 font-medium">Statut</th>
                     <th className="px-4 py-2.5 font-medium">
