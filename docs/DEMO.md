@@ -30,12 +30,18 @@
 
 ## Après la démo : expliquer nos choix (questions préparées)
 
-Support de présentation (8 slides avec Colette, notes de l'orateur sous chaque slide ; la démo se fait après la slide 2) : https://claude.ai/artifact/8euRdaaMk6wrVysXGWzuNk
+Support de présentation : https://claude.ai/artifact/8euRdaaMk6wrVysXGWzuNk (21 slides, notes de l'orateur sous chaque slide, mises à jour le 26/11). Le fil : on répond à l'appel d'offres de l'école, et notre angle, c'est « une appli où l'on revient » (Colette, la gamification, le réseau du campus).
+1. **Ce qu'on a compris** (slides 1 à 3) : la demande de l'école, le problème (« l'aide existe, mais personne ne la voit »).
+2. **Notre réponse** (4 à 11) : la genèse, notre angle en composants, la boucle de l'entraide, le réseau (réactions, commentaires, discussion, salons), Colette, le concept papier/écran, la DA et son kit.
+3. **La preuve** (12 à 14) : **la démo se fait sur la slide 12**, puis l'entraide de bout en bout et la comparaison avec le canal Teams.
+4. **La confiance** (15 à 21) : les risques maîtrisés, l'espace admin, les 4 IA, les retours des testeurs, la méthode, nos engagements.
+
+Les notes de la slide 12 contiennent une **antisèche** de toutes les fonctionnalités, pour répondre à « et sinon, il y a quoi ? » sans rien oublier.
 
 - **Notre palier** : les 3 (ça tourne, ça discute, ça matche). Le palier 1 testé à deux comptes, les règles d'or prouvées en base par environ 145 vérifications SQL, plus un robot qui parcourt le site en ligne chaque jour.
 - **Nos IA** : les deux demandées (le profil depuis le CV, la relecture des post-its, photo comprise) et deux bonus (Colette rédige un post-it, le tri « Pour moi »). Voir `docs/IA-DEFENSE.md` et la page « Les IA de Colette » de l'appli (besoin, humain qui valide, plan si ça rate, aucune clé).
 - **Une faille réparée** : l'erreur d'une demande de contact laissait deviner si une annonce existait (un « oracle »). Correction : connexion exigée avant toute vérification, message neutre, test SQL qui rejoue l'attaque (voir `docs/securite/FAILLES.md`).
-- **Avec une séance de plus** : les notifications par email (Brevo), pour savoir qu'on a reçu une demande sans ouvrir l'appli.
+- **Avec une séance de plus** : les notifications par email (Brevo), pour savoir qu'on a reçu une demande sans ouvrir l'appli ; puis, si l'école nous choisit, une appli mobile (elle s'installe déjà sur l'écran d'accueil du téléphone).
 
 ## Plan B si quelque chose casse en direct
 - **L'IA est lente** : continuer le parcours, revenir à l'annonce à la fin (la modération tourne en arrière-plan).
