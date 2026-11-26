@@ -214,3 +214,11 @@ export async function changerPlafondIA(formData: FormData) {
   revalidatePath("/admin");
   redirect("/admin?onglet=impact#cout-ia");
 }
+
+// Boîte à suggestions (0038) : l'admin marque une suggestion « lue » ou « faite » ; l'étudiant le voit dans ses Réglages.
+export async function suivreSuggestion(id: string, statut: "lue" | "faite") {
+  const { supabase } = await exigerAdmin();
+  await supabase.from("suggestions").update({ statut }).eq("id", id);
+  revalidatePath("/admin");
+  redirect("/admin?onglet=suggestions");
+}

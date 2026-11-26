@@ -1,4 +1,5 @@
 import { SAISIE_COMPACTE } from "@/components/ui/saisie";
+import { AdminSuggestions } from "./suggestions";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -73,7 +74,8 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
   const onglet =
     brutOnglet === "etudiants" ||
     brutOnglet === "classes" ||
-    brutOnglet === "moderation"
+    brutOnglet === "moderation" ||
+    brutOnglet === "suggestions"
       ? brutOnglet
       : "impact";
 
@@ -184,7 +186,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
       )}
 
       <nav
-        className="inline-flex self-start rounded-ui bg-papier-fonce p-1"
+        className="inline-flex flex-wrap self-start rounded-ui bg-papier-fonce p-1"
         aria-label="Sections admin"
       >
         {[
@@ -204,6 +206,11 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
             label: "Classes",
             href: "/admin?onglet=classes",
           },
+          {
+            valeur: "suggestions",
+            label: "Suggestions",
+            href: "/admin?onglet=suggestions",
+          },
         ].map((o) => (
           <Link
             key={o.valeur}
@@ -216,7 +223,9 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
         ))}
       </nav>
 
-      {onglet === "impact" ? (
+      {onglet === "suggestions" ? (
+        <AdminSuggestions supabase={supabase} />
+      ) : onglet === "impact" ? (
         <>
           <SanteIA />
           <CoutIA supabase={supabase} />

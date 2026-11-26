@@ -72,6 +72,9 @@ function MenuMoi({ pseudo, campus, avatar }: { pseudo: string; campus: string; a
             <Link href="/ia" className={lien} onClick={() => setOuvert(false)} role="menuitem">
               Les IA de Colette
             </Link>
+            <Link href="/reglages#suggestions" className={lien} onClick={() => setOuvert(false)} role="menuitem">
+              Une idée ? Boîte à suggestions
+            </Link>
             <BoutonTheme className="px-3 py-2 font-medium" />
             <form action={deconnecter} className="border-t border-ligne pt-0.5">
               <button className="presse w-full rounded-ui px-3 py-2 text-left text-sm text-encre-douce hover:bg-papier-fonce hover:text-encre" role="menuitem">

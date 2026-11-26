@@ -8,12 +8,22 @@ import { TitrePage } from "@/components/ui/titre-page";
 import { BoutonTheme } from "@/components/app/theme";
 import { ZoneSensible } from "../compte/zone-sensible";
 import { basculerFil } from "../compte/actions";
+import { BoiteSuggestions } from "@/components/reglages/boite-suggestions";
+import { CATEGORIES_SUGGESTION, type CategorieSuggestion } from "@/lib/suggestions/validation";
+import { jourCampus } from "@/lib/temps";
 
 export const metadata: Metadata = { title: "Réglages" };
 
 // Les réglages : tout ce qui n'est pas « qui je suis » (ça, c'est Mon profil).
 export default async function PageReglages() {
-  const { user, profil } = await exigerSession();
+  const { supabase, user, profil } = await exigerSession();
+  // Mes suggestions déjà envoyées et leur suite (la RLS ne renvoie que les miennes).
+  const { data: mesSuggestions } = await supabase
+    .from("suggestions")
+    .select("id, categorie, texte, statut, cree_le")
+    .eq("auteur_id", user.id)
+    .order("cree_le", { ascending: false })
+    .limit(5);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -30,6 +40,7 @@ export default async function PageReglages() {
         liens={[
           { href: "#fil", label: "Confidentialité" },
           { href: "#apparence", label: "Apparence" },
+          { href: "#suggestions", label: "Suggestions" },
           { href: "#compte", label: "Compte" },
         ]}
       />
@@ -54,6 +65,34 @@ export default async function PageReglages() {
 
       <Section id="apparence" titre="Apparence" aide="Le tableau noir : l'appli passe en sombre, pratique le soir. Le réglage reste sur cet appareil.">
         <BoutonTheme className="self-start border border-ligne-forte px-3 py-2 font-semibold" />
+      </Section>
+
+      <Section
+        id="suggestions"
+        titre="Boîte à suggestions"
+        aide="Une idée, un bug, un truc qui manque ? Ça arrive directement à l'équipe, et tu vois ici ce qu'on en fait."
+      >
+        <BoiteSuggestions />
+        {mesSuggestions && mesSuggestions.length > 0 && (
+          <div className="flex flex-col gap-2 border-t border-ligne pt-4">
+            <h3 className="text-sm font-semibold">Tes dernières suggestions</h3>
+            <ul className="flex flex-col gap-2">
+              {mesSuggestions.map((s) => (
+                <li key={s.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${s.statut === "faite" ? "bg-ok-fond text-ok" : s.statut === "lue" ? "bg-papier-fonce" : "border border-ligne-forte"}`}
+                  >
+                    {s.statut === "faite" ? "C'est fait ✓" : s.statut === "lue" ? "Lue par l'équipe" : "Envoyée"}
+                  </span>
+                  <span className="text-encre-douce">
+                    {CATEGORIES_SUGGESTION[s.categorie as CategorieSuggestion]} · {jourCampus(s.cree_le)}
+                  </span>
+                  <span className="w-full truncate">{s.texte}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </Section>
 
       <Section id="compte" titre="Mon compte" aide={`Ton campus : ${profil.campus}. Seul un admin peut le changer (c'est lui qui compte au championnat).`}>
