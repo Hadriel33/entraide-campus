@@ -71,7 +71,7 @@ export async function creerAnnonce(_: EtatAnnonce, formData: FormData): Promise<
     if (photo.chemin) await supabase.storage.from("annonces").remove([photo.chemin]);
     if (error?.code === "P0429") return { message: error.message, valeurs: champs }; // limite anti-spam
     console.error("Création d'annonce", error);
-    return { message: "L'annonce n'a pas pu être publiée. Réessaie.", valeurs: champs };
+    return { message: "Le post-it n'a pas pu être publié. Réessaie.", valeurs: champs };
   }
 
   // Post-it de groupe dès la publication : les potes indiqués sont invités (la base vérifie : 3 au plus,

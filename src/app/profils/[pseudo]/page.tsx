@@ -158,7 +158,7 @@ export default async function PageProfil({ params }: PageProps<"/profils/[pseudo
       {s && <CarteProgression stats={s} />}
 
       <section className="flex flex-col gap-3">
-        <h2 className="titre-charte text-section">Annonces en cours</h2>
+        <h2 className="titre-charte text-section">Post-its en cours</h2>
         {annonces?.length ? (
           <div className="grid gap-x-6 gap-y-9 pt-3 sm:grid-cols-2">
             {annonces.map((a, i) => (

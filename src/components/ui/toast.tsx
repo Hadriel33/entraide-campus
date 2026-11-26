@@ -29,7 +29,7 @@ const MESSAGES: Record<string, string> = {
   classe_proposee: "Classe proposée : elle compte au classement dès qu'un admin la valide.",
   classe_validee: "Classe validée.",
   fil: "Préférence du fil du campus enregistrée.",
-  corrigee: "Correction appliquée : Colette relit ton annonce.",
+  corrigee: "Correction appliquée : Colette relit ton post-it.",
   classe_supprimee: "Classe supprimée.",
   moderation: "Décision de modération enregistrée.",
   signalement: "Merci, l'équipe de modération va regarder.",

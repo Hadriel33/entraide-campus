@@ -21,7 +21,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       { name: "Publier un post-it", url: "/annonces/nouvelle" },
-      { name: "Mes demandes", url: "/demandes" },
+      { name: "Mes échanges", url: "/demandes" },
       { name: "Le tableau en direct", url: "/mur" },
     ],
   };

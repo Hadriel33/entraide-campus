@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 type Commande = { label: string; aide: string; href: string };
 
 const PAGES: Commande[] = [
-  { label: "Le tableau", aide: "Toutes les annonces du campus", href: "/annonces" },
+  { label: "Le tableau", aide: "Tous les post-its du campus", href: "/annonces" },
   {
     label: "La carte",
     aide: "Les post-its par quartier et ligne de tram",
@@ -33,7 +33,7 @@ const PAGES: Commande[] = [
     aide: "Publiées, archivées, prolonger",
     href: "/mes-annonces",
   },
-  { label: "Favoris", aide: "Annonces gardées de côté", href: "/favoris" },
+  { label: "Favoris", aide: "Post-its gardés de côté", href: "/favoris" },
   {
     label: "Classement",
     aide: "Points, défi de la semaine",
@@ -55,7 +55,7 @@ const PAGES: Commande[] = [
     href: "/reglages",
   },
   {
-    label: "Annonces gratuites",
+    label: "Post-its gratuits",
     aide: "Filtre : contrepartie gratuite",
     href: "/annonces?contrepartie=gratuit",
   },
@@ -173,7 +173,7 @@ export function Palette() {
             } else if (e.key === "Enter" && resultats[index])
               aller(resultats[index].href);
           }}
-          placeholder="Aller à une page ou chercher une annonce..."
+          placeholder="Aller à une page ou chercher un post-it..."
           aria-label="Aller à une page ou chercher un post-it"
           className="w-full border-b border-ligne px-4 py-3.5 text-base outline-none"
         />

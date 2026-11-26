@@ -261,7 +261,7 @@ export async function TableauImpact({
             couleur="bg-ciel"
           />
           <Serie
-            titre="Annonces publiées"
+            titre="Post-its publiés"
             valeurs={s.activite.map((a) => a.annonces)}
             jours={jours}
             couleur="bg-lilas"
@@ -306,7 +306,7 @@ export async function TableauImpact({
             s.moderation.refus_probable ===
             0 && (
             <p className="rounded-ui bg-postit-jaune px-3 py-2 text-sm">
-              Toutes les annonces sont « en attente » : l&apos;IA ne peut pas
+              Tous les post-its sont « en attente » : l&apos;IA ne peut pas
               écrire son verdict. Vérifie que <code>SUPABASE_SECRET_KEY</code>{" "}
               est bien dans les variables Vercel.
             </p>
