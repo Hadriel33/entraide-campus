@@ -73,7 +73,8 @@ export function AtelierColette({
   motif: string;
   stats: Stats | null;
 }) {
-  const [c, setC] = useState(couleur || "jaune");
+  // La couleur arrive déjà résolue (choisie, sinon celle tirée du pseudo, comme dans le menu).
+  const [c, setC] = useState(couleur);
   const [h, setH] = useState(humeur || "contente");
   const [a, setA] = useState(accessoire || "aucun");
   const [m, setM] = useState(motif || "uni");
