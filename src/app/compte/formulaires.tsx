@@ -52,7 +52,7 @@ export function FormulaireIdentite({ pseudo, prenom, bio }: { pseudo: string; pr
         <span className="text-xs font-normal text-encre-douce">{texte.length} / 160</span>
       </label>
       <Message etat={etat} />
-      <p className="text-xs text-encre-douce" aria-live="polite">{enCours ? "Enregistrement..." : "Enregistré automatiquement quand tu quittes un champ."}</p>
+      <p className="text-xs text-encre-douce" aria-live="polite">{enCours ? "Enregistrement..." : etat.ok ? "Enregistré ✓" : "Enregistré automatiquement quand tu quittes un champ."}</p>
     </form>
   );
 }
@@ -106,7 +106,7 @@ export function FormulaireCoordonnees({ telephone, email, reseau }: { telephone:
       <Champ label="Réseau (facultatif)" name="reseau" defaultValue={reseau} erreur={etat.erreurs?.reseau} aide="Instagram, LinkedIn, Discord..." />
       {etat.erreurs?.general && <p className="text-sm text-alerte">{etat.erreurs.general}</p>}
       <Message etat={etat} />
-      <p className="text-xs text-encre-douce" aria-live="polite">{enCours ? "Enregistrement..." : "Enregistré automatiquement quand tu quittes un champ."}</p>
+      <p className="text-xs text-encre-douce" aria-live="polite">{enCours ? "Enregistrement..." : etat.ok ? "Enregistré ✓" : "Enregistré automatiquement quand tu quittes un champ."}</p>
     </form>
   );
 }

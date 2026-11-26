@@ -2,8 +2,17 @@ import type { Stats } from "@/lib/gamification/progression";
 
 // La garde-robe de Colette (mêmes listes et mêmes conditions que la base, migrations 0017 et 0018).
 // Certaines pièces se débloquent en s'entraidant : la base refuse un objet verrouillé, même via l'API.
-export const COULEURS_COLETTE = { jaune: "Jaune", lilas: "Lilas", ciel: "Ciel", ocre: "Ocre" } as const;
-export const HUMEURS_COLETTE = { contente: "Contente", fiere: "Fière", surprise: "Surprise", concentree: "Concentrée" } as const;
+export const COULEURS_COLETTE = { jaune: "Jaune", lilas: "Lilas", ciel: "Ciel", ocre: "Ocre", menthe: "Menthe", rose: "Rose" } as const;
+export const HUMEURS_COLETTE = {
+  contente: "Contente",
+  fiere: "Fière",
+  surprise: "Surprise",
+  concentree: "Concentrée",
+  // Migration 0037 : plus de caractère (retour de Hadriel, 26/11).
+  rit: "Morte de rire",
+  dort: "Sieste",
+  fachee: "Ronchon",
+} as const;
 
 type Objet = { nom: string; condition?: (s: Stats) => boolean; aide?: string };
 
@@ -30,6 +39,11 @@ export const ACCESSOIRES_COLETTE: Record<string, Objet> = {
   bob: { nom: "Bob de festival" },
   bandana: { nom: "Bandana" },
   ballon: { nom: "Ballon" },
+  // Migration 0037 : encore des tenues libres, pour une Colette qui te ressemble sans photo.
+  lunettes_rondes: { nom: "Lunettes rondes" },
+  moustache: { nom: "Moustache" },
+  casquette: { nom: "Casquette à l'envers" },
+  antennes: { nom: "Antennes d'alien" },
   micro: { nom: "Micro", condition: (s) => (s.commentaires ?? 0) >= 3, aide: "Écris 3 commentaires" },
   lunettes_coeur: { nom: "Lunettes cœur", condition: (s) => (s.reactions_recues ?? 0) >= 5, aide: "Reçois 5 réactions" },
   flamme: { nom: "Flamme", condition: (s) => (s.serie ?? 0) >= 3, aide: "Participe 3 semaines d'affilée" },

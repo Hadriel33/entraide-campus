@@ -20,6 +20,7 @@ const MESSAGES: Record<string, string> = {
   avis: "Merci pour ton avis.",
   profil: "Profil enregistré.",
   photo: "Photo de profil mise à jour.",
+  photo_retiree: "Photo retirée : ta Colette reprend sa place partout.",
   coordonnees: "Coordonnées enregistrées.",
   competences: "Compétences enregistrées sur ton profil.",
   groupe: "Tu as rejoint le post-it : te voilà dans l'équipe.",

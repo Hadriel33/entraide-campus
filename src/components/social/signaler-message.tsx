@@ -1,5 +1,6 @@
 "use client";
 
+import { SAISIE_COMPACTE } from "@/components/ui/saisie";
 import { useState, useTransition } from "react";
 import { signalerMessage } from "@/app/fil/actions";
 import { MOTIFS_SIGNALEMENT, type CibleSignalement } from "@/lib/social/signalement";
@@ -29,7 +30,7 @@ export function SignalerMessage({ cible, id, clair = false }: { cible: CibleSign
       <label className="sr-only" htmlFor={`signal-${id}`}>
         Motif du signalement
       </label>
-      <select id={`signal-${id}`} name="motif" required defaultValue="" className="min-h-8 rounded-ui border border-ligne-forte bg-surface px-2 text-xs text-encre">
+      <select id={`signal-${id}`} name="motif" required defaultValue="" className={SAISIE_COMPACTE}>
         <option value="" disabled>
           Pourquoi ?
         </option>

@@ -8,7 +8,7 @@ import { extraireCompetences } from "@/lib/ia/modele";
 import { nettoyerCompetences } from "@/lib/ia/regles";
 import { validerClasse, validerColette, validerNomClasse } from "@/lib/profils/colette";
 
-export type EtatProfil = { erreurs?: Partial<Record<string, string>>; message?: string };
+export type EtatProfil = { erreurs?: Partial<Record<string, string>>; message?: string; ok?: boolean };
 
 const EXTENSIONS: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
 
@@ -32,8 +32,9 @@ export async function enregistrerProfil(_: EtatProfil, formData: FormData): Prom
 
   const { error } = await supabase.from("profils").update({ pseudo, prenom, bio: bio || null }).eq("id", user.id);
   if (error) return { message: "Enregistrement impossible. Réessaie." };
+  // Enregistrement automatique : on reste sur place (une redirection faisait remonter la page en haut).
   revalidatePath("/", "layout");
-  redirect("/compte?ok=profil");
+  return { ok: true };
 }
 
 export async function changerPhoto(_: EtatProfil, formData: FormData): Promise<EtatProfil> {
@@ -51,7 +52,17 @@ export async function changerPhoto(_: EtatProfil, formData: FormData): Promise<E
   await supabase.from("profils").update({ avatar_chemin: chemin }).eq("id", user.id);
   if (profil.avatar_chemin) await supabase.storage.from("avatars").remove([profil.avatar_chemin]);
   revalidatePath("/", "layout");
-  redirect("/compte?ok=photo");
+  redirect("/compte?ok=photo#tete");
+}
+
+// Revenir à sa Colette : la photo est retirée du stockage et du profil (retour du 26/11 : la photo n'est pas obligatoire).
+export async function retirerPhoto() {
+  const { supabase, user, profil } = await exigerSession();
+  if (!profil.avatar_chemin) redirect("/compte#tete");
+  const { error } = await supabase.from("profils").update({ avatar_chemin: null }).eq("id", user.id);
+  if (!error) await supabase.storage.from("avatars").remove([profil.avatar_chemin]);
+  revalidatePath("/", "layout");
+  redirect(error ? "/compte?erreur=photo#tete" : "/compte?ok=photo_retiree#tete");
 }
 
 export async function enregistrerCoordonnees(_: EtatProfil, formData: FormData): Promise<EtatProfil> {
@@ -64,7 +75,9 @@ export async function enregistrerCoordonnees(_: EtatProfil, formData: FormData):
   if (!validation.ok) return { erreurs: validation.erreurs };
   const { error } = await supabase.from("coordonnees").update(validation.valeurs).eq("id", user.id);
   if (error) return { message: "Enregistrement impossible. Réessaie." };
-  redirect("/reglages?ok=coordonnees#coordonnees");
+  // Les coordonnées sont dans Mon profil depuis le 19/11 : on reste sur place (avant : renvoi vers Réglages).
+  revalidatePath("/compte");
+  return { ok: true };
 }
 
 // ---------- IA n°1 : compétences depuis le CV ----------

@@ -37,10 +37,14 @@
   --color-postit-ciel: #d4e6f8;
   --color-postit-ocre: #f6dfb4;
   --color-postit-gris: #ecebe6;
+  --color-postit-menthe: #d3efdf; /* Colette menthe et rose (garde-robe, 0037) */
+  --color-postit-rose: #f8dbe6;
   --color-coin-jaune: #e3d35a;    /* coin qui rebique des post-it (et de Colette) */
   --color-coin-lilas: #c9b6ec;
   --color-coin-ciel: #a9c9ea;
   --color-coin-ocre: #e2bf7c;
+  --color-coin-menthe: #a3d8bb;
+  --color-coin-rose: #edb3c9;
   --color-encre-bleue: #1f5f8b;   /* stylo bleu (gribouillis, code) */
   --color-bois: #8a5a2b;          /* manche de pinceau, cartable */
   --color-or: #e8c25a;            /* Colette dorée (10 personnes aidées) */

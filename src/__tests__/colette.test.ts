@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { ACCESSOIRES_COLETTE, MOTIFS_COLETTE, estDebloque, validerClasse, validerColette, validerNomClasse } from "@/lib/profils/colette";
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { ACCESSOIRES_COLETTE, COULEURS_COLETTE, HUMEURS_COLETTE, MOTIFS_COLETTE, estDebloque, validerClasse, validerColette, validerNomClasse } from "@/lib/profils/colette";
 import type { Stats } from "@/lib/gamification/progression";
 
 const vide: Stats = { annonces: 0, categories: 0, aides_donnees: 0, aides_recues: 0, croisements: 0, nb_avis: 0, note_moyenne: null, aides_par_categorie: {}, defis_reussis: 0 };
@@ -75,5 +77,41 @@ describe("tenues libres (migration 0030) : de quoi personnaliser, sans rien de p
       expect(ACCESSOIRES_COLETTE[p], p).toBeDefined();
       expect(estDebloque(ACCESSOIRES_COLETTE[p], vide), p).toBe(true);
     }
+  });
+});
+
+// Retour de Hadriel (26/11) : « c'est marrant d'avoir sa Colette personnalisée, il faut plus d'éléments ».
+// Des choix LIBRES (rien à gagner) : deux couleurs, trois humeurs, quatre tenues.
+describe("garde-robe élargie (migration 0037) : plus de choix, tous libres", () => {
+  it("accepte les nouvelles couleurs et humeurs", () => {
+    for (const couleur of ["menthe", "rose"]) {
+      expect(validerColette({ couleur, humeur: "contente", accessoire: "aucun", motif: "uni" }), couleur).not.toBeNull();
+    }
+    for (const humeur of ["rit", "dort", "fachee"]) {
+      expect(validerColette({ couleur: "jaune", humeur, accessoire: "aucun", motif: "uni" }), humeur).not.toBeNull();
+    }
+  });
+  it("les quatre nouvelles tenues sont libres", () => {
+    for (const p of ["lunettes_rondes", "moustache", "casquette", "antennes"]) {
+      expect(ACCESSOIRES_COLETTE[p], p).toBeDefined();
+      expect(estDebloque(ACCESSOIRES_COLETTE[p], vide), p).toBe(true);
+    }
+  });
+});
+
+// La base refuse ce qu'elle ne connaît pas : ses listes (dernière contrainte de chaque colonne) = celles du code.
+describe("mêmes listes dans la base et dans le code", () => {
+  const dossier = path.resolve(__dirname, "../../supabase/migrations");
+  const sql = readdirSync(dossier).sort().map((f) => readFileSync(path.join(dossier, f), "utf8")).join("\n");
+  const derniere = (colonne: string) => {
+    const blocs = [...sql.matchAll(new RegExp(`check \\(${colonne} in \\(([^)]*)\\)`, "g"))];
+    const valeurs = [...blocs.at(-1)![1].matchAll(/'([^']*)'/g)].map((m) => m[1]).filter(Boolean);
+    return valeurs.sort();
+  };
+  it("couleurs, humeurs, tenues et motifs", () => {
+    expect(derniere("colette_couleur")).toEqual(Object.keys(COULEURS_COLETTE).sort());
+    expect(derniere("colette_humeur")).toEqual(Object.keys(HUMEURS_COLETTE).sort());
+    expect(derniere("colette_accessoire")).toEqual(Object.keys(ACCESSOIRES_COLETTE).sort());
+    expect(derniere("colette_motif")).toEqual(Object.keys(MOTIFS_COLETTE).sort());
   });
 });

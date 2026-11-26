@@ -1,3 +1,4 @@
+import { SAISIE } from "@/components/ui/saisie";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -190,8 +191,8 @@ export default async function PageAnnonce({
           {annonce.statut === "publiee" && jours > 0 && <li className="rounded-full bg-surface/80 px-3 py-1">Encore {jours} jour{jours > 1 ? "s" : ""}</li>}
         </ul>
         {annonce.photo_chemin && (
-          <div className="relative h-56 overflow-hidden rounded-ui border border-encre/15 sm:h-72">
-            <Image src={urlPhotoAnnonce(annonce.photo_chemin)!} alt={`Photo du post-it « ${annonce.titre} »`} fill priority sizes="(min-width: 768px) 640px, 100vw" className="object-cover" />
+          <div className="relative h-40 max-w-md overflow-hidden rounded-ui border border-encre/15 sm:h-48">
+            <Image src={urlPhotoAnnonce(annonce.photo_chemin)!} alt={`Photo du post-it « ${annonce.titre} »`} fill priority sizes="(min-width: 768px) 448px, 100vw" className="object-cover" />
           </div>
         )}
 
@@ -441,7 +442,7 @@ export default async function PageAnnonce({
               name="motif"
               required
               defaultValue=""
-              className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3"
+              className={SAISIE}
             >
               <option value="" disabled>
                 Pourquoi ?

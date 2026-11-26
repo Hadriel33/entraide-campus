@@ -1,3 +1,4 @@
+import { SAISIE_COMPACTE } from "@/components/ui/saisie";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -529,7 +530,7 @@ export default async function PageAdmin({ searchParams }: PageProps<"/admin">) {
                 </Link>
                 <form action={changerCampus.bind(null, e.id)} className="flex items-center gap-1.5">
                   <label className="sr-only" htmlFor={`campus-${e.id}`}>Campus de @{e.pseudo}</label>
-                  <select id={`campus-${e.id}`} name="campus" defaultValue={e.campus} className="min-h-8 rounded-ui border border-ligne-forte bg-surface px-2 text-sm">
+                  <select id={`campus-${e.id}`} name="campus" defaultValue={e.campus} className={SAISIE_COMPACTE}>
                     {CAMPUS.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
@@ -610,7 +611,7 @@ async function ListeClasses() {
           Campus
           <select
             name="campus"
-            className="min-h-10 rounded-ui border border-ligne-forte bg-surface px-3"
+            className={SAISIE_COMPACTE}
           >
             {CAMPUS.map((c) => (
               <option key={c} value={c}>{c}</option>
