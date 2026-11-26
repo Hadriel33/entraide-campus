@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ETAPES, colonneEchange, etapesDatees, etapesSuivantes, jeSuisAide, peutConfirmer, validerAvancement } from "@/lib/echanges/suivi";
+import { ETAPES, colonneEchange, etapesDatees, etapesSuivantes, jeSuisAide, peutConfirmer, relanceApresAvis, validerAvancement } from "@/lib/echanges/suivi";
 
 const moi = "11111111-1111-4111-8111-111111111111";
 const autre = "22222222-2222-4222-8222-222222222222";
@@ -69,5 +69,15 @@ describe("le parcours daté d'un échange (Historique)", () => {
   it("refusé : demandé puis refusé ; en cours : pas encore de « Bien reçu »", () => {
     expect(etapesDatees({ statut: "refusee", creeLe: "2026-11-02T10:00:00Z", reponduLe: "2026-11-04T10:00:00Z", etape: null, suiviLe: null }).map((e) => e.label)).toEqual(["Demandé", "Refusé"]);
     expect(etapesDatees({ statut: "acceptee", creeLe: "2026-11-02T10:00:00Z", reponduLe: null, etape: "presque", suiviLe: "2026-11-05T10:00:00Z" }).map((e) => e.label)).toEqual(["Demandé", "Accepté"]);
+  });
+});
+
+// Après l'avis (26/11) : on propose de rendre la pareille, sans bouton de plus dans le parcours.
+describe("relance après l'avis", () => {
+  it("celui qui a été aidé est invité à proposer ce qu'il sait faire", () => {
+    expect(relanceApresAvis({ aide: false })).toEqual({ texte: expect.stringMatching(/ton tour/i), href: "/annonces/nouvelle?type=propose" });
+  });
+  it("celui qui a aidé voit qui d'autre cherche un coup de main", () => {
+    expect(relanceApresAvis({ aide: true }).href).toBe("/annonces?type=cherche");
   });
 });

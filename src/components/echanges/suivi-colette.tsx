@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { Colette } from "@/components/colette/colette";
 import { BoutonEtape } from "./bouton-etape";
 import { heureCampus } from "@/lib/temps";
 import { avancerEntraide, confirmerEntraide } from "@/app/demandes/actions";
-import { ETAPES, MOT_MAX, RECU, etapesSuivantes, peutConfirmer, rang, type Etape } from "@/lib/echanges/suivi";
+import { ETAPES, MOT_MAX, RECU, etapesSuivantes, peutConfirmer, rang, relanceApresAvis, type Etape } from "@/lib/echanges/suivi";
 
 // Le suivi façon colis : une ligne à 4 arrêts, Colette livreuse marche jusqu'à l'étape en cours avec la tenue
 // de l'étape, et le petit mot de celui qui aide s'affiche dans sa bulle. Celui qui aide avance ; l'autre
@@ -125,7 +126,17 @@ export function SuiviColette({
       {!aide && !fini && etape !== "livre" && (
         <p className="text-sm text-encre-douce">Quand ce sera livré, tu fermeras l&apos;échange ici avec « Bien reçu ».</p>
       )}
-      {fini && avisDonne && <p className="text-sm font-semibold">Entraide terminée, merci pour ton avis.</p>}
+      {fini && avisDonne && (
+        <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+          <span className="font-semibold">Entraide terminée, merci pour ton avis.</span>
+          {/* Rendre la pareille (retour du 26/11) : un simple lien, pas une étape de plus. */}
+          {!demo && (
+            <Link href={relanceApresAvis({ aide }).href} className="font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+              {relanceApresAvis({ aide }).texte} →
+            </Link>
+          )}
+        </p>
+      )}
       {fini && !avisDonne && (
         <p className="pop flex flex-wrap items-center gap-x-3 gap-y-2 text-sm font-semibold">
           Entraide terminée. Dernière étape : ton avis sur {prenomAutre}.

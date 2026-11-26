@@ -146,6 +146,25 @@ export default async function PageAnnonce({
         <span aria-hidden className="transition-transform group-hover/retour:-translate-x-1">←</span>
         Retour au tableau
       </Link>
+      {/* Juste après la publication : Colette dit quoi faire ensuite (retour du 26/11 : « et maintenant ? »). */}
+      {vientDePublier && estEquipe && (
+        <div className="pop flex items-end gap-3">
+          <Colette anim="saute" taille={64} className="shrink-0" />
+          <p className="relative mb-3 flex flex-col gap-1.5 rounded-carte border border-encre bg-surface px-4 py-3 text-sm shadow-[3px_3px_0_0_var(--color-bandeau)]">
+            <strong>Ton post-it est punaisé ! Et maintenant ?</strong>
+            <span className="flex flex-wrap gap-x-4 gap-y-1">
+              {annonce.statut === "publiee" && (
+                <Link href={`/annonces/${annonce.id}?partager=1#partager`} className="font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+                  Le partager dans un salon
+                </Link>
+              )}
+              <Link href="/annonces?tri=pour_moi" className="font-semibold underline decoration-2 underline-offset-4 hover:decoration-bandeau">
+                Voir les post-its pour moi
+              </Link>
+            </span>
+          </p>
+        </div>
+      )}
       {/* L'annonce en grand post-it, décollé du mur. */}
       <div
         className={`postit ${teinte(annonce.categorie).papier} ${vientDePublier ? "atterrit" : ""} flex flex-col gap-5 p-6 pt-8 sm:p-8 sm:pt-10`}

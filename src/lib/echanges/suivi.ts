@@ -65,3 +65,10 @@ export function etapesDatees(e: {
   if (e.statut === "acceptee" && e.etape === "recu") liste.push({ label: "Bien reçu", date: jour(e.suiviLe) });
   return liste;
 }
+
+/** Après l'avis : rendre la pareille. L'aidé est invité à proposer, l'aidant voit qui d'autre cherche. */
+export function relanceApresAvis({ aide }: { aide: boolean }) {
+  return aide
+    ? { texte: "Envie de remettre ça ? D'autres cherchent un coup de main", href: "/annonces?type=cherche" }
+    : { texte: "À ton tour : propose ce que tu sais faire", href: "/annonces/nouvelle?type=propose" };
+}
