@@ -30,13 +30,14 @@
 
 ## Après la démo : expliquer nos choix (questions préparées)
 
-Support de présentation : https://claude.ai/artifact/8euRdaaMk6wrVysXGWzuNk (21 slides, notes de l'orateur sous chaque slide, mises à jour le 26/11). Le fil : on répond à l'appel d'offres de l'école, et notre angle, c'est « une appli où l'on revient » (Colette, la gamification, le réseau du campus).
-1. **Ce qu'on a compris** (slides 1 à 3) : la demande de l'école, le problème (« l'aide existe, mais personne ne la voit »).
-2. **Notre réponse** (4 à 11) : la genèse, notre angle en composants, la boucle de l'entraide, le réseau (réactions, commentaires, discussion, salons), Colette, le concept papier/écran, la DA et son kit.
-3. **La preuve** (12 à 14) : **la démo se fait sur la slide 12**, puis l'entraide de bout en bout et la comparaison avec le canal Teams.
-4. **La confiance** (15 à 21) : les risques maîtrisés, l'espace admin, les 4 IA, les retours des testeurs, la méthode, nos engagements.
+Support de présentation : https://claude.ai/artifact/8euRdaaMk6wrVysXGWzuNk (14 slides, notes de l'orateur sous chaque slide, refaites le 26/11 pour aller droit au but). Le fil : on répond à l'appel d'offres de l'école ; notre angle, c'est « une appli où l'on revient ».
+1. **Le problème** (slide 1) : « Qui peut m'aider ? », trois chiffres (talents invisibles, messages noyés dans le canal Teams, aucun suivi), puis « l'aide existe, mais personne ne la voit ».
+2. **Notre réponse** (2 à 7) : Post-it campus, la genèse, notre angle en composants, le réseau du campus, Colette, la DA.
+3. **La preuve** (8) : **la démo se fait sur la slide 8**.
+4. **Pourquoi nous** (9 et 10) : ce que le canal Teams et un site d'annonces n'ont pas ; qui porte le projet.
+5. **Clés en main** (11 à 14) : en ligne en 7 jours, les 4 IA déjà branchées, la sécurité déjà en place, et la suite (maintenance, appli mobile, d'autres campus), puis « Merci ! À vos questions. »
 
-Les notes de la slide 12 contiennent une **antisèche** de toutes les fonctionnalités, pour répondre à « et sinon, il y a quoi ? » sans rien oublier.
+Les notes de la slide 8 contiennent une **antisèche** de toutes les fonctionnalités, pour répondre à « et sinon, il y a quoi ? » sans rien oublier.
 
 - **Notre palier** : les 3 (ça tourne, ça discute, ça matche). Le palier 1 testé à deux comptes, les règles d'or prouvées en base par environ 145 vérifications SQL, plus un robot qui parcourt le site en ligne chaque jour.
 - **Nos IA** : les deux demandées (le profil depuis le CV, la relecture des post-its, photo comprise) et deux bonus (Colette rédige un post-it, le tri « Pour moi »). Voir `docs/IA-DEFENSE.md` et la page « Les IA de Colette » de l'appli (besoin, humain qui valide, plan si ça rate, aucune clé).
