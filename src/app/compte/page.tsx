@@ -4,11 +4,11 @@ import type { Metadata } from "next";
 import { exigerSession } from "@/lib/session";
 import type { Stats } from "@/lib/gamification/progression";
 import { Avatar } from "@/components/ui/avatar";
+import { coletteParDefaut } from "@/components/colette/colette";
 import { BadgeCampus } from "@/components/ui/badge";
 import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { Section, Sommaire } from "@/components/ui/section";
-import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { FormulaireCoordonnees, FormulaireIdentite, FormulairePhoto } from "./formulaires";
 import { AssistantCompetences } from "./assistant-competences";
@@ -63,7 +63,7 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
       <TenueGagnee
         moi={user.id}
         pieces={piecesGagnees((stats as Stats | null) ?? null)}
-        couleur={profil.colette_couleur}
+        couleur={profil.colette_couleur || coletteParDefaut(profil.pseudo).couleur}
         humeur={profil.colette_humeur}
         accessoire={profil.colette_accessoire}
         motif={profil.colette_motif}
@@ -87,8 +87,8 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
           </BoutonLien>
         </div>
       </div>
-      {/* « Bien démarrer » : les étapes du profil, ici et plus sur le tableau. Disparaît quand tout est fait. */}
-      <ChecklistAccueil etat={etatAccueil} />
+      {/* Les étapes du profil : ce sommaire numéroté (coché quand c'est fait) remplace l'ancienne liste « Bien démarrer »,
+          qui faisait doublon ici avec une fin différente. Le parcours complet reste sur Bienvenue et le bureau. */}
       <Sommaire liens={etapes.map((e, i) => ({ href: `#${e.id}`, label: `${i + 1}. ${e.titre}${e.fait ? " ✓" : ""}` }))} />
 
       <Section
@@ -113,7 +113,7 @@ export default async function PageCompte({ searchParams }: PageProps<"/compte">)
             </span>
           </h3>
           <AtelierColette
-            couleur={profil.colette_couleur}
+            couleur={profil.colette_couleur || coletteParDefaut(profil.pseudo).couleur}
             humeur={profil.colette_humeur}
             accessoire={profil.colette_accessoire}
             motif={profil.colette_motif}

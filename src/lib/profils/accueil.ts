@@ -19,6 +19,11 @@ export function etapeSuivante(id: string): { href: string; label: string } | nul
   return { href: `#${suivante.id}`, label: `Étape suivante : ${suivante.titre.toLowerCase()}` };
 }
 
+/** Un titre d'étape transformé en bouton (« Commencer : choisis ta tête… ») : seule la première lettre passe en minuscule. */
+export function versAction(titre: string) {
+  return titre.charAt(0).toLowerCase() + titre.slice(1);
+}
+
 export function etapesAccueil(etat: { avatar: boolean; colette?: boolean; competences: number; coordonnees: boolean; annonces: number }) {
   const etapes = [
     {

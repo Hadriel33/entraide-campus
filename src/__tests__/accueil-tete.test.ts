@@ -1,7 +1,9 @@
 // Retour de Hadriel (26/11) : on ne force pas la photo, une Colette personnalisée compte autant.
 // Et le parcours d'arrivée s'enchaîne : chaque étape du profil mène à la suivante, la dernière au premier post-it.
 import { describe, expect, it } from "vitest";
-import { etapesAccueil, ETAPES_PROFIL, etapeSuivante } from "@/lib/profils/accueil";
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { etapesAccueil, ETAPES_PROFIL, etapeSuivante, versAction } from "@/lib/profils/accueil";
 
 const rien = { avatar: false, colette: false, competences: 0, coordonnees: false, annonces: 0 };
 
@@ -34,5 +36,20 @@ describe("parcours d'arrivée : mêmes étapes partout, dans le même ordre", ()
     expect(etapeSuivante("coordonnees")?.href).toBe("#classe");
     expect(etapeSuivante("classe")).toEqual({ href: "/annonces/nouvelle", label: expect.stringMatching(/premier post-it/i) });
     expect(etapeSuivante("inconnue")).toBeNull();
+  });
+});
+
+describe("parcours : ce qui s'affiche est cohérent d'un écran à l'autre", () => {
+  it("le bouton de la page Bienvenue garde « Colette » avec sa majuscule", () => {
+    expect(versAction("Choisis ta tête : une photo ou ta Colette")).toBe("choisis ta tête : une photo ou ta Colette");
+  });
+  it("sans couleur choisie, la même Colette partout (menu, bureau, atelier) : celle tirée du pseudo", () => {
+    const SRC = path.resolve(__dirname, "..");
+    const fichiers = (d: string): string[] =>
+      readdirSync(d, { withFileTypes: true }).flatMap((e) =>
+        e.isDirectory() ? (e.name === "__tests__" ? [] : fichiers(path.join(d, e.name))) : e.name.endsWith(".tsx") ? [path.join(d, e.name)] : [],
+      );
+    const fautifs = fichiers(SRC).filter((f) => /couleur \|\| "jaune"|colette_couleur \|\| "jaune"/.test(readFileSync(f, "utf8")));
+    expect(fautifs.map((f) => path.relative(SRC, f))).toEqual([]);
   });
 });

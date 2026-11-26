@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { exigerSession } from "@/lib/session";
 import { lireEtatAccueil } from "@/lib/profils/etat-accueil";
 import { ChecklistAccueil } from "@/components/profil/checklist-accueil";
-import { etapesAccueil } from "@/lib/profils/accueil";
+import { etapesAccueil, versAction } from "@/lib/profils/accueil";
 import { BoutonLien } from "@/components/ui/bouton";
 import { TitrePage } from "@/components/ui/titre-page";
 import { Colette } from "@/components/colette/colette";
@@ -23,7 +23,7 @@ export default async function PageBienvenue() {
       <ChecklistAccueil etat={etat} grand />
       <div className="flex flex-wrap gap-3">
         {/* Le parcours : la première étape pas encore faite, puis le bureau (où Colette fait la visite). */}
-        {suivante ? <BoutonLien href={suivante.lien}>Commencer : {suivante.titre.toLowerCase()}</BoutonLien> : <BoutonLien href="/bureau">Aller à mon bureau</BoutonLien>}
+        {suivante ? <BoutonLien href={suivante.lien}>Commencer : {versAction(suivante.titre)}</BoutonLien> : <BoutonLien href="/bureau">Aller à mon bureau</BoutonLien>}
         {suivante && (
           <BoutonLien href="/bureau" variante="contour">
             Plus tard, voir mon bureau

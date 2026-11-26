@@ -56,7 +56,7 @@ export function TenueGagnee({ moi, pieces, couleur, humeur, accessoire, motif }:
         <div className="flex w-full justify-center rounded-carte bg-papier-fonce pt-6 pb-3">
           <Colette
             anim="saute"
-            couleur={(couleur || "jaune") as CouleurColette}
+            couleur={couleur as CouleurColette}
             humeur={(humeur || "fiere") as Humeur}
             accessoire={(piece.type === "accessoire" ? piece.valeur : accessoire || "aucun") as Accessoire}
             motif={(piece.type === "motif" ? piece.valeur : motif || "uni") as Motif}

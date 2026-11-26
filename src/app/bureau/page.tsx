@@ -15,6 +15,7 @@ import { etapesAccueil } from "@/lib/profils/accueil";
 import { inclinaison, teinte } from "@/lib/design/teintes";
 import {
   Colette,
+  coletteParDefaut,
   type Accessoire,
   type CouleurColette,
   type Humeur,
@@ -252,7 +253,7 @@ export default async function PageBureau() {
       <TenueGagnee
         moi={user.id}
         pieces={piecesGagnees((stats as Stats | null) ?? null)}
-        couleur={profil.colette_couleur}
+        couleur={profil.colette_couleur || coletteParDefaut(profil.pseudo).couleur}
         humeur={profil.colette_humeur}
         accessoire={profil.colette_accessoire}
         motif={profil.colette_motif}
@@ -262,7 +263,7 @@ export default async function PageBureau() {
           <div className="flex items-end gap-2">
             <Colette
               anim={nbAttente > 2 ? "debordee" : "coucou"}
-              couleur={(profil.colette_couleur || "jaune") as CouleurColette}
+              couleur={(profil.colette_couleur || coletteParDefaut(profil.pseudo).couleur) as CouleurColette}
               accessoire={(profil.colette_accessoire || "aucun") as Accessoire}
               humeur={(profil.colette_humeur || "contente") as Humeur}
               motif={(profil.colette_motif || "uni") as Motif}
